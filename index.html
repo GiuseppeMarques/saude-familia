@@ -24,8 +24,7 @@
   --sh:0 2px 12px rgba(124,92,191,.10);
   --r:16px;--rs:10px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:'Nunito',sans-serif;}
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;}
 body{background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:80px;}
 
 /* TELAS */
@@ -309,6 +308,7 @@ textarea.fc{resize:vertical;min-height:60px;}
 .nascSel{display:grid;grid-template-columns:2fr 3fr 3fr;gap:6px;}
 .nascSel select{background:var(--s2);border:2px solid var(--bdr);border-radius:var(--rs);padding:8px 4px;font-size:.82rem;color:var(--txt);outline:none;-webkit-appearance:none;text-align:center;cursor:pointer;}
 .nascSel select:focus{border-color:var(--pl);}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
 /* CHIPS ALIMENTOS */
 .alimChips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 .alimChip{background:var(--s2);border:2px solid var(--bdr);border-radius:20px;padding:6px 12px;font-size:.8rem;font-weight:700;color:var(--t2);cursor:pointer;transition:all .15s;}
@@ -1455,7 +1455,43 @@ function copiarMemo(){var el=document.querySelector('.memoBox');if(!el)return;va
 function buscar(){var q=get('bQ').toLowerCase();var de=get('bDe'),ate=get('bAte');var ev=getEv().filter(function(e){if(de&&e.data.slice(0,10)<de)return false;if(ate&&e.data.slice(0,10)>ate)return false;if(q&&!(e.nome.toLowerCase().includes(q)||(e.sint||'').toLowerCase().includes(q)||(e.med||'').toLowerCase().includes(q)||(e.obs||'').toLowerCase().includes(q)))return false;return true;});renderTl(ev,'bOut');}
 
 // ── BACKUP ────────────────────────────────
-function exportar(){var pf=get('expSel');var data;if(pf){var p=getP(pf);data={perfis:[p],eventos:{},medicacoes:{},dozesDadas:{},medicos:{},exportedAt:new Date().toISOString(),por:disp(),v:8};data.eventos[pf]=EV[pf]||[];data.medicacoes[pf]=MD[pf]||[];data.dozesDadas[pf]=DS[pf]||{};data.medicos[pf]=DC[pf]||[];}else{data={perfis:P,eventos:EV,medicacoes:MD,dozesDadas:DS,medicos:DC,exportedAt:new Date().toISOString(),por:disp(),v:8};}var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saude-familia-'+new Date().toISOString().slice(0,10)+'.json';a.click();ls('sf2_bkp',new Date().toISOString());setTimeout(renderBkp,300);}
+function exportar(){
+  var pf=get('expSel');var data;
+  if(pf){var p=getP(pf);data={perfis:[p],eventos:{},medicacoes:{},dozesDadas:{},medicos:{},exportedAt:new Date().toISOString(),por:disp(),v:8};data.eventos[pf]=EV[pf]||[];data.medicacoes[pf]=MD[pf]||[];data.dozesDadas[pf]=DS[pf]||{};data.medicos[pf]=DC[pf]||[];}
+  else{data={perfis:P,eventos:EV,medicacoes:MD,dozesDadas:DS,medicos:DC,exportedAt:new Date().toISOString(),por:disp(),v:8};}
+  var nome='saude-familia-'+new Date().toISOString().slice(0,10)+'.json';
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;a.click();
+  ls('sf2_bkp',new Date().toISOString());setTimeout(renderBkp,300);
+  // Mostrar botão do Drive após download
+  setTimeout(function(){mostrarBotaoDrive(nome);},800);
+}
+function fecharDrive(){var m=document.getElementById("driveModal");if(m)m.remove();}
+function mostrarBotaoDrive(nome){
+  // Criar modal flutuante com instrução e botão do Drive
+  var ex=document.getElementById('driveModal');if(ex)ex.remove();
+  var div=document.createElement('div');
+  div.id='driveModal';
+  div.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:90%;max-width:340px;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.25);padding:16px;z-index:500;animation:slideUp .3s ease;';
+  div.innerHTML='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+    +'<div style="font-size:1.5rem;">✅</div>'
+    +'<div><div style="font-size:.88rem;font-weight:800;color:#2d7a58;">Backup baixado!</div>'
+    +'<div style="font-size:.72rem;color:#6B5C8A;">'+nome+'</div></div>'
+    +'<button onclick="fecharDrive()" style="margin-left:auto;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#9B8FBB;">✕</button>'
+    +'</div>'
+    +'<div style="font-size:.76rem;color:#6B5C8A;margin-bottom:12px;line-height:1.5;">'
+    +'Para salvar no Google Drive, toque no botão abaixo. O arquivo está na pasta <b>Downloads</b> do celular.'
+    +'</div>'
+    +'<a href="https://drive.google.com/drive/my-drive" target="_blank" '
+    +'style="display:flex;align-items:center;justify-content:center;gap:8px;background:#4285F4;color:#fff;border-radius:10px;padding:11px;text-decoration:none;font-weight:800;font-size:.88rem;margin-bottom:8px;">'
+    +'<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M4.5 20.5l4-7H22l-4 7H4.5zm3.8-9L5 6h10l3.3 5.5H8.3zm5.2-5.5h7l-3.3 5.5H10L13.5 6z"/></svg>'
+    +'Abrir Google Drive'
+    +'</a>'
+    +'<div style="font-size:.68rem;color:#9B8FBB;text-align:center;">Depois: toque em + → Fazer upload → selecione o arquivo</div>';
+  document.body.appendChild(div);
+  // Auto-fechar após 15s
+  setTimeout(function(){var m=document.getElementById('driveModal');if(m)m.remove();},15000);
+}
 function renderBkp(){var el=document.getElementById('bkpBan');if(!el)return;var tevs=Object.values(EV).reduce(function(a,ev){return a+ev.length;},0);var last=lg('sf2_bkp');if(!tevs){el.innerHTML='';return;}var dias=last?Math.floor((Date.now()-new Date(last))/86400000):999;var urg=!last||dias>=7;el.innerHTML='<div class="bkpB'+(urg?' urg':'')+'" onclick="abrirCfg()"><div class="bkpI">'+(urg?'⚠️':'✅')+'</div><div class="bkpT"><div class="bkpTit">'+(urg?(!last?'Nenhum backup ainda!':'Backup desatualizado ('+dias+' dias)'):'Backup em dia')+'</div><div class="bkpSub">'+(urg?'Toque ⚙️ para fazer agora':'Último: '+new Date(last).toLocaleDateString('pt-BR'))+'</div></div><button class="bkpBtn">⚙️</button></div>';}
 
 // ── FOTOS ─────────────────────────────────
@@ -1710,7 +1746,15 @@ function editarResultadoExame(id){
   salvar();fModal('ovDet');abrirDet(id);
 }
 
-function exportarGeral(){var data={perfis:P,eventos:EV,medicacoes:MD,dozesDadas:DS,medicos:DC,exportedAt:new Date().toISOString(),por:disp(),v:8};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saude-familia-'+new Date().toISOString().slice(0,10)+'.json';a.click();ls('sf2_bkp',new Date().toISOString());setTimeout(renderBkp,300);fModal('ovCfgGeral');}
+function exportarGeral(){
+  var data={perfis:P,eventos:EV,medicacoes:MD,dozesDadas:DS,medicos:DC,exportedAt:new Date().toISOString(),por:disp(),v:8};
+  var nome='saude-familia-completo-'+new Date().toISOString().slice(0,10)+'.json';
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;a.click();
+  ls('sf2_bkp',new Date().toISOString());setTimeout(renderBkp,300);
+  fModal('ovCfgGeral');
+  setTimeout(function(){mostrarBotaoDrive(nome);},800);
+}
 function salvarDisp(){var v=document.getElementById('cfgDispNm').value.trim();if(!v){alert('Informe o nome.');return;}localStorage.setItem('sf_disp',v);alert('\u2705 Nome salvo: '+v);fModal('ovCfgGeral');}
 
 // ── SERVICE WORKER + ALARMES ─────────────────
@@ -1718,10 +1762,12 @@ var _swReg = null;
 
 function registrarSW(){
   if(!('serviceWorker' in navigator) || !('Notification' in window)) return;
-  // Criar SW via Blob (funciona em arquivo hospedado)
-  var swBlob = new Blob(["\n// SERVICE WORKER — Saúde Família\nvar CACHE = 'sf-v1';\n\nself.addEventListener('install', function(e){\n  self.skipWaiting();\n});\n\nself.addEventListener('activate', function(e){\n  e.waitUntil(clients.claim());\n});\n\n// Recebe mensagem do app para agendar notificação\nself.addEventListener('message', function(e){\n  var data = e.data;\n  if(!data || data.type !== 'AGENDAR') return;\n  var delay = data.delay; // ms até disparar\n  if(delay < 0) return;\n  setTimeout(function(){\n    self.registration.showNotification(data.titulo, {\n      body: data.corpo,\n      icon: data.icon || '',\n      badge: data.icon || '',\n      tag: data.tag || 'sf',\n      vibrate: [300, 100, 300],\n      requireInteraction: true,\n      data: { url: self.registration.scope }\n    });\n  }, Math.min(delay, 2147483647)); // max setTimeout\n});\n\nself.addEventListener('notificationclick', function(e){\n  e.notification.close();\n  e.waitUntil(\n    clients.matchAll({type:'window'}).then(function(cs){\n      if(cs.length) return cs[0].focus();\n      return clients.openWindow(e.notification.data.url || '/');\n    })\n  );\n});\n"], {type:'application/javascript'});
-  var swUrl = URL.createObjectURL(swBlob);
-  navigator.serviceWorker.register(swUrl, {scope: './'})
+  // IMPORTANTE: o Chrome bloqueia registro de Service Worker via blob: URL (erro de segurança
+  // silencioso). Por isso o SW precisa ser um arquivo real "sw.js" hospedado ao lado deste HTML
+  // (ex: GitHub Pages/Netlify). Em arquivo local (file://) o navegador não permite Service Worker
+  // de forma alguma — isso é uma restrição da plataforma, não um bug daqui; nesse caso o app
+  // simplesmente funciona sem cache de SW e sem notificação em segundo plano.
+  navigator.serviceWorker.register('./sw.js', {scope: './'})
     .then(function(reg){
       _swReg = reg;
       console.log('SW registrado');
