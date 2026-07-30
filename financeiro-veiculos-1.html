@@ -16,7 +16,7 @@ header .sub{font-size:11px;color:var(--muted)}
 main{padding:12px;max-width:640px;margin:0 auto}
 .card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--border)}
 .card h2{font-size:14px;color:var(--accent);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
 .big{font-size:22px;font-weight:700}
 .muted{color:var(--muted);font-size:12px}
 .bar-bg{background:var(--card2);border-radius:8px;height:10px;overflow:hidden;margin:8px 0}
@@ -33,13 +33,11 @@ button.small{padding:6px 10px;font-size:12px}
 .list-item{background:var(--card2);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .list-item .info{flex:1;min-width:0}
 .list-item .info b{display:block;font-size:14px}
-.list-item .info span{font-size:12px;color:var(--muted)}
+.list-item .info span{font-size:12px;color:var(--muted);display:block}
 .tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--card);border:1px solid var(--border);white-space:nowrap}
-.tag.auto{background:#1e3a3a;color:var(--accent);border-color:var(--accent)}
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:20}
 nav button{flex:1;background:none;border:none;color:var(--muted);padding:10px 2px;font-size:11px;border-radius:0;display:flex;flex-direction:column;align-items:center;gap:2px}
 nav button.active{color:var(--accent)}
-nav button svg{width:20px;height:20px}
 .hidden{display:none !important}
 .tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto}
 .tabs button{background:var(--card2);color:var(--muted);white-space:nowrap;font-size:12px;padding:7px 12px}
@@ -65,7 +63,7 @@ nav button svg{width:20px;height:20px}
 
 <nav>
 <button id="navDash" onclick="setScreen('dash')">📊<span>Painel</span></button>
-<button id="navFin" onclick="setScreen('fin')">💰<span>Financeiro</span></button>
+<button id="navFin" onclick="setScreen('fin')">💰<span>Gastos</span></button>
 <button id="navVei" onclick="setScreen('vei')">🚗<span>Veículos</span></button>
 <button id="navComp" onclick="setScreen('comp')">📅<span>Comparar</span></button>
 <button id="navCfg" onclick="setScreen('cfg')">⚙️<span>Config</span></button>
@@ -74,24 +72,82 @@ nav button svg{width:20px;height:20px}
 <div id="modalRoot"></div>
 
 <script>
-/* ====================== DATA LAYER ====================== */
-const STORAGE_KEY = 'fv_data_v1';
+/* ======================================================================
+   DATA LAYER
+   Orçamento: só existem GASTOS (sem lançamento de receita/entrada).
+   Categoria = Grupo (ex: Veículo, Moradia) + Subcategoria (ex: Combustível).
+====================================================================== */
+const STORAGE_KEY = 'fv_data_v3';
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 const todayISO = () => new Date().toISOString().slice(0,10);
 
-const DEFAULT_CATEGORIES = [
-  {id:'combustivel', nome:'Combustível', cor:'#fbbf24', veiculo:true},
-  {id:'manutencao', nome:'Manutenção', cor:'#f87171', veiculo:true},
-  {id:'ipva', nome:'IPVA', cor:'#a78bfa', veiculo:true},
-  {id:'seguro', nome:'Seguro Veículo', cor:'#60a5fa', veiculo:true},
-  {id:'vistoria', nome:'Vistoria', cor:'#22d3ee', veiculo:true},
-  {id:'moradia', nome:'Moradia', cor:'#34d399', veiculo:false},
-  {id:'alimentacao', nome:'Alimentação', cor:'#fb923c', veiculo:false},
-  {id:'saude', nome:'Saúde', cor:'#f472b6', veiculo:false},
-  {id:'lazer', nome:'Lazer', cor:'#818cf8', veiculo:false},
-  {id:'educacao', nome:'Educação', cor:'#38bdf8', veiculo:false},
-  {id:'outros', nome:'Outros', cor:'#94a3b8', veiculo:false},
-  {id:'receita', nome:'Receita', cor:'#34d399', veiculo:false}
+const GRUPOS = [
+  {id:'veiculo', nome:'Veículo', cor:'#fbbf24', veiculo:true, subs:[
+    {id:'combustivel', nome:'Combustível'},
+    {id:'manutencao', nome:'Manutenção'},
+    {id:'revisao', nome:'Revisão'},
+    {id:'ipva', nome:'IPVA'},
+    {id:'seguro', nome:'Seguro'},
+    {id:'vistoria', nome:'Vistoria'}
+  ]},
+  {id:'moradia', nome:'Moradia', cor:'#34d399', veiculo:false, subs:[
+    {id:'aluguel', nome:'Aluguel/Financiamento'},
+    {id:'condominio', nome:'Condomínio'},
+    {id:'agua', nome:'Água'},
+    {id:'luz', nome:'Luz'},
+    {id:'internet', nome:'Internet/TV'},
+    {id:'manutencao_casa', nome:'Manutenção da casa'},
+    {id:'moradia_outros', nome:'Outros'}
+  ]},
+  {id:'alimentacao', nome:'Alimentação', cor:'#fb923c', veiculo:false, subs:[
+    {id:'mercado', nome:'Mercado'},
+    {id:'restaurante', nome:'Restaurante/Delivery'},
+    {id:'alimentacao_outros', nome:'Outros'}
+  ]},
+  {id:'saude', nome:'Saúde', cor:'#f472b6', veiculo:false, subs:[
+    {id:'consulta', nome:'Consulta'},
+    {id:'exame', nome:'Exame'},
+    {id:'farmacia', nome:'Farmácia'},
+    {id:'plano_saude', nome:'Plano de saúde'},
+    {id:'saude_outros', nome:'Outros'}
+  ]},
+  {id:'lazer', nome:'Lazer', cor:'#818cf8', veiculo:false, subs:[
+    {id:'viagem', nome:'Viagem'},
+    {id:'streaming', nome:'Cinema/Streaming'},
+    {id:'hobby', nome:'Hobby'},
+    {id:'lazer_outros', nome:'Outros'}
+  ]},
+  {id:'educacao', nome:'Educação', cor:'#38bdf8', veiculo:false, subs:[
+    {id:'mensalidade', nome:'Mensalidade'},
+    {id:'material', nome:'Material'},
+    {id:'curso', nome:'Curso'},
+    {id:'educacao_outros', nome:'Outros'}
+  ]},
+  {id:'outros', nome:'Outros', cor:'#94a3b8', veiculo:false, subs:[
+    {id:'outros_geral', nome:'Geral'}
+  ]}
+];
+function grupoDaSub(subId){ return GRUPOS.find(g=>g.subs.some(s=>s.id===subId)); }
+function subObj(subId){ const g=grupoDaSub(subId); return g ? g.subs.find(s=>s.id===subId) : null; }
+
+// Áreas do veículo — mantidas simples, de propósito
+const AREAS_PADRAO = [
+  {id:'motor', nome:'Motor'},
+  {id:'suspensao', nome:'Suspensão'},
+  {id:'eletrica', nome:'Elétrica'},
+  {id:'lataria', nome:'Lataria'}
+];
+
+// Opções rápidas de duração de garantia
+const DURACOES_GARANTIA = [
+  {id:'3m', nome:'3 meses', anos:0, meses:3},
+  {id:'6m', nome:'6 meses', anos:0, meses:6},
+  {id:'1a', nome:'1 ano', anos:1, meses:0},
+  {id:'2a', nome:'2 anos', anos:2, meses:0},
+  {id:'3a', nome:'3 anos', anos:3, meses:0},
+  {id:'5a', nome:'5 anos', anos:5, meses:0},
+  {id:'10a', nome:'10 anos', anos:10, meses:0},
+  {id:'custom', nome:'Escolher data exata...', anos:null, meses:null}
 ];
 
 function defaultData(){
@@ -103,10 +159,10 @@ function defaultData(){
       alertPercent: 80,
       rolloverWeekly: true
     },
-    categories: DEFAULT_CATEGORIES,
-    vehicles: [],
-    drivers: [],
-    transactions: []
+    areas: AREAS_PADRAO,
+    veiculos: [],
+    motoristas: [],
+    gastos: []
   };
 }
 
@@ -116,32 +172,38 @@ function load(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return defaultData();
-    const parsed = JSON.parse(raw);
-    return Object.assign(defaultData(), parsed, {
-      config: Object.assign(defaultData().config, parsed.config||{}),
-      categories: parsed.categories && parsed.categories.length ? parsed.categories : DEFAULT_CATEGORIES
-    });
+    const p = JSON.parse(raw);
+    return {
+      config: Object.assign(defaultData().config, p.config||{}),
+      areas: p.areas && p.areas.length ? p.areas : AREAS_PADRAO,
+      veiculos: p.veiculos || [],
+      motoristas: p.motoristas || [],
+      gastos: p.gastos || []
+    };
   }catch(e){
     console.error('Erro ao carregar dados, iniciando vazio.', e);
     return defaultData();
   }
 }
-
 function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
   renderHeaderSub();
 }
 
-/* ====================== DATE / WEEK HELPERS ====================== */
+/* ====================== DATE / HELPERS ====================== */
 function parseDate(iso){ const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); }
-function fmtDate(iso){ const d=parseDate(iso); return d.toLocaleDateString('pt-BR'); }
+function fmtDate(iso){ return parseDate(iso).toLocaleDateString('pt-BR'); }
 function fmtMoney(v){ return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function fmtKm(km){ return (km||0).toLocaleString('pt-BR')+' km'; }
+function addYearsMonths(dateISO, anos, meses){
+  let [y,m,d] = dateISO.split('-').map(Number);
+  const dt = new Date(y + anos, (m-1) + meses, d);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
 
-// Retorna {start:Date, end:Date} da semana que contém 'date', respeitando weekStartDay
 function weekRange(date){
   const start = new Date(date);
-  const wsd = DB.config.weekStartDay;
-  let diff = (start.getDay() - wsd + 7) % 7;
+  const diff = (start.getDay() - DB.config.weekStartDay + 7) % 7;
   start.setDate(start.getDate() - diff);
   start.setHours(0,0,0,0);
   const end = new Date(start);
@@ -152,61 +214,52 @@ function weekRange(date){
 function isoOf(d){ return d.toISOString().slice(0,10); }
 function weekLabel(range){
   const sameMonth = range.start.getMonth()===range.end.getMonth();
-  const opts = sameMonth ? {day:'2-digit'} : {day:'2-digit', month:'2-digit'};
-  const s = range.start.toLocaleDateString('pt-BR', opts);
+  const s = range.start.toLocaleDateString('pt-BR', sameMonth?{day:'2-digit'}:{day:'2-digit',month:'2-digit'});
   const e = range.end.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
   return `${s} – ${e}`;
 }
-function monthKey(iso){ return iso.slice(0,7); } // YYYY-MM
-function monthLabel(key){
-  const [y,m]=key.split('-').map(Number);
-  return new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long', year:'numeric'});
-}
+function monthKey(iso){ return iso.slice(0,7); }
+function monthLabel(key){ const [y,m]=key.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long', year:'numeric'}); }
 
-/* Soma transações de despesa dentro de um intervalo de datas (ISO strings, inclusive) */
-function sumInRange(startISO, endISO, filterFn){
-  return DB.transactions
-    .filter(t => t.date>=startISO && t.date<=endISO && t.tipo==='gasto' && (!filterFn || filterFn(t)))
-    .reduce((s,t)=>s+Number(t.valor),0);
+/* ====================== ORÇAMENTO (semanal / mensal) ====================== */
+function sumGastos(startISO, endISO, filterFn){
+  return DB.gastos.filter(g => g.date>=startISO && g.date<=endISO && (!filterFn || filterFn(g))).reduce((s,g)=>s+Number(g.valor),0);
 }
-function sumReceitaInRange(startISO, endISO){
-  return DB.transactions
-    .filter(t => t.date>=startISO && t.date<=endISO && t.tipo==='receita')
-    .reduce((s,t)=>s+Number(t.valor),0);
-}
+function escopoMatch(g, alvo){ const e = g.escopo || 'ambos'; return e==='ambos' || e===alvo; }
 
-/* Calcula orçamento semanal com rollover: soma o saldo (orçamento - gasto) de todas as semanas
-   anteriores até a semana atual, se rollover ativado. Caso contrário, usa só a semana atual. */
 function weeklyBudgetStatus(refDate){
   const cfg = DB.config;
   const range = weekRange(refDate);
-  const gastoSemana = sumInRange(isoOf(range.start), isoOf(range.end));
-  let saldoDisponivel = cfg.weeklyBudget - gastoSemana;
+  const filtro = g => escopoMatch(g,'semanal');
+  const gastoSemana = sumGastos(isoOf(range.start), isoOf(range.end), filtro);
+  let saldo = cfg.weeklyBudget - gastoSemana;
+  let rollover = 0;
 
-  if(cfg.rolloverWeekly && cfg.weeklyBudget>0){
-    // acumula saldo das semanas anteriores desde o primeiro lançamento registrado
-    const firstTxDate = DB.transactions.length ? DB.transactions.reduce((min,t)=> t.date<min?t.date:min, DB.transactions[0].date) : isoOf(range.start);
-    let cursor = weekRange(parseDate(firstTxDate)).start;
-    let rollover = 0;
+  if(cfg.rolloverWeekly && cfg.weeklyBudget>0 && DB.gastos.length){
+    const firstDate = DB.gastos.reduce((min,g)=> g.date<min?g.date:min, DB.gastos[0].date);
+    let cursor = weekRange(parseDate(firstDate)).start;
     while(cursor < range.start){
       const r = weekRange(cursor);
-      const gasto = sumInRange(isoOf(r.start), isoOf(r.end));
+      const gasto = sumGastos(isoOf(r.start), isoOf(r.end), filtro);
       rollover += (cfg.weeklyBudget - gasto);
       cursor = new Date(r.end); cursor.setDate(cursor.getDate()+1);
     }
-    saldoDisponivel = cfg.weeklyBudget - gastoSemana + rollover;
-    return {gasto:gastoSemana, orcamento:cfg.weeklyBudget, saldo:saldoDisponivel, rollover, range};
+    saldo = cfg.weeklyBudget - gastoSemana + rollover;
   }
-  return {gasto:gastoSemana, orcamento:cfg.weeklyBudget, saldo:saldoDisponivel, rollover:0, range};
+  return {gasto:gastoSemana, orcamento:cfg.weeklyBudget, saldo, rollover, range};
 }
-
 function monthlyBudgetStatus(refDate){
   const key = monthKey(isoOf(refDate));
   const start = key+'-01';
-  const endD = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0);
-  const end = isoOf(endD);
-  const gasto = sumInRange(start,end);
+  const end = isoOf(new Date(refDate.getFullYear(), refDate.getMonth()+1, 0));
+  const gasto = sumGastos(start, end, g=>escopoMatch(g,'mensal'));
   return {gasto, orcamento: DB.config.monthlyBudget, saldo: DB.config.monthlyBudget - gasto, key, start, end};
+}
+function gastoDoMes(key){
+  const start = key+'-01';
+  const [y,m] = key.split('-').map(Number);
+  const end = isoOf(new Date(y, m, 0));
+  return DB.gastos.filter(g=>g.date>=start && g.date<=end);
 }
 
 /* ====================== SCREEN STATE ====================== */
@@ -218,14 +271,11 @@ function setScreen(s){
   document.getElementById(map[s]).classList.add('active');
   render();
 }
-
 function renderHeaderSub(){
   const el = document.getElementById('headerSub');
   if(!el) return;
-  el.textContent = `${DB.transactions.length} lançamentos · ${DB.vehicles.length} veículo(s)`;
+  el.textContent = `${DB.gastos.length} gasto(s) · ${DB.veiculos.length} veículo(s)`;
 }
-
-/* ====================== RENDER ROUTER ====================== */
 function render(){
   const app = document.getElementById('app');
   if(currentScreen==='dash') app.innerHTML = renderDash();
@@ -251,7 +301,7 @@ function renderDash(){
   if(m.orcamento>0 && (m.gasto/m.orcamento*100)>=100) banners += `<div class="alert-banner danger">⚠️ Orçamento mensal estourado em ${fmtMoney(m.gasto-m.orcamento)}.</div>`;
   else if(m.orcamento>0 && (m.gasto/m.orcamento*100)>=alertP) banners += `<div class="alert-banner">⚠️ Você já usou ${mPct}% do orçamento mensal.</div>`;
 
-  const recentes = [...DB.transactions].sort((a,b)=>b.date.localeCompare(a.date) || b.criadoEm-a.criadoEm).slice(0,6);
+  const recentes = [...DB.gastos].sort((a,b)=>b.date.localeCompare(a.date) || b.criadoEm-a.criadoEm).slice(0,6);
 
   return `
   ${banners}
@@ -270,201 +320,457 @@ function renderDash(){
     <div class="bar-bg"><div class="bar-fill ${mPct>=100?'over':mPct>=alertP?'warn':''}" style="width:${mPct}%"></div></div>
   </div>
   <div class="card">
-    <h2>Últimos lançamentos</h2>
-    ${recentes.length ? recentes.map(txItem).join('') : '<div class="empty">Nenhum lançamento ainda.</div>'}
+    <h2>Últimos gastos</h2>
+    ${recentes.length ? recentes.map(gastoItem).join('') : '<div class="empty">Nenhum gasto ainda.</div>'}
   </div>
-  <div class="grid2">
-    <button onclick="openTxModal()">+ Lançamento</button>
-    <button class="secondary" onclick="setScreen('vei')">+ Gasto de veículo</button>
-  </div>
+  <button onclick="openGastoModal()">+ Gasto</button>
   `;
 }
 
-function txItem(t){
-  const cat = DB.categories.find(c=>c.id===t.categoria) || {nome:t.categoria, cor:'#94a3b8'};
-  const sign = t.tipo==='receita' ? '+' : '−';
-  const color = t.tipo==='receita' ? 'var(--accent)' : 'var(--text)';
+function gastoItem(g){
+  const sub = subObj(g.subcategoria) || {nome:g.subcategoria};
+  const grupo = grupoDaSub(g.subcategoria) || {nome:'', cor:'#94a3b8'};
+  const natureza = g.natureza==='superfluo' ? '<span class="tag" style="color:var(--accent2);border-color:var(--accent2)">supérfluo</span>' : '<span class="tag" style="color:var(--accent);border-color:var(--accent)">essencial</span>';
+  const escopoTxt = {semanal:'semana', mensal:'mês', ambos:'semana + mês'}[g.escopo||'ambos'];
+  const v = g.veiculoId ? DB.veiculos.find(v=>v.id===g.veiculoId) : null;
+  const area = g.area ? DB.areas.find(a=>a.id===g.area) : null;
+  const itensLinha = g.itens && g.itens.length ? `<span>Itens: ${g.itens.map(i=>{ const a=DB.areas.find(x=>x.id===i.area); return `${a?a.nome:i.area}${i.descricao?' ('+i.descricao+')':''}`; }).join(', ')}</span>` : '';
+  const garantiaLinha = g.garantiaAte ? `<span>Garantia até ${fmtDate(g.garantiaAte)}${garantiaVencida(g.garantiaAte)?' — vencida':''}</span>` : '';
+  const kmLinha = g.km ? `<span>Km: ${fmtKm(g.km)}${g.litros?' · '+g.litros+' L':''}</span>` : '';
   return `<div class="list-item">
     <div class="info">
-      <b><span class="category-color" style="background:${cat.cor}"></span>${t.descricao||cat.nome}</b>
-      <span>${fmtDate(t.date)} · ${cat.nome}${t.origem==='veiculo'?' · veículo':''}</span>
+      <b><span class="category-color" style="background:${grupo.cor}"></span>${g.descricao||sub.nome}</b>
+      <span>${fmtDate(g.date)} · ${grupo.nome} · ${sub.nome}${v?' · '+v.nome:''}${area?' · '+area.nome:''} · conta em: ${escopoTxt}</span>
+      ${kmLinha}
+      ${itensLinha}
+      ${garantiaLinha}
     </div>
     <div style="text-align:right">
-      <div style="color:${color};font-weight:700">${sign} ${fmtMoney(t.valor)}</div>
-      ${t.origem==='veiculo' ? '<span class="tag auto">auto</span>' : `<button class="small secondary" onclick="deleteTx('${t.id}')">excluir</button>`}
+      <div style="color:var(--text);font-weight:700">${fmtMoney(g.valor)}</div>
+      <div style="margin-top:4px">${natureza}</div>
+      <button class="small secondary" onclick="deleteGasto('${g.id}')">excluir</button>
     </div>
   </div>`;
 }
-
-function deleteTx(id){
-  const t = DB.transactions.find(x=>x.id===id);
-  if(t && t.origem==='veiculo'){ alert('Este lançamento veio de um gasto de veículo. Exclua-o na aba Veículos.'); return; }
-  if(!confirm('Excluir este lançamento?')) return;
-  DB.transactions = DB.transactions.filter(x=>x.id!==id);
+function garantiaVencida(dataISO){ return dataISO && dataISO < todayISO(); }
+function deleteGasto(id){
+  if(!confirm('Excluir este gasto?')) return;
+  DB.gastos = DB.gastos.filter(x=>x.id!==id);
   save(); render();
 }
 
-/* ====================== FINANCEIRO (extrato + lançamento manual) ====================== */
+/* ====================== TELA DE GASTOS (extrato) ====================== */
 let finFilterMonth = monthKey(todayISO());
+let finFilterNatureza = 'todos';
 function renderFin(){
-  const months = [...new Set(DB.transactions.map(t=>monthKey(t.date)))].sort().reverse();
+  const months = [...new Set(DB.gastos.map(g=>monthKey(g.date)))].sort().reverse();
   if(!months.includes(finFilterMonth)) months.unshift(finFilterMonth);
-  const list = DB.transactions.filter(t=>monthKey(t.date)===finFilterMonth).sort((a,b)=>b.date.localeCompare(a.date));
-  const totalGasto = list.filter(t=>t.tipo==='gasto').reduce((s,t)=>s+Number(t.valor),0);
-  const totalReceita = list.filter(t=>t.tipo==='receita').reduce((s,t)=>s+Number(t.valor),0);
+  const todosDoMes = gastoDoMes(finFilterMonth).sort((a,b)=>b.date.localeCompare(a.date));
+  const totalGasto = todosDoMes.reduce((s,g)=>s+Number(g.valor),0);
+  const essencial = todosDoMes.filter(g=>g.natureza!=='superfluo').reduce((s,g)=>s+Number(g.valor),0);
+  const superfluo = todosDoMes.filter(g=>g.natureza==='superfluo').reduce((s,g)=>s+Number(g.valor),0);
+  const pctSuperfluo = totalGasto>0 ? Math.round((superfluo/totalGasto)*100) : 0;
+
+  const list = finFilterNatureza==='todos' ? todosDoMes : todosDoMes.filter(g=>(g.natureza||'essencial')===finFilterNatureza);
 
   return `
   <div class="card">
-    <h2>Extrato</h2>
+    <h2>Gastos do mês</h2>
     <select onchange="finFilterMonth=this.value;render()">
       ${months.map(k=>`<option value="${k}" ${k===finFilterMonth?'selected':''}>${monthLabel(k)}</option>`).join('')}
     </select>
-    <div class="row"><span class="muted">Receitas</span><b style="color:var(--accent)">${fmtMoney(totalReceita)}</b></div>
-    <div class="row"><span class="muted">Gastos</span><b>${fmtMoney(totalGasto)}</b></div>
-    <div class="row"><span class="muted">Saldo do mês</span><b>${fmtMoney(totalReceita-totalGasto)}</b></div>
+    <div class="row"><span class="muted">Total gasto</span><b>${fmtMoney(totalGasto)}</b></div>
+    <div class="row"><span class="muted">Orçamento mensal</span><b>${fmtMoney(DB.config.monthlyBudget)}</b></div>
+    <div class="row"><span class="muted">— essencial</span><span>${fmtMoney(essencial)}</span></div>
+    <div class="row"><span class="muted">— supérfluo</span><span>${fmtMoney(superfluo)} (${pctSuperfluo}% do mês)</span></div>
+  </div>
+  <div class="card">
+    <h2>Triagem — o que eu podia não ter feito</h2>
+    <label>Mostrar</label>
+    <select onchange="finFilterNatureza=this.value;render()">
+      <option value="todos" ${finFilterNatureza==='todos'?'selected':''}>Todos os gastos</option>
+      <option value="essencial" ${finFilterNatureza==='essencial'?'selected':''}>Só essenciais</option>
+      <option value="superfluo" ${finFilterNatureza==='superfluo'?'selected':''}>Só supérfluos</option>
+    </select>
+    <p class="muted">Use o filtro "Só supérfluos" pra revisar, mês a mês, o que deu pra cortar.</p>
   </div>
   <div class="card">
     <h2>Lançamentos (${list.length})</h2>
-    ${list.length ? list.map(txItem).join('') : '<div class="empty">Nenhum lançamento neste mês.</div>'}
+
+    ${list.length ? list.map(gastoItem).join('') : '<div class="empty">Nenhum gasto neste mês.</div>'}
   </div>
-  <button onclick="openTxModal()">+ Novo lançamento</button>
+  <button onclick="openGastoModal()">+ Gasto</button>
   `;
 }
 
-function openTxModal(){
-  const cats = DB.categories.filter(c=>!c.veiculo);
+/* ====================== MODAL ÚNICO DE GASTO (Grupo > Subcategoria) ====================== */
+let revisaoItensTemp = [];
+
+function openGastoModal(){
+  revisaoItensTemp = [];
   const html = `
   <div class="modal-bg" onclick="if(event.target===this)closeModal()">
     <div class="modal">
       <button class="close-x" onclick="closeModal()">✕</button>
-      <h3>Novo lançamento</h3>
-      <label>Tipo</label>
-      <select id="txTipo"><option value="gasto">Gasto</option><option value="receita">Receita</option></select>
-      <label>Descrição</label>
-      <input id="txDesc" placeholder="Ex: Mercado, salário...">
+      <h3>Novo gasto</h3>
+
       <label>Categoria</label>
-      <select id="txCat">${cats.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')}</select>
-      <label>Valor (R$)</label>
-      <input id="txValor" type="number" step="0.01" placeholder="0,00">
+      <select id="gGrupo" onchange="onGrupoChange()">${GRUPOS.map(g=>`<option value="${g.id}">${g.nome}</option>`).join('')}</select>
+
+      <label>Subcategoria</label>
+      <select id="gSub" onchange="onSubChange()"></select>
+
+      <div id="gVeiculoBox" class="hidden">
+        ${!DB.veiculos.length ? '<p class="muted" style="margin-bottom:8px">Cadastre um veículo na aba "Veículos" primeiro.</p>' : `
+        <label>Veículo</label>
+        <select id="gVeiculoId">${DB.veiculos.map(v=>`<option value="${v.id}">${v.nome}</option>`).join('')}</select>
+        `}
+      </div>
+
+      <div id="gAreaBox" class="hidden">
+        <label>Área do veículo</label>
+        <select id="gArea" onchange="onAreaSelectChange()"></select>
+      </div>
+
+      <div id="gKmBox" class="hidden">
+        <label>Quilometragem no momento do gasto (opcional)</label>
+        <input id="gKm" type="number" placeholder="Ex: 58200">
+      </div>
+
+      <div id="gLitrosBox" class="hidden">
+        <label>Litros abastecidos (opcional, calcula consumo)</label>
+        <input id="gLitros" type="number" step="0.01" placeholder="Ex: 40">
+      </div>
+
+      <div id="gRevisaoBox" class="hidden">
+        <label>Itens da revisão (um por área)</label>
+        <div id="revisaoItensList"></div>
+        <button type="button" class="small secondary" onclick="addRevisaoItemRow()" style="margin:4px 0 8px">+ Adicionar item</button>
+        <div class="row"><span class="muted">Total</span><b id="revisaoTotalDisplay">R$ 0,00</b></div>
+      </div>
+
+      <div id="gSimplesBox">
+        <label>Descrição</label>
+        <input id="gDesc" placeholder="Ex: Mercado, posto Shell, troca de óleo...">
+        <label>Valor (R$)</label>
+        <input id="gValor" type="number" step="0.01" placeholder="0,00">
+      </div>
+
+      <div id="gGarantiaBox" class="hidden">
+        <label style="display:flex;align-items:center;gap:8px">
+          <input type="checkbox" id="gGarantia" style="width:auto" onchange="onGarantiaToggle()"> Tem garantia?
+        </label>
+        <div id="gGarantiaDuracaoBox" class="hidden">
+          <label>Duração da garantia</label>
+          <select id="gGarantiaDuracao" onchange="onGarantiaDuracaoChange()">
+            ${DURACOES_GARANTIA.map(d=>`<option value="${d.id}" ${d.id==='1a'?'selected':''}>${d.nome}</option>`).join('')}
+          </select>
+          <input id="gGarantiaData" type="date" class="hidden">
+        </div>
+      </div>
+
       <label>Data</label>
-      <input id="txData" type="date" value="${todayISO()}">
-      <button onclick="saveTxManual()">Salvar</button>
+      <input id="gData" type="date" value="${todayISO()}">
+      <label>Essencial ou supérfluo?</label>
+      <select id="gNatureza"><option value="essencial">Essencial</option><option value="superfluo">Supérfluo</option></select>
+      <label>Contar no orçamento</label>
+      <select id="gEscopo">
+        <option value="ambos" selected>Semanal + Mensal</option>
+        <option value="semanal">Só Semanal</option>
+        <option value="mensal">Só Mensal</option>
+      </select>
+      <button onclick="saveGasto()">Salvar</button>
     </div>
   </div>`;
   document.getElementById('modalRoot').innerHTML = html;
+  onGrupoChange();
 }
 function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
 
-function saveTxManual(){
-  const valor = parseFloat(document.getElementById('txValor').value);
-  if(!valor || valor<=0){ alert('Informe um valor válido.'); return; }
-  DB.transactions.push({
-    id: uid(),
-    date: document.getElementById('txData').value || todayISO(),
-    descricao: document.getElementById('txDesc').value.trim(),
-    categoria: document.getElementById('txCat').value,
-    valor,
-    tipo: document.getElementById('txTipo').value,
-    origem: 'manual',
-    criadoEm: Date.now()
-  });
+function onGrupoChange(){
+  const grupoId = document.getElementById('gGrupo').value;
+  const grupo = GRUPOS.find(g=>g.id===grupoId);
+  const subSel = document.getElementById('gSub');
+  subSel.innerHTML = grupo.subs.map(s=>`<option value="${s.id}">${s.nome}</option>`).join('');
+  onSubChange();
+}
+
+function onSubChange(){
+  const grupoId = document.getElementById('gGrupo').value;
+  const grupo = GRUPOS.find(g=>g.id===grupoId);
+  const subId = document.getElementById('gSub').value;
+  const isVeiculo = !!grupo.veiculo;
+
+  document.getElementById('gVeiculoBox').classList.toggle('hidden', !isVeiculo);
+  document.getElementById('gAreaBox').classList.toggle('hidden', !isVeiculo);
+  document.getElementById('gKmBox').classList.toggle('hidden', !isVeiculo);
+  document.getElementById('gLitrosBox').classList.toggle('hidden', !(isVeiculo && subId==='combustivel'));
+  document.getElementById('gGarantiaBox').classList.toggle('hidden', !isVeiculo);
+  if(isVeiculo) populateAreaSelect();
+
+  const isRevisao = isVeiculo && subId==='revisao';
+  document.getElementById('gRevisaoBox').classList.toggle('hidden', !isRevisao);
+  document.getElementById('gSimplesBox').classList.toggle('hidden', isRevisao);
+  if(isRevisao && revisaoItensTemp.length===0) addRevisaoItemRow();
+}
+
+function populateAreaSelect(){
+  const sel = document.getElementById('gArea');
+  if(!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = DB.areas.map(a=>`<option value="${a.id}">${a.nome}</option>`).join('') + `<option value="__nova__">+ Nova área...</option>`;
+  if(DB.areas.some(a=>a.id===prev)) sel.value = prev;
+}
+function onAreaSelectChange(){
+  const sel = document.getElementById('gArea');
+  if(sel.value==='__nova__'){
+    const nome = prompt('Nome da nova área do veículo:');
+    if(nome && nome.trim()){
+      const nova = {id:uid(), nome:nome.trim()};
+      DB.areas.push(nova);
+      save();
+      populateAreaSelect();
+      sel.value = nova.id;
+    } else {
+      sel.value = DB.areas[0]?.id || '';
+    }
+  }
+}
+
+function onGarantiaToggle(){
+  const checked = document.getElementById('gGarantia').checked;
+  document.getElementById('gGarantiaDuracaoBox').classList.toggle('hidden', !checked);
+}
+function onGarantiaDuracaoChange(){
+  const val = document.getElementById('gGarantiaDuracao').value;
+  document.getElementById('gGarantiaData').classList.toggle('hidden', val!=='custom');
+}
+
+function addRevisaoItemRow(){
+  revisaoItensTemp.push({key:uid(), area:(DB.areas[0]?.id||''), descricao:'', valor:''});
+  renderRevisaoItensList();
+}
+function removeRevisaoItemRow(key){
+  revisaoItensTemp = revisaoItensTemp.filter(i=>i.key!==key);
+  renderRevisaoItensList();
+}
+function updateRevisaoItemField(key, field, value){
+  const it = revisaoItensTemp.find(i=>i.key===key);
+  if(it) it[field] = value;
+  updateRevisaoTotal();
+}
+function updateRevisaoTotal(){
+  const total = revisaoItensTemp.reduce((s,i)=>s+(parseFloat(i.valor)||0),0);
+  const el = document.getElementById('revisaoTotalDisplay');
+  if(el) el.textContent = fmtMoney(total);
+}
+function renderRevisaoItensList(){
+  const html = revisaoItensTemp.map(it=>`
+    <div class="list-item" style="flex-direction:column;align-items:stretch;gap:6px">
+      <div class="grid2">
+        <select onchange="updateRevisaoItemField('${it.key}','area',this.value)">${DB.areas.map(a=>`<option value="${a.id}" ${a.id===it.area?'selected':''}>${a.nome}</option>`).join('')}</select>
+        <input placeholder="Item (ex: troca de óleo)" value="${it.descricao}" oninput="updateRevisaoItemField('${it.key}','descricao',this.value)">
+      </div>
+      <input type="number" step="0.01" placeholder="Valor" value="${it.valor}" oninput="updateRevisaoItemField('${it.key}','valor',this.value)">
+      <button type="button" class="small secondary" onclick="removeRevisaoItemRow('${it.key}')">remover item</button>
+    </div>
+  `).join('');
+  document.getElementById('revisaoItensList').innerHTML = html || '<p class="muted">Nenhum item ainda.</p>';
+  updateRevisaoTotal();
+}
+
+function calcGarantiaAte(dataISO){
+  const dur = document.getElementById('gGarantiaDuracao').value;
+  if(dur==='custom') return document.getElementById('gGarantiaData').value || null;
+  const d = DURACOES_GARANTIA.find(x=>x.id===dur);
+  return d ? addYearsMonths(dataISO, d.anos, d.meses) : null;
+}
+
+function saveGasto(){
+  const grupoId = document.getElementById('gGrupo').value;
+  const grupo = GRUPOS.find(g=>g.id===grupoId);
+  const subcategoria = document.getElementById('gSub').value;
+  const isVeiculo = !!grupo.veiculo;
+  const data = document.getElementById('gData').value || todayISO();
+  const natureza = document.getElementById('gNatureza').value;
+  const escopo = document.getElementById('gEscopo').value;
+
+  if(isVeiculo && !DB.veiculos.length){ alert('Cadastre um veículo primeiro.'); return; }
+
+  const base = {id:uid(), date:data, subcategoria, natureza, escopo, criadoEm:Date.now()};
+
+  if(isVeiculo){
+    base.veiculoId = document.getElementById('gVeiculoId').value;
+    const kmVal = parseInt(document.getElementById('gKm').value);
+    if(kmVal>0) base.km = kmVal;
+    if(document.getElementById('gGarantia').checked){
+      base.garantiaAte = calcGarantiaAte(data);
+    }
+  }
+
+  if(isVeiculo && subcategoria==='revisao'){
+    const validos = revisaoItensTemp.filter(i=>parseFloat(i.valor)>0);
+    if(!validos.length){ alert('Adicione ao menos um item com valor.'); return; }
+    base.valor = validos.reduce((s,i)=>s+parseFloat(i.valor),0);
+    base.descricao = 'Revisão';
+    base.itens = validos.map(i=>({area:i.area, descricao:i.descricao.trim(), valor:parseFloat(i.valor)}));
+  } else {
+    const valor = parseFloat(document.getElementById('gValor').value);
+    if(!valor || valor<=0){ alert('Informe um valor válido.'); return; }
+    base.valor = valor;
+    base.descricao = document.getElementById('gDesc').value.trim();
+    if(isVeiculo){
+      base.area = document.getElementById('gArea').value;
+      if(subcategoria==='combustivel'){
+        const litros = parseFloat(document.getElementById('gLitros').value);
+        if(litros>0) base.litros = litros;
+      }
+    }
+  }
+
+  DB.gastos.push(base);
   save(); closeModal(); render();
 }
 
 /* ====================== VEÍCULOS ====================== */
 let veiTab = 'gastos';
+let veiAreaFilter = 'todas';
 function renderVei(){
   return `
   <div class="tabs">
     <button class="${veiTab==='gastos'?'active':''}" onclick="veiTab='gastos';render()">Gastos</button>
     <button class="${veiTab==='veiculos'?'active':''}" onclick="veiTab='veiculos';render()">Veículos</button>
     <button class="${veiTab==='motoristas'?'active':''}" onclick="veiTab='motoristas';render()">Motoristas</button>
+    <button class="${veiTab==='areas'?'active':''}" onclick="veiTab='areas';render()">Áreas & Histórico</button>
   </div>
-  ${veiTab==='gastos'?renderVeiGastos():veiTab==='veiculos'?renderVeiVeiculos():renderVeiMotoristas()}
+  ${veiTab==='gastos'?renderVeiGastos():veiTab==='veiculos'?renderVeiVeiculos():veiTab==='motoristas'?renderVeiMotoristas():renderVeiAreas()}
   `;
+}
+
+function kmAtualDoVeiculo(veiculoId){
+  let max = 0;
+  DB.gastos.forEach(g=>{ if(g.veiculoId===veiculoId && g.km && g.km>max) max=g.km; });
+  return max;
 }
 
 function renderVeiGastos(){
-  const list = DB.transactions.filter(t=>t.origem==='veiculo').sort((a,b)=>b.date.localeCompare(a.date));
+  let list = DB.gastos.filter(g=>{ const gr=grupoDaSub(g.subcategoria); return gr && gr.veiculo; }).sort((a,b)=>b.date.localeCompare(a.date));
+  if(veiAreaFilter!=='todas'){
+    list = list.filter(g => g.area===veiAreaFilter || (g.itens && g.itens.some(i=>i.area===veiAreaFilter)));
+  }
   return `
   <div class="card">
     <h2>Gastos com veículos</h2>
-    ${!DB.vehicles.length ? '<div class="empty">Cadastre um veículo primeiro na aba "Veículos".</div>' : list.length ? list.map(t=>{
-      const v = DB.vehicles.find(v=>v.id===t.veiculoId);
-      const cat = DB.categories.find(c=>c.id===t.categoria)||{nome:t.categoria,cor:'#94a3b8'};
-      return `<div class="list-item">
-        <div class="info"><b><span class="category-color" style="background:${cat.cor}"></span>${cat.nome} — ${v?v.nome:'?'}</b><span>${fmtDate(t.date)} · ${t.descricao||''}</span></div>
-        <div style="text-align:right"><div style="font-weight:700">${fmtMoney(t.valor)}</div><button class="small secondary" onclick="deleteVeiGasto('${t.id}')">excluir</button></div>
-      </div>`;
-    }).join('') : '<div class="empty">Nenhum gasto registrado.</div>'}
+    <label>Filtrar por área</label>
+    <select onchange="veiAreaFilter=this.value;render()">
+      <option value="todas" ${veiAreaFilter==='todas'?'selected':''}>Todas as áreas</option>
+      ${DB.areas.map(a=>`<option value="${a.id}" ${a.id===veiAreaFilter?'selected':''}>${a.nome}</option>`).join('')}
+    </select>
+    ${!DB.veiculos.length ? '<div class="empty">Cadastre um veículo primeiro na aba "Veículos".</div>' : list.length ? list.map(gastoItem).join('') : '<div class="empty">Nenhum gasto registrado para esse filtro.</div>'}
   </div>
-  ${DB.vehicles.length ? '<button onclick="openVeiGastoModal()">+ Registrar gasto de veículo</button>' : ''}
+  ${DB.veiculos.length ? '<button onclick="openGastoModal()">+ Gasto</button>' : ''}
   `;
 }
 
-function deleteVeiGasto(id){
-  if(!confirm('Excluir este gasto de veículo? Ele será removido também do Financeiro.')) return;
-  DB.transactions = DB.transactions.filter(t=>t.id!==id);
-  save(); render();
-}
-
-function openVeiGastoModal(){
-  const catsVei = DB.categories.filter(c=>c.veiculo);
-  const html = `
-  <div class="modal-bg" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-      <button class="close-x" onclick="closeModal()">✕</button>
-      <h3>Gasto de veículo</h3>
-      <label>Veículo</label>
-      <select id="vgVeiculo">${DB.vehicles.map(v=>`<option value="${v.id}">${v.nome}</option>`).join('')}</select>
-      <label>Tipo de gasto</label>
-      <select id="vgCat">${catsVei.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')}</select>
-      <label>Descrição (opcional)</label>
-      <input id="vgDesc" placeholder="Ex: Posto Shell, troca de óleo...">
-      <label>Valor (R$)</label>
-      <input id="vgValor" type="number" step="0.01">
-      <label>Data</label>
-      <input id="vgData" type="date" value="${todayISO()}">
-      <p class="muted" style="margin:6px 0 10px">Este gasto será lançado automaticamente no Financeiro.</p>
-      <button onclick="saveVeiGasto()">Salvar</button>
-    </div>
-  </div>`;
-  document.getElementById('modalRoot').innerHTML = html;
-}
-
-function saveVeiGasto(){
-  const valor = parseFloat(document.getElementById('vgValor').value);
-  if(!valor || valor<=0){ alert('Informe um valor válido.'); return; }
-  DB.transactions.push({
-    id: uid(),
-    date: document.getElementById('vgData').value || todayISO(),
-    descricao: document.getElementById('vgDesc').value.trim(),
-    categoria: document.getElementById('vgCat').value,
-    valor,
-    tipo: 'gasto',
-    origem: 'veiculo',
-    veiculoId: document.getElementById('vgVeiculo').value,
-    criadoEm: Date.now()
+function renderVeiAreas(){
+  const garantias = [];
+  DB.gastos.forEach(g=>{
+    if(!g.garantiaAte) return;
+    const v = DB.veiculos.find(v=>v.id===g.veiculoId);
+    const a = DB.areas.find(x=>x.id===g.area);
+    garantias.push({data:g.garantiaAte, area:a?a.nome:'—', descricao:g.descricao, veiculo:v?v.nome:'?'});
   });
-  save(); closeModal(); render();
+  garantias.sort((a,b)=>a.data.localeCompare(b.data));
+
+  const porArea = {};
+  DB.gastos.forEach(g=>{
+    if(g.area) (porArea[g.area]=porArea[g.area]||[]).push({date:g.date, km:g.km, veiculoId:g.veiculoId, descricao:g.descricao});
+    (g.itens||[]).forEach(i=>{
+      if(i.area) (porArea[i.area]=porArea[i.area]||[]).push({date:g.date, km:g.km, veiculoId:g.veiculoId, descricao:i.descricao});
+    });
+  });
+  let historicoHtml = '';
+  Object.keys(porArea).forEach(areaId=>{
+    const area = DB.areas.find(a=>a.id===areaId);
+    const comKm = porArea[areaId].filter(e=>e.km);
+    if(!comKm.length) return;
+    const porVeiculo = {};
+    comKm.forEach(e=> (porVeiculo[e.veiculoId]=porVeiculo[e.veiculoId]||[]).push(e));
+    let linhas = '';
+    Object.keys(porVeiculo).forEach(vid=>{
+      const v = DB.veiculos.find(v=>v.id===vid);
+      const lista = porVeiculo[vid].sort((a,b)=>a.km-b.km);
+      lista.forEach((e,idx)=>{
+        const anterior = lista[idx-1];
+        const delta = anterior ? (e.km-anterior.km) : null;
+        linhas += `<div class="row"><span class="muted">${v?v.nome:'?'} · ${fmtDate(e.date)} · ${fmtKm(e.km)}${e.descricao?' — '+e.descricao:''}</span><span>${delta!==null?'durou '+fmtKm(delta):'—'}</span></div>`;
+      });
+    });
+    if(linhas) historicoHtml += `<div style="margin-bottom:12px"><b>${area?area.nome:areaId}</b>${linhas}</div>`;
+  });
+
+  let consumoHtml = '';
+  DB.veiculos.forEach(v=>{
+    const abastecimentos = DB.gastos.filter(g=>g.veiculoId===v.id && g.subcategoria==='combustivel' && g.km && g.litros).sort((a,b)=>a.km-b.km);
+    if(abastecimentos.length<2) return;
+    let linhas = '';
+    for(let i=1;i<abastecimentos.length;i++){
+      const kmRodado = abastecimentos[i].km - abastecimentos[i-1].km;
+      const consumo = kmRodado>0 ? (kmRodado/abastecimentos[i].litros).toFixed(1) : '—';
+      linhas += `<div class="row"><span class="muted">${fmtDate(abastecimentos[i].date)} · ${fmtKm(kmRodado)} rodados</span><span>${consumo} km/l</span></div>`;
+    }
+    consumoHtml += `<div style="margin-bottom:12px"><b>${v.nome}</b>${linhas}</div>`;
+  });
+
+  return `
+  <div class="card">
+    <h2>Áreas do veículo</h2>
+    <p class="muted" style="margin-bottom:10px">Cadastradas uma vez, aparecem prontas nos formulários de gasto.</p>
+    ${DB.areas.map(a=>`<div class="list-item"><div class="info"><b>${a.nome}</b></div><button class="small secondary" onclick="deleteArea('${a.id}')">excluir</button></div>`).join('')}
+    <button onclick="addAreaPrompt()">+ Nova área</button>
+  </div>
+  <div class="card">
+    <h2>Durabilidade por área</h2>
+    ${historicoHtml || '<div class="empty">Registre a quilometragem nos gastos de veículo para ver aqui quanto durou cada peça/serviço.</div>'}
+  </div>
+  <div class="card">
+    <h2>Consumo de combustível (km/l)</h2>
+    ${consumoHtml || '<div class="empty">Registre km e litros em ao menos dois abastecimentos para calcular o consumo.</div>'}
+  </div>
+  <div class="card">
+    <h2>Garantias cadastradas</h2>
+    ${garantias.length ? garantias.map(g=>`<div class="list-item"><div class="info"><b>${g.area}${g.descricao?' — '+g.descricao:''}</b><span>${g.veiculo} · vence em ${fmtDate(g.data)}${garantiaVencida(g.data)?' (vencida)':''}</span></div></div>`).join('') : '<div class="empty">Nenhuma garantia cadastrada ainda.</div>'}
+  </div>
+  `;
+}
+function addAreaPrompt(){
+  const nome = prompt('Nome da nova área:');
+  if(nome && nome.trim()){ DB.areas.push({id:uid(), nome:nome.trim()}); save(); render(); }
+}
+function deleteArea(id){
+  const emUso = DB.gastos.some(g=>g.area===id || (g.itens&&g.itens.some(i=>i.area===id)));
+  if(emUso && !confirm('Essa área já foi usada em algum gasto. Excluir mesmo assim? (os gastos antigos continuam com o registro)')) return;
+  DB.areas = DB.areas.filter(a=>a.id!==id);
+  save(); render();
 }
 
 function renderVeiVeiculos(){
   return `
   <div class="card">
     <h2>Meus veículos</h2>
-    ${DB.vehicles.length ? DB.vehicles.map(v=>{
-      const gastoTotal = DB.transactions.filter(t=>t.veiculoId===v.id).reduce((s,t)=>s+Number(t.valor),0);
+    ${DB.veiculos.length ? DB.veiculos.map(v=>{
+      const gastoTotal = DB.gastos.filter(g=>g.veiculoId===v.id).reduce((s,g)=>s+Number(g.valor),0);
+      const km = kmAtualDoVeiculo(v.id);
       return `<div class="list-item">
-        <div class="info"><b>${v.nome}</b><span>${v.placa||'sem placa'} · gasto total: ${fmtMoney(gastoTotal)}</span></div>
-        <button class="small secondary" onclick="deleteVehicle('${v.id}')">excluir</button>
+        <div class="info"><b>${v.nome}</b><span>${v.placa||'sem placa'}${km?' · '+fmtKm(km)+' (última registrada)':''} · gasto total: ${fmtMoney(gastoTotal)}</span></div>
+        <button class="small secondary" onclick="deleteVeiculo('${v.id}')">excluir</button>
       </div>`;
     }).join('') : '<div class="empty">Nenhum veículo cadastrado.</div>'}
   </div>
-  <button onclick="openVehicleModal()">+ Novo veículo</button>
+  <button onclick="openVeiculoModal()">+ Novo veículo</button>
   `;
 }
-function openVehicleModal(){
+function openVeiculoModal(){
   document.getElementById('modalRoot').innerHTML = `
   <div class="modal-bg" onclick="if(event.target===this)closeModal()">
     <div class="modal">
@@ -472,19 +778,19 @@ function openVehicleModal(){
       <h3>Novo veículo</h3>
       <label>Nome / apelido</label><input id="vName" placeholder="Ex: Corolla, Moto...">
       <label>Placa</label><input id="vPlaca" placeholder="ABC1D23">
-      <button onclick="saveVehicle()">Salvar</button>
+      <button onclick="saveVeiculo()">Salvar</button>
     </div>
   </div>`;
 }
-function saveVehicle(){
+function saveVeiculo(){
   const nome = document.getElementById('vName').value.trim();
   if(!nome){ alert('Informe um nome.'); return; }
-  DB.vehicles.push({id:uid(), nome, placa:document.getElementById('vPlaca').value.trim()});
+  DB.veiculos.push({id:uid(), nome, placa:document.getElementById('vPlaca').value.trim()});
   save(); closeModal(); render();
 }
-function deleteVehicle(id){
+function deleteVeiculo(id){
   if(!confirm('Excluir veículo? Os gastos já lançados permanecem no histórico.')) return;
-  DB.vehicles = DB.vehicles.filter(v=>v.id!==id);
+  DB.veiculos = DB.veiculos.filter(v=>v.id!==id);
   save(); render();
 }
 
@@ -492,15 +798,15 @@ function renderVeiMotoristas(){
   return `
   <div class="card">
     <h2>Motoristas</h2>
-    ${DB.drivers.length ? DB.drivers.map(d=>`<div class="list-item">
+    ${DB.motoristas.length ? DB.motoristas.map(d=>`<div class="list-item">
       <div class="info"><b>${d.nome}</b><span>CNH vence: ${d.cnhVenc?fmtDate(d.cnhVenc):'não informado'}</span></div>
-      <button class="small secondary" onclick="deleteDriver('${d.id}')">excluir</button>
+      <button class="small secondary" onclick="deleteMotorista('${d.id}')">excluir</button>
     </div>`).join('') : '<div class="empty">Nenhum motorista cadastrado.</div>'}
   </div>
-  <button onclick="openDriverModal()">+ Novo motorista</button>
+  <button onclick="openMotoristaModal()">+ Novo motorista</button>
   `;
 }
-function openDriverModal(){
+function openMotoristaModal(){
   document.getElementById('modalRoot').innerHTML = `
   <div class="modal-bg" onclick="if(event.target===this)closeModal()">
     <div class="modal">
@@ -508,25 +814,25 @@ function openDriverModal(){
       <h3>Novo motorista</h3>
       <label>Nome</label><input id="dName">
       <label>Validade da CNH</label><input id="dCnh" type="date">
-      <button onclick="saveDriver()">Salvar</button>
+      <button onclick="saveMotorista()">Salvar</button>
     </div>
   </div>`;
 }
-function saveDriver(){
+function saveMotorista(){
   const nome = document.getElementById('dName').value.trim();
   if(!nome){ alert('Informe um nome.'); return; }
-  DB.drivers.push({id:uid(), nome, cnhVenc:document.getElementById('dCnh').value});
+  DB.motoristas.push({id:uid(), nome, cnhVenc:document.getElementById('dCnh').value});
   save(); closeModal(); render();
 }
-function deleteDriver(id){
+function deleteMotorista(id){
   if(!confirm('Excluir motorista?')) return;
-  DB.drivers = DB.drivers.filter(d=>d.id!==id);
+  DB.motoristas = DB.motoristas.filter(d=>d.id!==id);
   save(); render();
 }
 
 /* ====================== COMPARATIVO ====================== */
 function renderComp(){
-  const months = [...new Set(DB.transactions.map(t=>monthKey(t.date)))].sort().reverse();
+  const months = [...new Set(DB.gastos.map(g=>monthKey(g.date)))].sort().reverse();
   if(months.length<1) return '<div class="card"><div class="empty">Sem dados suficientes para comparar ainda.</div></div>';
   const a = months[0], b = months[1]||months[0];
   return `
@@ -537,25 +843,38 @@ function renderComp(){
       <div><label>Mês B</label><select id="compB" onchange="render()">${months.map(k=>`<option value="${k}" ${k===b?'selected':''}>${monthLabel(k)}</option>`).join('')}</select></div>
     </div>
     ${renderCompTable(document.getElementById('compA')?document.getElementById('compA').value:a, document.getElementById('compB')?document.getElementById('compB').value:b)}
+  </div>
+  <div class="card">
+    <h2>Histórico essencial x supérfluo</h2>
+    <p class="muted" style="margin-bottom:8px">Acompanhe mês a mês quanto foi gasto com supérfluos, pra identificar padrões.</p>
+    ${months.map(k=>{
+      const gastos = gastoDoMes(k);
+      const total = gastos.reduce((s,g)=>s+Number(g.valor),0);
+      const sup = gastos.filter(g=>g.natureza==='superfluo').reduce((s,g)=>s+Number(g.valor),0);
+      const pct = total>0 ? Math.round((sup/total)*100) : 0;
+      return `<div class="row"><span class="muted">${monthLabel(k)}</span><span>${fmtMoney(sup)} supérfluo (${pct}%)</span></div>`;
+    }).join('')}
   </div>`;
 }
 function renderCompTable(a,b){
-  const byCat = (key)=>{
+  const byGrupo = (key)=>{
     const map = {};
-    DB.transactions.filter(t=>monthKey(t.date)===key && t.tipo==='gasto').forEach(t=>{
-      map[t.categoria] = (map[t.categoria]||0) + Number(t.valor);
+    gastoDoMes(key).forEach(g=>{
+      const gr = grupoDaSub(g.subcategoria);
+      const id = gr ? gr.id : 'outros';
+      map[id] = (map[id]||0) + Number(g.valor);
     });
     return map;
   };
-  const ca = byCat(a), cb = byCat(b);
-  const allCats = [...new Set([...Object.keys(ca), ...Object.keys(cb)])];
+  const ca = byGrupo(a), cb = byGrupo(b);
+  const allGrupos = [...new Set([...Object.keys(ca), ...Object.keys(cb)])];
   const totalA = Object.values(ca).reduce((s,v)=>s+v,0);
   const totalB = Object.values(cb).reduce((s,v)=>s+v,0);
   return `
   <div style="margin-top:10px">
-    ${allCats.map(id=>{
-      const cat = DB.categories.find(c=>c.id===id)||{nome:id,cor:'#94a3b8'};
-      return `<div class="row"><span><span class="category-color" style="background:${cat.cor}"></span>${cat.nome}</span><span>${fmtMoney(ca[id]||0)} vs ${fmtMoney(cb[id]||0)}</span></div>`;
+    ${allGrupos.map(id=>{
+      const grupo = GRUPOS.find(g=>g.id===id)||{nome:id,cor:'#94a3b8'};
+      return `<div class="row"><span><span class="category-color" style="background:${grupo.cor}"></span>${grupo.nome}</span><span>${fmtMoney(ca[id]||0)} vs ${fmtMoney(cb[id]||0)}</span></div>`;
     }).join('') || '<div class="empty">Sem gastos nesses meses.</div>'}
     <div class="row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:6px"><b>Total</b><b>${fmtMoney(totalA)} vs ${fmtMoney(totalB)}</b></div>
   </div>`;
@@ -567,6 +886,7 @@ function renderCfg(){
   return `
   <div class="card">
     <h2>Orçamentos</h2>
+    <p class="muted" style="margin-bottom:8px">Defina aqui quanto você planeja gastar — não há lançamento de entradas de dinheiro, só o registro dos gastos.</p>
     <label>Orçamento semanal (R$)</label>
     <input id="cfgWeekly" type="number" step="0.01" value="${c.weeklyBudget}">
     <label>Orçamento mensal (R$)</label>
@@ -609,9 +929,8 @@ function saveConfig(){
   alert('Configurações salvas.');
   render();
 }
-
 function exportBackup(){
-  const payload = {...DB, exportadoEm: new Date().toISOString(), app:'financeiro-veiculos', versao:1};
+  const payload = {...DB, exportadoEm: new Date().toISOString(), app:'financeiro-veiculos', versao:3};
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -620,7 +939,6 @@ function exportBackup(){
   a.click();
   URL.revokeObjectURL(url);
 }
-
 function importBackup(ev){
   const file = ev.target.files[0];
   if(!file) return;
@@ -632,12 +950,14 @@ function importBackup(ev){
       if(mode==='replace'){
         DB = Object.assign(defaultData(), incoming);
       } else {
-        const existingIds = new Set(DB.transactions.map(t=>t.id));
-        (incoming.transactions||[]).forEach(t=>{ if(!existingIds.has(t.id)) DB.transactions.push(t); });
-        const existingVeh = new Set(DB.vehicles.map(v=>v.id));
-        (incoming.vehicles||[]).forEach(v=>{ if(!existingVeh.has(v.id)) DB.vehicles.push(v); });
-        const existingDrv = new Set(DB.drivers.map(d=>d.id));
-        (incoming.drivers||[]).forEach(d=>{ if(!existingDrv.has(d.id)) DB.drivers.push(d); });
+        const idsExistentes = new Set(DB.gastos.map(g=>g.id));
+        (incoming.gastos||[]).forEach(g=>{ if(!idsExistentes.has(g.id)) DB.gastos.push(g); });
+        const veiExistentes = new Set(DB.veiculos.map(v=>v.id));
+        (incoming.veiculos||[]).forEach(v=>{ if(!veiExistentes.has(v.id)) DB.veiculos.push(v); });
+        const drvExistentes = new Set(DB.motoristas.map(d=>d.id));
+        (incoming.motoristas||[]).forEach(d=>{ if(!drvExistentes.has(d.id)) DB.motoristas.push(d); });
+        const areaExistentes = new Set(DB.areas.map(a=>a.id));
+        (incoming.areas||[]).forEach(a=>{ if(!areaExistentes.has(a.id)) DB.areas.push(a); });
       }
       save(); render();
       alert('Backup importado com sucesso.');
@@ -648,7 +968,6 @@ function importBackup(ev){
   reader.readAsText(file);
   ev.target.value = '';
 }
-
 function wipeAll(){
   if(!confirm('Isso vai apagar TODOS os dados deste aplicativo neste dispositivo. Tem certeza?')) return;
   if(!confirm('Confirme novamente: apagar tudo?')) return;
@@ -658,7 +977,6 @@ function wipeAll(){
 
 /* ====================== PWA (manifest + service worker inline) ====================== */
 const ICON_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23134e4a'/%3E%3Cpath d='M20 60 L28 40 Q30 36 35 36 L65 36 Q70 36 72 40 L80 60' stroke='%23fbbf24' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Crect x='16' y='58' width='68' height='16' rx='6' fill='%23fbbf24'/%3E%3Ccircle cx='30' cy='78' r='7' fill='%23134e4a'/%3E%3Ccircle cx='70' cy='78' r='7' fill='%23134e4a'/%3E%3Crect x='42' y='20' width='16' height='12' rx='2' fill='%2334d399'/%3E%3C/svg%3E";
-
 function setupPWA(){
   try{
     const manifest = {
@@ -680,10 +998,9 @@ function setupPWA(){
     link.href = URL.createObjectURL(manifestBlob);
     document.head.appendChild(link);
 
-    // Service worker só é aceito pelo navegador em contexto https ou localhost — não funciona abrindo o arquivo direto (file://).
     if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
       const swCode = `
-        const CACHE='fv-cache-v1';
+        const CACHE='fv-cache-v3';
         self.addEventListener('install', e=>{ self.skipWaiting(); });
         self.addEventListener('activate', e=>{ self.clients.claim(); });
         self.addEventListener('fetch', e=>{
