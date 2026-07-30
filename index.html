@@ -407,10 +407,17 @@ textarea.fc{resize:vertical;min-height:60px;}
 </div>
 <!-- PRÉ-CONSULTA -->
 <div class="scr" id="scr-cons">
-  <div style="background:var(--sur);border-radius:var(--r);box-shadow:0 4px 20px rgba(124,92,191,.13);margin-bottom:12px;overflow:hidden;">
+  <!-- LISTA DE CONSULTAS -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;">
+    <span style="font-size:.8rem;font-weight:800;color:var(--t2);">Consultas registradas</span>
+    <button class="btn bB bSm" onclick="abrirNovaConsulta()">+ Nova Consulta</button>
+  </div>
+  <div id="consOut"></div>
+  <!-- MEMO PRÉ-CONSULTA -->
+  <div style="background:var(--sur);border-radius:var(--r);box-shadow:0 4px 20px rgba(124,92,191,.13);margin-top:16px;overflow:hidden;">
     <div style="display:flex;align-items:center;gap:8px;padding:11px 13px 9px;border-bottom:1px solid var(--bdr);">
-      <div style="width:32px;height:32px;border-radius:7px;background:var(--blup);display:flex;align-items:center;justify-content:center;font-size:1rem;">🩺</div>
-      <div><div style="font-size:.88rem;font-weight:700;">Memo Pré-Consulta</div><div style="font-size:.68rem;color:var(--t3);">Resumo automático para entregar ao médico</div></div>
+      <div style="width:32px;height:32px;border-radius:7px;background:var(--blup);display:flex;align-items:center;justify-content:center;font-size:1rem;">📋</div>
+      <div><div style="font-size:.88rem;font-weight:700;">Memo Pré-Consulta</div><div style="font-size:.68rem;color:var(--t3);">Resumo para entregar ao médico</div></div>
     </div>
     <div style="padding:11px 13px;">
       <div class="dr"><div class="fg"><label>De</label><input type="date" class="fc" id="memoF"></div><div class="fg"><label>Até</label><input type="date" class="fc" id="memoT"></div></div>
@@ -444,11 +451,79 @@ textarea.fc{resize:vertical;min-height:60px;}
   </div>
   <div class="fg"><label>Título</label><input type="text" class="fc" id="eNome" placeholder="Ex: Febre, Ibuprofeno, Pediatra…"></div>
   <div class="dr"><div class="fg"><label>Data</label><input type="date" class="fc" id="eData"></div><div class="fg"><label>Hora</label><input type="time" class="fc" id="eHora"></div></div>
-  <div class="fg" id="gSint"><label>Sintomas</label><textarea class="fc" id="eSint" placeholder="Febre 38.5°C, tosse…"></textarea></div>
-  <div class="fg" id="gMed"><label>Medicação / Dose</label><input type="text" class="fc" id="eMed" placeholder="Conforme prescrição médica"></div>
-  <div class="fg" id="gFreq"><label>Frequência / Duração</label><input type="text" class="fc" id="eFreq"></div>
-  <div class="fg" id="gMdc"><label>Médico / Local</label><select class="fc" id="eMdcSel" onchange="syncMdcSel()"></select><input type="text" class="fc" id="eMdcTxt" placeholder="Nome do médico ou local…" style="margin-top:6px;display:none;"></div>
-  <div class="fg"><label>Sinais Vitais <span style="font-weight:400;color:var(--t3)">(opcional)</span></label>
+
+  <!-- CAMPOS ESPECÍFICOS POR TIPO -->
+
+  <!-- DOENÇA -->
+  <div id="gDoenca" style="display:none;">
+    <div class="fg"><label>Sintomas</label><textarea class="fc" id="eSint" placeholder="Febre 38.5°C, tosse, coriza…"></textarea></div>
+    <div class="fg"><label>Medicação usada</label><input type="text" class="fc" id="eMed" placeholder="Conforme prescrição médica"></div>
+    <div class="fg"><label>Frequência / Duração</label><input type="text" class="fc" id="eFreq" placeholder="Ex: 8 em 8h por 5 dias"></div>
+    <div class="fg"><label>Médico</label><select class="fc" id="eMdcSel" onchange="syncMdcSel()"></select><input type="text" class="fc" id="eMdcTxt" placeholder="Nome do médico…" style="margin-top:6px;display:none;"></div>
+  </div>
+
+  <!-- CONSULTA (via modal evento) -->
+  <div id="gConsulta" style="display:none;">
+    <div class="fg"><label>Área / Especialidade</label><input type="text" class="fc" id="eEsp" placeholder="Ex: Pediatria, Cardiologia, Clínico Geral…"></div>
+    <div class="fg"><label>Motivo da consulta</label><textarea class="fc" id="eMotivo" placeholder="Por que foi à consulta…" style="min-height:50px;"></textarea></div>
+    <div class="fg"><label>Diagnóstico / Conduta médica</label><textarea class="fc" id="eDiag" placeholder="O que o médico disse…" style="min-height:50px;"></textarea></div>
+    <div class="fg"><label>Médico</label><select class="fc" id="eMdcSel2" onchange="syncMdcSel2()"></select><input type="text" class="fc" id="eMdcTxt2" placeholder="Nome do médico…" style="margin-top:6px;display:none;"></div>
+    <div class="fg"><label>Observações</label><textarea class="fc" id="eConsObs" placeholder="Outras anotações…"></textarea></div>
+  </div>
+
+  <!-- EXAME -->
+  <div id="gExame" style="display:none;">
+    <div class="fg"><label>Área / Tipo de exame</label><input type="text" class="fc" id="eExArea" placeholder="Ex: Hemograma, Raio-X, Ultrassom…"></div>
+    <div class="fg"><label>Motivo / Consulta que solicitou</label><input type="text" class="fc" id="eExMotivo" placeholder="Ex: Solicitado pela Dra. Ana — Pediatria"></div>
+    <div class="fg"><label>Local / Laboratório</label><input type="text" class="fc" id="eExLocal" placeholder="Ex: Lab. Santa Maria…"></div>
+    <div class="fg"><label>Resultado <span style="font-weight:400;color:var(--t3);font-size:.7rem;">— preencher depois</span></label><textarea class="fc" id="eExResult" placeholder="Resultado do exame…" style="min-height:50px;"></textarea></div>
+    <div class="fg"><label>Médico que solicitou</label><select class="fc" id="eMdcSel3" onchange="syncMdcSel3()"></select><input type="text" class="fc" id="eMdcTxt3" placeholder="Nome do médico…" style="margin-top:6px;display:none;"></div>
+  </div>
+
+  <!-- ALIMENTAÇÃO -->
+  <div id="gAlim" style="display:none;">
+    <div id="alimRestBanner" style="display:none;"></div>
+    <div class="fg"><label>O que foi dado / consumido</label><textarea class="fc" id="eAlimDado" placeholder="Ex: Papa de abóbora, frango desfiado…" style="min-height:50px;"></textarea></div>
+    <div class="fg"><label>Como foi a reação</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:6px;" id="reacGrid">
+        <div class="tyo" data-r="aceitou" onclick="selReac(this)"><span style="font-size:1rem;">😊</span>Aceitou bem</div>
+        <div class="tyo" data-r="parcial" onclick="selReac(this)"><span style="font-size:1rem;">😐</span>Parcialmente</div>
+        <div class="tyo" data-r="rejeitou" onclick="selReac(this)"><span style="font-size:1rem;">😣</span>Rejeitou</div>
+        <div class="tyo" data-r="gases" onclick="selReac(this)"><span style="font-size:1rem;">😖</span>Gerou gases</div>
+        <div class="tyo" data-r="vomito" onclick="selReac(this)"><span style="font-size:1rem;">🤢</span>Vômito</div>
+        <div class="tyo" data-r="alergia" onclick="selReac(this)"><span style="font-size:1rem;">⚠️</span>Alergia</div>
+      </div>
+    </div>
+    <div class="fg"><label>Como a pessoa se sentiu / Observações</label><textarea class="fc" id="eAlimObs" placeholder="Ficou bem, dormiu logo depois, teve cólica…"></textarea></div>
+    <div style="background:var(--grnp);border:1.5px solid var(--grn);border-radius:var(--rs);padding:11px;margin-bottom:11px;">
+      <div style="font-size:.75rem;font-weight:800;color:#2d7a58;margin-bottom:3px;">✅ Pode comer — indicado pelo médico</div>
+      <div style="font-size:.68rem;color:#2d7a58;margin-bottom:7px;">Quem indicou: <select class="fc" id="eAlimMdcP" style="display:inline-block;width:auto;padding:2px 6px;font-size:.72rem;"></select></div>
+      <textarea class="fc" id="eAlimPode" placeholder="O que o médico disse que pode comer…" style="min-height:45px;"></textarea>
+    </div>
+    <div style="background:var(--redp);border:1.5px solid var(--red);border-radius:var(--rs);padding:11px;margin-bottom:11px;">
+      <div style="font-size:.75rem;font-weight:800;color:var(--red);margin-bottom:3px;">🚫 Não pode comer — indicado pelo médico</div>
+      <div style="font-size:.68rem;color:var(--red);margin-bottom:4px;">Quem indicou: <select class="fc" id="eAlimMdcN" style="display:inline-block;width:auto;padding:2px 6px;font-size:.72rem;"></select></div>
+      <textarea class="fc" id="eAlimNPode" placeholder="O que o médico disse que não pode comer…" style="min-height:45px;"></textarea>
+      <div class="fg" style="margin-top:7px;margin-bottom:0;"><label style="font-size:.7rem;">Restrição até qual idade / período</label><input type="text" class="fc" id="eAlimIdade" placeholder="Ex: Não dar mel antes de 1 ano, glúten só após 6 meses…" style="font-size:.78rem;"></div>
+    </div>
+  </div>
+
+  <!-- MEDICAÇÃO (evento) -->
+  <div id="gMedicacao" style="display:none;">
+    <div class="fg"><label>Medicação / Dose</label><input type="text" class="fc" id="eMed" placeholder="Conforme prescrição médica"></div>
+    <div class="fg"><label>Frequência / Duração</label><input type="text" class="fc" id="eFreq" placeholder="Ex: 8 em 8h por 5 dias"></div>
+    <div class="fg"><label>Médico</label><select class="fc" id="eMdcSel" onchange="syncMdcSel()"></select><input type="text" class="fc" id="eMdcTxt" placeholder="Nome do médico…" style="margin-top:6px;display:none;"></div>
+  </div>
+
+  <!-- OUTRO -->
+  <div id="gOutro" style="display:none;">
+    <div class="fg"><label>Descrição</label><textarea class="fc" id="eSint" placeholder="Descreva o evento…"></textarea></div>
+    <div class="fg"><label>Observações</label><textarea class="fc" id="eObs" placeholder="Outras anotações…"></textarea></div>
+  </div>
+
+  <!-- SINAIS VITAIS (todos os tipos) -->
+  <div class="fg" id="gSV">
+    <label>Sinais Vitais <span style="font-weight:400;color:var(--t3)">(opcional)</span></label>
     <div class="svg">
       <div class="svf"><label>Temp°C</label><input type="number" step="0.1" id="svT" placeholder="37.5"></div>
       <div class="svf"><label>FC bpm</label><input type="number" id="svFC" placeholder="80"></div>
@@ -458,7 +533,6 @@ textarea.fc{resize:vertical;min-height:60px;}
       <div class="svf"><label>Pressão</label><input type="text" id="svPA" placeholder="120/80"></div>
     </div>
   </div>
-  <div class="fg"><label>Observações</label><textarea class="fc" id="eObs" placeholder="O que aconteceu, como evoluiu…"></textarea></div>
   <div class="fg"><label>Fotos</label><div class="pgrid" id="photoGrid"><div class="padd" onclick="addFoto()"><b>📷</b>Adicionar</div></div><input type="file" id="photoInp" accept="image/*" multiple style="display:none" onchange="handleFotos(this)"></div>
   <div class="rbtn"><button class="btn bS" onclick="fModal('ovEv')">Cancelar</button><button class="btn bP" onclick="salvarEv()">Salvar ✓</button></div>
 </div></div>
@@ -649,6 +723,45 @@ textarea.fc{resize:vertical;min-height:60px;}
     <button class="btn bP bSm" style="width:100%;margin-top:7px;" onclick="salvarDisp()">Salvar ✓</button>
   </div>
   <button class="btn bS" onclick="fModal('ovCfgGeral')">Fechar</button>
+</div></div>
+
+<!-- MODAL CONSULTA COMPLETA -->
+<div class="ov" id="ovCons"><div class="modal">
+  <div class="mHdl"></div><div class="mTit" id="consTit">🩺 Nova Consulta</div>
+  <div class="fg"><label>Médico / Especialidade</label><select class="fc" id="cMdcSel" onchange="syncConsMdcSel()"></select><input type="text" class="fc" id="cMdcTxt" placeholder="Nome do médico ou especialidade…" style="margin-top:6px;display:none;"></div>
+  <div class="dr"><div class="fg"><label>Data</label><input type="date" class="fc" id="cData"></div><div class="fg"><label>Hora</label><input type="time" class="fc" id="cHora"></div></div>
+  <div class="fg"><label>Motivo / Queixa principal</label><textarea class="fc" id="cMotivo" placeholder="Ex: Dor no peito, revisão anual…" style="min-height:50px;"></textarea></div>
+  <div class="fg"><label>Diagnóstico / Conduta</label><textarea class="fc" id="cDiag" placeholder="O que o médico disse…" style="min-height:50px;"></textarea></div>
+  <div class="fg"><label>Observações</label><textarea class="fc" id="cObs" placeholder="Outras anotações…" style="min-height:40px;"></textarea></div>
+  <div style="background:var(--orap);border:1.5px solid var(--ora);border-radius:var(--rs);padding:11px;margin-bottom:11px;">
+    <div style="font-size:.78rem;font-weight:800;color:#7a5200;margin-bottom:8px;">💊 Medicações prescritas</div>
+    <div id="cMedList"></div>
+    <div style="display:flex;gap:6px;margin-top:6px;">
+      <input type="text" class="fc" id="cMedNome" placeholder="Nome do remédio…" style="flex:2;">
+      <input type="text" class="fc" id="cMedDose" placeholder="Dose…" style="flex:1;">
+      <button class="btn bSm" style="background:var(--ora);color:#fff;flex-shrink:0;" onclick="addConsMed()">+</button>
+    </div>
+  </div>
+  <div style="background:var(--grnp);border:1.5px solid var(--grn);border-radius:var(--rs);padding:11px;margin-bottom:11px;">
+    <div style="font-size:.78rem;font-weight:800;color:#2d7a58;margin-bottom:8px;">🔬 Exames solicitados</div>
+    <div id="cExList"></div>
+    <div style="display:flex;gap:6px;margin-top:6px;">
+      <input type="text" class="fc" id="cExNome" placeholder="Nome do exame…" style="flex:1;">
+      <button class="btn bSm" style="background:var(--grn);color:#fff;flex-shrink:0;" onclick="addConsEx()">+</button>
+    </div>
+  </div>
+  <div style="background:var(--blup);border:1.5px solid var(--blu);border-radius:var(--rs);padding:11px;margin-bottom:11px;">
+    <div style="font-size:.78rem;font-weight:800;color:#2a4d8f;margin-bottom:8px;">🔄 Retorno</div>
+    <div class="dr">
+      <div class="fg"><label>Data prevista</label><input type="date" class="fc" id="cRetD"></div>
+      <div class="fg"><label>Hora</label><input type="time" class="fc" id="cRetH"></div>
+    </div>
+    <div class="fg" style="margin-bottom:0;"><label>Observação</label><input type="text" class="fc" id="cRetObs" placeholder="Ex: Retorno em ~3 meses (a confirmar)…"></div>
+  </div>
+  <div class="rbtn">
+    <button class="btn bS" onclick="fModal('ovCons')">Cancelar</button>
+    <button class="btn bB" onclick="salvarConsulta()">Salvar ✓</button>
+  </div>
 </div></div>
 
 <script>
@@ -859,7 +972,7 @@ function selPerfil(id){
   var hj=new Date().toISOString().slice(0,10);var hr=new Date().toTimeString().slice(0,5);
   set('eData',hj);set('eHora',hr);set('mD1',hj);set('mH1',hr);
   showTab('hoje',document.querySelector('.tab'));
-  renderHoje();renderBkp();renderEst();renderNotifBanner();if(Notification.permission==='granted'&&!_swReg)registrarSW();
+  renderHoje();renderBkp();renderEst();renderConsLista();renderNotifBanner();if(Notification.permission==='granted'&&!_swReg)registrarSW();
 }
 function voltarPerfis(){pid=null;mostrarPerfis();}
 function abrirNP(){set('npNm','');set('npAv','👤');initNasc('npN','');setFase('npFase','adulto');abrirModal('ovNP');}
@@ -878,6 +991,7 @@ function showTab(nm,btn){
   if(nm==='hoje')renderHoje();
   if(nm==='hist'){renderStats();renderTl();}
   if(nm==='meds')renderMeds();
+  if(nm==='cons')renderConsLista();
 }
 function fabAct(){abrirNovoEv();}
 
@@ -906,9 +1020,17 @@ function addDoc(){var nm=get('docNm').trim();if(!nm){alert('Informe o nome.');re
 function remDoc(id){if(!confirm('Remover médico?'))return;DC[pid]=(DC[pid]||[]).filter(function(d){return d.id!==id;});salvar();renderDocs();}
 function renderDocs(){var el=document.getElementById('cfgDocs');var ds=getDc();if(!ds.length){el.innerHTML='<div style="font-size:.74rem;color:var(--t3);margin-bottom:9px;">Nenhum médico cadastrado.</div>';return;}el.innerHTML=ds.map(function(d){return '<div class="mdcCard"><div class="mdcInf"><div class="mdcN">'+esc(d.nome)+'</div>'+(d.esp?'<div class="mdcE">'+esc(d.esp)+'</div>':'')+(d.tel?'<div class="mdcT">📞 '+esc(d.tel)+'</div>':'')+'</div><button style="background:none;border:none;cursor:pointer;color:var(--t3);" onclick="remDoc(\''+d.id+'\')">🗑️</button></div>';}).join('');}
 function buildMdcSel(selId,val){var s=document.getElementById(selId);if(!s)return;var ds=getDc();s.innerHTML='<option value="">— Selecionar —</option>'+ds.map(function(d){return '<option value="'+esc(d.nome+(d.esp?' ('+d.esp+')':''))+'">'+esc(d.nome+(d.esp?' · '+d.esp:''))+'</option>';}).join('')+'<option value="__outro__">✏️ Digitar outro…</option>';if(val){var f=Array.from(s.options).find(function(o){return o.value===val;});if(f)s.value=val;else s.value='__outro__';}}
-function syncMdcSel(){var v=get('eMdcSel');document.getElementById('eMdcTxt').style.display=v==='__outro__'?'block':'none';}
+function syncMdcSel(){var v=get('eMdcSel');var el=document.getElementById('eMdcTxt');if(el)el.style.display=v==='__outro__'?'block':'none';}
+function syncMdcSel2(){var v=get('eMdcSel2');var el=document.getElementById('eMdcTxt2');if(el)el.style.display=v==='__outro__'?'block':'none';}
+function syncMdcSel3(){var v=get('eMdcSel3');var el=document.getElementById('eMdcTxt3');if(el)el.style.display=v==='__outro__'?'block':'none';}
 function syncMedSel(){var v=get('mMdcSel');document.getElementById('mMdcTxt').style.display=v==='__outro__'?'block':'none';}
 function getMdcVal(){var v=get('eMdcSel');return v==='__outro__'?get('eMdcTxt').trim():v;}
+function getMdcVal2(){var v=get('eMdcSel2');return v==='__outro__'?get('eMdcTxt2').trim():v;}
+function getMdcVal3(){var v=get('eMdcSel3');return v==='__outro__'?get('eMdcTxt3').trim():v;}
+function selReac(el){document.querySelectorAll('#reacGrid .tyo').forEach(function(x){x.classList.remove('on');});el.classList.add('on');}
+function getReac(){var el=document.querySelector('#reacGrid .tyo.on');return el?el.dataset.r:'';}
+function buildMdcSelSimple(selId){var s=document.getElementById(selId);if(!s)return;var ds=getDc();s.innerHTML='<option value="">— Médico —</option>'+ds.map(function(d){return '<option value="'+esc(d.nome+(d.esp?' ('+d.esp+')':''))+'">'+esc(d.nome+(d.esp?' · '+d.esp:''))+'</option>';}).join('')+'<option value="__outro__">✏️ Outro…</option>';}
+function renderAlimRestBanner(){var el=document.getElementById('alimRestBanner');if(!el)return;var p=getP();var rests=p&&p.alimRests?p.alimRests:[];if(!rests.length){el.style.display='none';return;}el.style.display='block';el.innerHTML='<div style="background:var(--blup);border:1.5px solid var(--blu);border-radius:var(--rs);padding:10px;margin-bottom:10px;"><div style="font-size:.75rem;font-weight:800;color:#2a4d8f;margin-bottom:6px;">📋 Orientações alimentares registradas</div>'+rests.map(function(r){return '<div style="font-size:.73rem;margin-bottom:5px;padding:5px 8px;background:#fff;border-radius:6px;">'+(r.pode?'<div><b style="color:var(--grn);">✅ Pode:</b> '+esc(r.pode)+'</div>':'')+(r.npode?'<div><b style="color:var(--red);">🚫 Não pode:</b> '+esc(r.npode)+'</div>':'')+(r.idade?'<div style="color:var(--t3);font-size:.68rem;">Restrição: '+esc(r.idade)+'</div>':'')+'<div style="color:var(--t3);font-size:.66rem;">Indicado por: '+esc(r.mdc||'—')+' em '+fD(r.data||'')+'</div></div>';}).join('')+'</div>';}
 
 // ── MEDICAÇÕES ────────────────────────────
 function getPeriH(){var s=document.querySelector('#perGrid .tyo.on');if(!s)return 8;if(s.dataset.p==='0'){var v=parseFloat(get('mPerCust'));return v>0?v:8;}return parseFloat(s.dataset.p);}
@@ -1126,9 +1248,25 @@ function renderOtim(){var el=document.getElementById('otimOut');var ms=getMd().f
 function renderEst(){var el=document.getElementById('estBan');if(!el)return;var al=[];getMd().filter(function(m){return m.ativo&&m.qtd>0;}).forEach(function(m){var rest=Math.max(0,m.qtd-(m.qtdU||0));var dias=m.periH>0?Math.round(rest*m.periH/24):0;var av=m.diasAv||7;if(dias<=av)al.push({nome:m.nome,dias:dias,rest:rest,unid:m.unid||'unidades',crit:dias<=2});});if(!al.length){el.innerHTML='';return;}el.innerHTML=al.map(function(a){return '<div style="background:'+(a.crit?'var(--redp)':'#fff3cd')+';border:1.5px solid '+(a.crit?'var(--red)':'#f0a500')+';border-radius:7px;padding:6px 9px;font-size:.73rem;font-weight:700;color:'+(a.crit?'var(--red)':'#7a5200')+';margin-bottom:6px;">📦 <b>'+esc(a.nome)+'</b>: restam ~'+a.dias+' dia'+(a.dias!==1?'s':'')+' de estoque ('+a.rest+' '+esc(a.unid)+') — hora de comprar!</div>';}).join('');}
 
 // ── EVENTOS ───────────────────────────────
-function abrirNovoEv(){eId=null;eFt=[];document.getElementById('evTit').textContent='Novo Evento';['eNome','eSint','eMed','eFreq','eObs','eMdcTxt','svT','svFC','svSat','svFR','svP','svPA'].forEach(function(id){set(id,'');});set('eData',new Date().toISOString().slice(0,10));set('eHora',new Date().toTimeString().slice(0,5));document.getElementById('eMdcTxt').style.display='none';selTipo(document.querySelector('.tyo[data-v="doenca"]'));buildMdcSel('eMdcSel','');renderFotos();renderAlBan();abrirModal('ovEv');}
-function selTipo(el){document.querySelectorAll('.tyo[data-v]').forEach(function(o){o.classList.remove('on');});el.classList.add('on');var t=el.dataset.v;document.getElementById('gSint').style.display=(t==='consulta'||t==='exame')?'none':'block';document.getElementById('gMed').style.display=(t==='medicacao'||t==='doenca')?'block':'none';document.getElementById('gFreq').style.display=(t==='medicacao'||t==='doenca')?'block':'none';document.getElementById('gMdc').style.display=(t==='consulta'||t==='exame')?'block':'none';}
-function salvarEv(){var nm=get('eNome').trim();if(!nm){alert('Informe o título.');return;}var tp=document.querySelector('.tyo[data-v].on');var tipo=tp?tp.dataset.v:'outro';var sv={t:get('svT'),fc:get('svFC'),sat:get('svSat'),fr:get('svFR'),p:get('svP'),pa:get('svPA')};var svOk=Object.values(sv).some(function(v){return v!=='';});var ev={id:eId||gId(),tipo:tipo,nome:nm,data:get('eData')+'T'+(get('eHora')||'00:00'),hora:get('eHora'),sintomas:get('eSint').trim(),medicacao:get('eMed').trim(),frequencia:get('eFreq').trim(),obs:get('eObs').trim(),medico:getMdcVal(),sv:svOk?sv:null,fotos:eFt.map(function(f){return f.d;}),atualizacoes:[],encerradaEm:undefined,por:audit()};if(eId){var evs=getEv();var i=evs.findIndex(function(e){return e.id===eId;});if(i>=0){ev.atualizacoes=evs[i].atualizacoes||[];ev.encerradaEm=evs[i].encerradaEm;ev.por=evs[i].por;ev.editPor=audit();evs[i]=ev;}}else{if(!EV[pid])EV[pid]=[];EV[pid].push(ev);}salvar();renderTl();renderStats();fModal('ovEv');agendarTodosAlarmes();}
+function abrirNovoEv(){eId=null;eFt=[];document.getElementById('evTit').textContent='Novo Evento';['eNome','eSint','eMed','eFreq','eMdcTxt','eMdcTxt2','eMdcTxt3','eEsp','eMotivo','eDiag','eConsObs','eExArea','eExMotivo','eExLocal','eExResult','eAlimDado','eAlimObs','eAlimPode','eAlimNPode','eAlimIdade','svT','svFC','svSat','svFR','svP','svPA'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});set('eData',new Date().toISOString().slice(0,10));set('eHora',new Date().toTimeString().slice(0,5));['eMdcTxt','eMdcTxt2','eMdcTxt3'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});document.querySelectorAll('#reacGrid .tyo').forEach(function(x){x.classList.remove('on');});buildMdcSel('eMdcSel','');buildMdcSel('eMdcSel2','');buildMdcSel('eMdcSel3','');buildMdcSelSimple('eAlimMdcP');buildMdcSelSimple('eAlimMdcN');selTipo(document.querySelector('.tyo[data-v="doenca"]'));renderFotos();renderAlBan();abrirModal('ovEv');}
+function selTipo(el){document.querySelectorAll('.tyo[data-v]').forEach(function(o){o.classList.remove('on');});el.classList.add('on');var t=el.dataset.v;['gDoenca','gConsulta','gExame','gAlim','gMedicacao','gOutro'].forEach(function(id){var g=document.getElementById(id);if(g)g.style.display='none';});var gSV=document.getElementById('gSV');if(gSV)gSV.style.display=t==='alimentacao'?'none':'block';var map={doenca:'gDoenca',consulta:'gConsulta',exame:'gExame',alimentacao:'gAlim',medicacao:'gMedicacao',outro:'gOutro'};var g=document.getElementById(map[t]||'gOutro');if(g)g.style.display='block';var ph={doenca:'Ex: Resfriado, Gripe…',consulta:'Ex: Consulta de rotina…',exame:'Ex: Hemograma, Ultrassom…',alimentacao:'Ex: Papinha de frango…',medicacao:'Ex: Dipirona…',outro:'Descreva o evento…'};var eN=document.getElementById('eNome');if(eN)eN.placeholder=ph[t]||'Título…';if(t==='alimentacao')renderAlimRestBanner();}
+function salvarEv(){
+  var nm=get('eNome').trim();if(!nm){alert('Informe o título.');return;}
+  var tp=document.querySelector('.tyo[data-v].on');var tipo=tp?tp.dataset.v:'outro';
+  var sv={t:get('svT'),fc:get('svFC'),sat:get('svSat'),fr:get('svFR'),p:get('svP'),pa:get('svPA')};
+  var svOk=Object.values(sv).some(function(v){return v!=='';});
+  var sint='',med='',freq='',mdc='',obs='',extra={};
+  if(tipo==='doenca'){sint=get('eSint')?get('eSint').trim():'';med=get('eMed')?get('eMed').trim():'';freq=get('eFreq')?get('eFreq').trim():'';mdc=getMdcVal();}
+  else if(tipo==='consulta'){extra.especialidade=get('eEsp')?get('eEsp').trim():'';sint=get('eMotivo')?get('eMotivo').trim():'';extra.diagnostico=get('eDiag')?get('eDiag').trim():'';mdc=getMdcVal2();obs=get('eConsObs')?get('eConsObs').trim():'';}
+  else if(tipo==='exame'){extra.area=get('eExArea')?get('eExArea').trim():'';extra.motivo=get('eExMotivo')?get('eExMotivo').trim():'';extra.local=get('eExLocal')?get('eExLocal').trim():'';extra.resultado=get('eExResult')?get('eExResult').trim():'';mdc=getMdcVal3();sint=extra.area+(extra.motivo?' — '+extra.motivo:'');}
+  else if(tipo==='alimentacao'){sint=get('eAlimDado')?get('eAlimDado').trim():'';extra.reacao=getReac();obs=get('eAlimObs')?get('eAlimObs').trim():'';var pode=get('eAlimPode')?get('eAlimPode').trim():'';var npode=get('eAlimNPode')?get('eAlimNPode').trim():'';var idade=get('eAlimIdade')?get('eAlimIdade').trim():'';var mdcPA=get('eAlimMdcP')||'';var mdcNA=get('eAlimMdcN')||'';if(pode||npode){var p=getP();if(!p.alimRests)p.alimRests=[];p.alimRests.push({pode:pode,npode:npode,idade:idade,mdc:mdcPA||mdcNA,data:get('eData'),por:audit()});if(p.alimRests.length>10)p.alimRests=p.alimRests.slice(-10);}extra.pode=pode;extra.npode=npode;extra.idade=idade;}
+  else if(tipo==='medicacao'){med=get('eMed')?get('eMed').trim():'';freq=get('eFreq')?get('eFreq').trim():'';mdc=getMdcVal();}
+  else{sint=get('eSint')?get('eSint').trim():'';obs='';}
+  var ev={id:eId||gId(),tipo:tipo,nome:nm,data:get('eData')+'T'+(get('eHora')||'00:00'),hora:get('eHora'),sintomas:sint,medicacao:med,frequencia:freq,obs:obs,medico:mdc,sv:svOk?sv:null,fotos:eFt.map(function(f){return f.d;}),atualizacoes:[],encerradaEm:undefined,por:audit()};
+  Object.keys(extra).forEach(function(k){ev[k]=extra[k];});
+  if(eId){var evs=getEv();var i=evs.findIndex(function(e){return e.id===eId;});if(i>=0){ev.atualizacoes=evs[i].atualizacoes||[];ev.encerradaEm=evs[i].encerradaEm;ev.por=evs[i].por;ev.editPor=audit();evs[i]=ev;}}else{if(!EV[pid])EV[pid]=[];EV[pid].push(ev);}
+  salvar();renderTl();renderStats();fModal('ovEv');agendarTodosAlarmes();
+}
 
 function renderTl(lst,cid){var id=cid||'tlOut';var el=document.getElementById(id);if(!el)return;var ev=lst!==undefined?lst:(fil==='todos'?getEv().slice():getEv().filter(function(e){return e.tipo===fil;}));ev.sort(function(a,b){return b.data.localeCompare(a.data);});if(!ev.length){el.innerHTML='<div class="empty"><div class="ei">🌸</div><h3>'+(lst!==undefined?'Nenhum resultado':'Nenhum evento ainda')+'</h3><p>'+(lst!==undefined?'Tente outros termos.':'Toque em + para adicionar.')+'</p></div>';return;}var html='',ld='';ev.forEach(function(e){var d=e.data.slice(0,10);if(d!==ld){html+='<div class="slabel">'+fD(d)+'</div>';ld=d;}html+=renderItem(e);});el.innerHTML=html;}
 function renderItem(e){var res=e.sintomas||e.medicacao||e.obs||'';var prev=res.length>58?res.slice(0,58)+'…':res;var nF=e.fotos&&e.fotos.length?'<span class="bdg bdg-p">📷 '+e.fotos.length+'</span>':'';var nU=e.atualizacoes&&e.atualizacoes.length?'<span class="bdg bdg-r">📋 '+e.atualizacoes.length+'</span>':'';var stB='';if(e.tipo==='doenca'){stB=!e.encerradaEm?'<div style="margin-top:3px;"><span class="stAb">🔴 Em curso</span></div>':'<div style="margin-top:3px;"><span class="stEnc">✅ '+calcDias(e.data.slice(0,10),e.encerradaEm)+' dias</span></div>';}var bcl={doenca:'bdg-r',medicacao:'bdg-o',consulta:'bdg-b',exame:'bdg-g',alimentacao:'bdg-p',outro:'bdg-p'}[e.tipo]||'bdg-p';return '<div class="tli" onclick="abrirDet(\''+e.id+'\')"><div class="tlDot '+e.tipo+'"></div><div class="tlC '+e.tipo+'"><div class="tlR"><span class="tlN">'+(IC[e.tipo]||'📝')+' '+esc(e.nome)+'</span><span class="tlH">'+(e.hora||'')+'</span></div>'+stB+(prev?'<div class="tlD">'+esc(prev)+'</div>':'')+(e.por?'<div class="audit">Por <b>'+esc(e.por)+'</b>'+(e.editPor?' · Ed: <b>'+esc(e.editPor)+'</b>':'')+'</div>':'')+'<div class="tlT"><span class="bdg '+bcl+'">'+(LB[e.tipo]||e.tipo)+'</span>'+nU+nF+'</div></div></div>';}
@@ -1184,6 +1322,194 @@ function abrirFoto(src){document.getElementById('pfImg').src=src;document.getEle
 function abrirModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 function fModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 document.querySelectorAll('.ov').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)fModal(o.id);});});
+
+// ── CONSULTAS ────────────────────────────
+var cMeds=[], cExs=[], cEditId=null;
+
+function syncConsMdcSel(){
+  var v=get('cMdcSel');
+  document.getElementById('cMdcTxt').style.display=v==='__outro__'?'block':'none';
+}
+function getConsMdcVal(){
+  var v=get('cMdcSel');
+  return v==='__outro__'?get('cMdcTxt').trim():(v===''?'':v);
+}
+
+function addConsMed(){
+  var nm=get('cMedNome').trim(),ds=get('cMedDose').trim();
+  if(!nm)return;
+  cMeds.push({nome:nm,dose:ds});
+  set('cMedNome','');set('cMedDose','');
+  renderConsMedList();
+}
+function remConsMed(i){cMeds.splice(i,1);renderConsMedList();}
+function renderConsMedList(){
+  document.getElementById('cMedList').innerHTML=cMeds.length?
+    cMeds.map(function(m,i){return '<div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:7px;padding:5px 8px;margin-bottom:5px;"><div style="flex:1;font-size:.78rem;"><b>'+esc(m.nome)+'</b>'+(m.dose?' — '+esc(m.dose):'')+'</div><button style="background:none;border:none;cursor:pointer;color:var(--t3);" onclick="remConsMed('+i+')">✕</button></div>';}).join('')
+    :'<div style="font-size:.73rem;color:var(--t3);">Nenhuma medicação adicionada.</div>';
+}
+
+function addConsEx(){
+  var nm=get('cExNome').trim();if(!nm)return;
+  cExs.push({nome:nm,resultado:'',pendente:true});
+  set('cExNome','');
+  renderConsExList();
+}
+function remConsEx(i){cExs.splice(i,1);renderConsExList();}
+function renderConsExList(){
+  document.getElementById('cExList').innerHTML=cExs.length?
+    cExs.map(function(e,i){return '<div style="display:flex;align-items:center;gap:6px;background:#fff;border-radius:7px;padding:5px 8px;margin-bottom:5px;"><div style="flex:1;font-size:.78rem;">🔬 '+esc(e.nome)+'<span style="font-size:.66rem;color:var(--grn);margin-left:5px;">pendente</span></div><button style="background:none;border:none;cursor:pointer;color:var(--t3);" onclick="remConsEx('+i+')">✕</button></div>';}).join('')
+    :'<div style="font-size:.73rem;color:var(--t3);">Nenhum exame adicionado.</div>';
+}
+
+function abrirNovaConsulta(){
+  cEditId=null;cMeds=[];cExs=[];
+  document.getElementById('consTit').textContent='🩺 Nova Consulta';
+  ['cMotivo','cDiag','cObs','cMdcTxt','cRetObs','cRetD','cRetH'].forEach(function(id){set(id,'');});
+  document.getElementById('cMdcTxt').style.display='none';
+  set('cData',new Date().toISOString().slice(0,10));
+  set('cHora',new Date().toTimeString().slice(0,5));
+  buildMdcSel('cMdcSel','');
+  renderConsMedList();renderConsExList();
+  abrirModal('ovCons');
+}
+
+function editarConsulta(id){
+  var ev=getEv().find(function(e){return e.id===id;});if(!ev)return;
+  cEditId=id;
+  cMeds=(ev.cMeds||[]).slice();
+  cExs=(ev.cExs||[]).slice();
+  document.getElementById('consTit').textContent='✏️ Editar Consulta';
+  set('cData',ev.data?ev.data.slice(0,10):'');
+  set('cHora',ev.hora||'');
+  set('cMotivo',ev.sintomas||ev.cMotivo||'');
+  set('cDiag',ev.cDiag||'');
+  set('cObs',ev.obs||'');
+  set('cRetD',ev.cRetD||'');
+  set('cRetH',ev.cRetH||'');
+  set('cRetObs',ev.cRetObs||'');
+  buildMdcSel('cMdcSel',ev.medico||'');
+  document.getElementById('cMdcTxt').style.display='none';set('cMdcTxt','');
+  renderConsMedList();renderConsExList();
+  abrirModal('ovCons');
+}
+
+function salvarConsulta(){
+  var mdc=getConsMdcVal();
+  var dt=get('cData');if(!dt){alert('Informe a data da consulta.');return;}
+  var hr=get('cHora');
+  var motivo=get('cMotivo').trim();
+  var diag=get('cDiag').trim();
+  var obs=get('cObs').trim();
+  var retD=get('cRetD');var retH=get('cRetH');var retObs=get('cRetObs').trim();
+
+  // Evento principal da consulta
+  var ev={
+    id:cEditId||gId(),tipo:'consulta',
+    nome:'Consulta'+(mdc?' — '+mdc:''),
+    data:dt+'T'+(hr||'00:00'),hora:hr,
+    sintomas:motivo,
+    medicacao:cMeds.map(function(m){return m.nome+(m.dose?' '+m.dose:'');}).join(', '),
+    medico:mdc,obs:obs,
+    cDiag:diag,cMeds:cMeds,cExs:cExs,
+    cRetD:retD,cRetH:retH,cRetObs:retObs,
+    fotos:[],atualizacoes:[],por:audit()
+  };
+
+  if(cEditId){
+    var evs=getEv();var i=evs.findIndex(function(e){return e.id===cEditId;});
+    if(i>=0){ev.por=evs[i].por;ev.editPor=audit();evs[i]=ev;}
+  } else {
+    if(!EV[pid])EV[pid]=[];
+    EV[pid].push(ev);
+
+    // Gerar eventos de exame pendentes
+    cExs.forEach(function(ex){
+      EV[pid].push({
+        id:gId(),tipo:'exame',
+        nome:ex.nome,
+        data:dt+'T'+(hr||'00:00'),hora:hr,
+        sintomas:'Exame solicitado na consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+        medicacao:'',medico:mdc,obs:'',
+        pendente:true,consId:ev.id,
+        resultado:'',
+        fotos:[],atualizacoes:[],por:audit()
+      });
+    });
+
+    // Gerar retorno agendado
+    if(retD){
+      EV[pid].push({
+        id:gId(),tipo:'consulta',
+        nome:'Retorno'+(mdc?' — '+mdc:''),
+        data:retD+'T'+(retH||'00:00'),hora:retH||'',
+        sintomas:retObs||'Retorno agendado da consulta de '+fD(dt),
+        medicacao:'',medico:mdc,obs:'',
+        fotos:[],atualizacoes:[],por:audit(),
+        retornoData:true
+      });
+    }
+
+    // Gerar medicações prescritas (só registra no histórico, não agenda)
+    cMeds.forEach(function(m){
+      EV[pid].push({
+        id:gId(),tipo:'medicacao',
+        nome:m.nome,
+        data:dt+'T'+(hr||'00:00'),hora:hr,
+        sintomas:'Prescrito na consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+        medicacao:m.nome+(m.dose?' — '+m.dose:''),
+        medico:mdc,obs:'',
+        fotos:[],atualizacoes:[],por:audit()
+      });
+    });
+  }
+
+  salvar();fModal('ovCons');
+  renderConsLista();renderTl();renderStats();
+  agendarTodosAlarmes();
+
+  if(!cEditId&&(cMeds.length||cExs.length||retD)){
+    var msg='Consulta salva!';if(cMeds.length)msg+=' '+cMeds.length+' med(s) registrada(s).';if(cExs.length)msg+=' '+cExs.length+' exame(s) pendente(s).';if(retD)msg+=' Retorno em '+fD(retD)+'.';
+    alert(msg);
+  }
+}
+
+function renderConsLista(){
+  var el=document.getElementById('consOut');if(!el)return;
+  var evs=getEv().filter(function(e){return e.tipo==='consulta';})
+    .sort(function(a,b){return b.data.localeCompare(a.data);});
+  if(!evs.length){
+    el.innerHTML='<div class="empty"><div class="ei">🩺</div><h3>Nenhuma consulta</h3><p>Toque em "+ Nova Consulta" para registrar.</p></div>';
+    return;
+  }
+  el.innerHTML=evs.map(function(e){
+    var mdc=e.medico||'';
+    var diag=e.cDiag||'';
+    var nM=e.cMeds?e.cMeds.length:0;
+    var nE=e.cExs?e.cExs.length:0;
+    var ret=e.cRetD?'Retorno: '+fD(e.cRetD):'';
+    var id=e.id;
+    return '<div style="background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:10px;border-left:4px solid var(--blu);overflow:hidden;">'
+      +'<div style="padding:11px 12px;" onclick="abrirDet(this.dataset.id)" data-id="'+id+'">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:5px;">'
+      +'<div style="font-size:.88rem;font-weight:800;">🩺 '+esc(e.nome)+'</div>'
+      +(e.retornoData?'<span class="bdg bdg-b">↩ Retorno</span>':'')
+      +'</div>'
+      +'<div style="font-size:.72rem;color:var(--t3);margin-top:2px;">'+fDT(e.data)+(mdc?' · '+esc(mdc):'')+'</div>'
+      +(diag?'<div style="font-size:.74rem;color:var(--t2);margin-top:4px;background:var(--s2);padding:4px 7px;border-radius:6px;">'+esc(diag.length>60?diag.slice(0,60)+'…':diag)+'</div>':'')
+      +'<div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">'
+      +(nM?'<span class="bdg bdg-o">💊 '+nM+' med.</span>':'')
+      +(nE?'<span class="bdg bdg-g">🔬 '+nE+' exame'+(nE>1?'s':'')+'</span>':'')
+      +(ret?'<span class="bdg bdg-b">'+ret+'</span>':'')
+      +'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:0;border-top:1px solid var(--bdr);">'
+      +'<button style="flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--blu);cursor:pointer;" onclick="editarConsulta(this.dataset.id)" data-id="'+id+'">✏️ Editar</button>'
+      +'<button style="flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--t2);cursor:pointer;border-left:1px solid var(--bdr);" onclick="abrirDet(this.dataset.id)" data-id="'+id+'">Ver detalhes →</button>'
+      +'</div></div>';
+  }).join('');
+}
+
 
 function exportarGeral(){var data={perfis:P,eventos:EV,medicacoes:MD,dozesDadas:DS,medicos:DC,exportedAt:new Date().toISOString(),por:disp(),v:8};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saude-familia-'+new Date().toISOString().slice(0,10)+'.json';a.click();ls('sf2_bkp',new Date().toISOString());setTimeout(renderBkp,300);fModal('ovCfgGeral');}
 function salvarDisp(){var v=document.getElementById('cfgDispNm').value.trim();if(!v){alert('Informe o nome.');return;}localStorage.setItem('sf_disp',v);alert('\u2705 Nome salvo: '+v);fModal('ovCfgGeral');}
