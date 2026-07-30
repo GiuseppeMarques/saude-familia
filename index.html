@@ -309,6 +309,13 @@ textarea.fc{resize:vertical;min-height:60px;}
 .nascSel{display:grid;grid-template-columns:2fr 3fr 3fr;gap:6px;}
 .nascSel select{background:var(--s2);border:2px solid var(--bdr);border-radius:var(--rs);padding:8px 4px;font-size:.82rem;color:var(--txt);outline:none;-webkit-appearance:none;text-align:center;cursor:pointer;}
 .nascSel select:focus{border-color:var(--pl);}
+/* AUTOCOMPLETE */
+.ac-wrap{position:relative;}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid var(--pl);border-radius:0 0 var(--rs) var(--rs);z-index:400;max-height:160px;overflow-y:auto;box-shadow:0 4px 12px rgba(124,92,191,.15);}
+.ac-item{padding:9px 12px;font-size:.84rem;cursor:pointer;border-bottom:1px solid var(--bdr);color:var(--txt);}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:active,.ac-item:hover{background:var(--pp);color:var(--pri);}
+.ac-item b{color:var(--pri);}
 .iw{background:var(--redp);border:1.5px solid var(--red);border-radius:8px;padding:7px 10px;font-size:.76rem;color:var(--red);font-weight:700;margin-top:7px;display:flex;align-items:flex-start;gap:5px;}
 .faseSel{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:4px;}
 .faseO{background:var(--s2);border:2px solid var(--bdr);border-radius:var(--rs);padding:6px 2px;text-align:center;cursor:pointer;font-size:.62rem;font-weight:700;color:var(--t2);}
@@ -972,7 +979,7 @@ function selPerfil(id){
   var hj=new Date().toISOString().slice(0,10);var hr=new Date().toTimeString().slice(0,5);
   set('eData',hj);set('eHora',hr);set('mD1',hj);set('mH1',hr);
   showTab('hoje',document.querySelector('.tab'));
-  renderHoje();renderBkp();renderEst();renderConsLista();renderNotifBanner();if(Notification.permission==='granted'&&!_swReg)registrarSW();
+  renderHoje();renderBkp();renderEst();renderConsLista();setupAcTodos();renderNotifBanner();if(Notification.permission==='granted'&&!_swReg)registrarSW();
 }
 function voltarPerfis(){pid=null;mostrarPerfis();}
 function abrirNP(){set('npNm','');set('npAv','👤');initNasc('npN','');setFase('npFase','adulto');abrirModal('ovNP');}
@@ -1177,7 +1184,7 @@ function abrirNovoMed(){
   document.querySelectorAll('#durGrid .tyo').forEach(function(e){e.classList.remove('on');});
   document.querySelector('#durGrid [data-d="5"]').classList.add('on');
   var hj=new Date().toISOString().slice(0,10);var hr=new Date().toTimeString().slice(0,5);
-  set('mD1',hj);set('mH1',hr);buildMdcSel('mMdcSel','');abrirModal('ovMed');calcPrev();
+  set('mD1',hj);set('mH1',hr);buildMdcSel('mMdcSel','');abrirModal('ovMed');calcPrev();setTimeout(function(){acSetup('mNome','med');acSetup('eMdcTxt','medico');},100);
 }
 function salvarMed(){
   var nm=get('mNome').trim();if(!nm){alert('Informe o nome.');return;}
@@ -1248,7 +1255,7 @@ function renderOtim(){var el=document.getElementById('otimOut');var ms=getMd().f
 function renderEst(){var el=document.getElementById('estBan');if(!el)return;var al=[];getMd().filter(function(m){return m.ativo&&m.qtd>0;}).forEach(function(m){var rest=Math.max(0,m.qtd-(m.qtdU||0));var dias=m.periH>0?Math.round(rest*m.periH/24):0;var av=m.diasAv||7;if(dias<=av)al.push({nome:m.nome,dias:dias,rest:rest,unid:m.unid||'unidades',crit:dias<=2});});if(!al.length){el.innerHTML='';return;}el.innerHTML=al.map(function(a){return '<div style="background:'+(a.crit?'var(--redp)':'#fff3cd')+';border:1.5px solid '+(a.crit?'var(--red)':'#f0a500')+';border-radius:7px;padding:6px 9px;font-size:.73rem;font-weight:700;color:'+(a.crit?'var(--red)':'#7a5200')+';margin-bottom:6px;">📦 <b>'+esc(a.nome)+'</b>: restam ~'+a.dias+' dia'+(a.dias!==1?'s':'')+' de estoque ('+a.rest+' '+esc(a.unid)+') — hora de comprar!</div>';}).join('');}
 
 // ── EVENTOS ───────────────────────────────
-function abrirNovoEv(){eId=null;eFt=[];document.getElementById('evTit').textContent='Novo Evento';['eNome','eSint','eMed','eFreq','eMdcTxt','eMdcTxt2','eMdcTxt3','eEsp','eMotivo','eDiag','eConsObs','eExArea','eExMotivo','eExLocal','eExResult','eAlimDado','eAlimObs','eAlimPode','eAlimNPode','eAlimIdade','svT','svFC','svSat','svFR','svP','svPA'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});set('eData',new Date().toISOString().slice(0,10));set('eHora',new Date().toTimeString().slice(0,5));['eMdcTxt','eMdcTxt2','eMdcTxt3'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});document.querySelectorAll('#reacGrid .tyo').forEach(function(x){x.classList.remove('on');});buildMdcSel('eMdcSel','');buildMdcSel('eMdcSel2','');buildMdcSel('eMdcSel3','');buildMdcSelSimple('eAlimMdcP');buildMdcSelSimple('eAlimMdcN');selTipo(document.querySelector('.tyo[data-v="doenca"]'));renderFotos();renderAlBan();abrirModal('ovEv');}
+function abrirNovoEv(){eId=null;eFt=[];document.getElementById('evTit').textContent='Novo Evento';['eNome','eSint','eMed','eFreq','eMdcTxt','eMdcTxt2','eMdcTxt3','eEsp','eMotivo','eDiag','eConsObs','eExArea','eExMotivo','eExLocal','eExResult','eAlimDado','eAlimObs','eAlimPode','eAlimNPode','eAlimIdade','svT','svFC','svSat','svFR','svP','svPA'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});set('eData',new Date().toISOString().slice(0,10));set('eHora',new Date().toTimeString().slice(0,5));['eMdcTxt','eMdcTxt2','eMdcTxt3'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});document.querySelectorAll('#reacGrid .tyo').forEach(function(x){x.classList.remove('on');});buildMdcSel('eMdcSel','');buildMdcSel('eMdcSel2','');buildMdcSel('eMdcSel3','');buildMdcSelSimple('eAlimMdcP');buildMdcSelSimple('eAlimMdcN');selTipo(document.querySelector('.tyo[data-v="doenca"]'));renderFotos();renderAlBan();abrirModal('ovEv');setTimeout(function(){setupAcTodos();},100);}
 function selTipo(el){document.querySelectorAll('.tyo[data-v]').forEach(function(o){o.classList.remove('on');});el.classList.add('on');var t=el.dataset.v;['gDoenca','gConsulta','gExame','gAlim','gMedicacao','gOutro'].forEach(function(id){var g=document.getElementById(id);if(g)g.style.display='none';});var gSV=document.getElementById('gSV');if(gSV)gSV.style.display=t==='alimentacao'?'none':'block';var map={doenca:'gDoenca',consulta:'gConsulta',exame:'gExame',alimentacao:'gAlim',medicacao:'gMedicacao',outro:'gOutro'};var g=document.getElementById(map[t]||'gOutro');if(g)g.style.display='block';var ph={doenca:'Ex: Resfriado, Gripe…',consulta:'Ex: Consulta de rotina…',exame:'Ex: Hemograma, Ultrassom…',alimentacao:'Ex: Papinha de frango…',medicacao:'Ex: Dipirona…',outro:'Descreva o evento…'};var eN=document.getElementById('eNome');if(eN)eN.placeholder=ph[t]||'Título…';if(t==='alimentacao')renderAlimRestBanner();}
 function salvarEv(){
   var nm=get('eNome').trim();if(!nm){alert('Informe o título.');return;}
@@ -1636,6 +1643,71 @@ function renderNotifBanner(){
   } else {
     el.innerHTML = '<div style="background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:8px 11px;margin-bottom:9px;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="pedirPermissaoNotif()"><div style="font-size:1rem;">🔕</div><div style="flex:1;font-size:.76rem;font-weight:700;color:var(--t3);">Ativar alarmes de medicação e consulta →</div><div style="font-size:.73rem;font-weight:800;color:var(--pri);">Ativar</div></div>';
   }
+}
+
+// ── AUTOCOMPLETE ─────────────────────────
+function getHistorico(tipo){
+  // Coleta valores únicos de todos os perfis para um tipo de campo
+  var vals=new Set();
+  Object.values(EV).forEach(function(evs){
+    (evs||[]).forEach(function(e){
+      if(tipo==='medico'&&e.medico)vals.add(e.medico.trim());
+      if(tipo==='local'&&e.local)vals.add(e.local.trim());
+      if(tipo==='local'&&e.extra&&e.extra.local)vals.add(e.extra.local.trim());
+      if(tipo==='exame'&&e.tipo==='exame'&&e.nome)vals.add(e.nome.trim());
+      if(tipo==='exame'&&e.area)vals.add(e.area.trim());
+      if(tipo==='med'&&e.medicacao)e.medicacao.split(',').forEach(function(m){var t=m.trim();if(t)vals.add(t);});
+      if(tipo==='med'&&e.nome&&(e.tipo==='medicacao'))vals.add(e.nome.trim());
+    });
+  });
+  // Adicionar médicos cadastrados
+  if(tipo==='medico'){Object.values(DC).forEach(function(ds){(ds||[]).forEach(function(d){if(d.nome)vals.add(d.nome+(d.esp?' ('+d.esp+')':''));});});}
+  // Adicionar medicações cadastradas
+  if(tipo==='med'){Object.values(MD).forEach(function(ms){(ms||[]).forEach(function(m){if(m.nome)vals.add(m.nome);});});}
+  return Array.from(vals).filter(Boolean).sort();
+}
+
+function acSetup(inputId, tipo){
+  var inp=document.getElementById(inputId);if(!inp)return;
+  // Criar wrapper se não existir
+  if(!inp.parentNode.classList.contains('ac-wrap')){
+    var wrap=document.createElement('div');wrap.className='ac-wrap';
+    inp.parentNode.insertBefore(wrap,inp);wrap.appendChild(inp);
+  }
+  var wrap=inp.parentNode;
+  // Remover lista existente
+  var old=wrap.querySelector('.ac-list');if(old)old.remove();
+
+  inp.addEventListener('input',function(){
+    var q=this.value.trim().toLowerCase();
+    var list=wrap.querySelector('.ac-list');
+    if(list)list.remove();
+    if(!q||q.length<1)return;
+    var opts=getHistorico(tipo).filter(function(v){return v.toLowerCase().includes(q);}).slice(0,8);
+    if(!opts.length)return;
+    var ul=document.createElement('div');ul.className='ac-list';
+    opts.forEach(function(v){
+      var item=document.createElement('div');item.className='ac-item';
+      // Destacar parte que coincide
+      var idx=v.toLowerCase().indexOf(q);
+      item.innerHTML=idx>=0?esc(v.slice(0,idx))+'<b>'+esc(v.slice(idx,idx+q.length))+'</b>'+esc(v.slice(idx+q.length)):esc(v);
+      item.addEventListener('mousedown',function(e){e.preventDefault();inp.value=v;var l=wrap.querySelector('.ac-list');if(l)l.remove();inp.dispatchEvent(new Event('change'));});
+      ul.appendChild(item);
+    });
+    wrap.appendChild(ul);
+  });
+  inp.addEventListener('blur',function(){setTimeout(function(){var l=wrap.querySelector('.ac-list');if(l)l.remove();},200);});
+}
+
+function setupAcTodos(){
+  // Médico nos campos de texto livre
+  ['eMdcTxt','eMdcTxt2','eMdcTxt3','cMdcTxt'].forEach(function(id){acSetup(id,'medico');});
+  // Local/laboratório
+  acSetup('eExLocal','local');
+  // Medicação
+  acSetup('eMed','med');
+  acSetup('cMedNome','med');
+  acSetup('mNome','med');
 }
 
 init();
