@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rastro — Pontos de Interesse</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232B211A'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23C99A3E' stroke-width='4'/%3E%3Cpath d='M50 20 L58 50 L50 80 L42 50 Z' fill='%23A8562E'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23EDE4D3'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#EDE4D3;
+    --card:#F7F1E4;
+    --ink:#2B211A;
+    --ink-soft:#5A4E40;
+    --clay:#A8562E;
+    --clay-dark:#8A4423;
+    --moss:#5C6B3F;
+    --gold:#C99A3E;
+    --line:#D8CBB0;
+    --danger:#8B3A3A;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    padding-bottom:76px;
+  }
+  h1,h2,h3{font-family:Georgia,"Times New Roman",serif; margin:0 0 8px;}
+  h1{font-size:1.3rem; letter-spacing:.3px;}
+  h2{font-size:1.05rem; color:var(--clay-dark);}
+  p{margin:0 0 8px; color:var(--ink-soft); font-size:.92rem;}
+  header.app-header{
+    background:var(--ink);
+    color:var(--bg);
+    padding:16px 16px 14px;
+    display:flex; align-items:center; gap:10px;
+    position:sticky; top:0; z-index:20;
+  }
+  header.app-header svg{flex-shrink:0;}
+  header.app-header .title small{display:block; font-size:.72rem; color:var(--gold); font-weight:600; letter-spacing:.5px; text-transform:uppercase;}
+  header.app-header .title strong{font-family:Georgia,serif; font-size:1.15rem;}
+  .trip-banner{
+    background:var(--clay); color:#fff; padding:8px 16px; font-size:.82rem;
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+  }
+  .trip-banner button{background:rgba(255,255,255,.18); color:#fff; border:none; border-radius:8px; padding:5px 10px; font-size:.78rem;}
+  main{padding:14px; max-width:640px; margin:0 auto;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-bottom:12px;}
+  button{
+    font-family:inherit; cursor:pointer; border:none; border-radius:10px;
+    padding:11px 14px; font-size:.92rem; font-weight:600; color:#fff; background:var(--clay);
+  }
+  button.secondary{background:var(--moss);}
+  button.ghost{background:transparent; color:var(--clay-dark); border:1.5px solid var(--clay); padding:9px 12px;}
+  button.danger{background:var(--danger);}
+  button.icon-btn{background:var(--card); color:var(--ink); border:1px solid var(--line); padding:8px 10px; font-size:1.1rem;}
+  button:disabled{opacity:.45; cursor:not-allowed;}
+  .btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .btn-block{width:100%;}
+  input[type=text], input[type=date], textarea, select{
+    width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px;
+    background:#fff; color:var(--ink); font-size:.95rem; font-family:inherit; margin-bottom:10px;
+  }
+  textarea{min-height:70px; resize:vertical;}
+  label.field-label{display:block; font-size:.78rem; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px;}
+  .empty-state{text-align:center; padding:34px 14px; color:var(--ink-soft);}
+  .empty-state .glyph{font-size:2.2rem; display:block; margin-bottom:8px;}
+
+  /* bottom nav */
+  nav.tabbar{
+    position:fixed; bottom:0; left:0; right:0; z-index:30;
+    background:var(--ink); display:flex; padding:6px 4px calc(env(safe-area-inset-bottom) + 6px);
+    border-top:1px solid #000;
+  }
+  nav.tabbar button{
+    flex:1; background:transparent; color:#B9AB92; font-weight:600; font-size:.68rem;
+    display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px; border-radius:10px;
+  }
+  nav.tabbar button.active{color:#fff; background:rgba(255,255,255,.08);}
+  nav.tabbar button .ic{font-size:1.15rem;}
+
+  /* category grid */
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px;}
+  .cat-chip{
+    background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:10px 4px;
+    display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.68rem; color:var(--ink-soft); font-weight:600;
+  }
+  .cat-chip .ic{font-size:1.4rem;}
+  .cat-chip.selected{border-color:var(--clay); background:#FBEEE3; color:var(--clay-dark);}
+
+  /* POI list */
+  .poi-item{
+    display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);
+  }
+  .poi-item:last-child{border-bottom:none;}
+  .poi-item .ic{font-size:1.5rem; width:34px; text-align:center; flex-shrink:0;}
+  .poi-item .info{flex:1; min-width:0;}
+  .poi-item .info .nome{font-weight:700; font-size:.92rem;}
+  .poi-item .info .meta{font-size:.75rem; color:var(--ink-soft);}
+  .poi-item .badge-pend{font-size:.65rem; background:var(--gold); color:#3a2a0a; padding:2px 6px; border-radius:6px; font-weight:700; margin-left:4px;}
+  .poi-item .check{width:24px; height:24px; border:2px solid var(--clay); border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.8rem; color:#fff;}
+  .poi-item .check.on{background:var(--clay);}
+  .filter-row{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px;}
+  .filter-chip{flex-shrink:0; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 12px; font-size:.75rem; font-weight:600; color:var(--ink-soft);}
+  .filter-chip.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  /* map */
+  .map-wrap{background:#E4D9C0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  canvas#poiCanvas{display:block; width:100%; touch-action:none;}
+  .map-legend{font-size:.72rem; color:var(--ink-soft); padding:8px 12px; display:flex; justify-content:space-between;}
+
+  /* route list */
+  .route-item{display:flex; align-items:center; gap:8px; padding:8px 4px; border-bottom:1px solid var(--line);}
+  .route-item .num{width:22px; height:22px; border-radius:50%; background:var(--moss); color:#fff; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .route-item .info{flex:1; font-size:.88rem; font-weight:600;}
+  .route-item .up-down{display:flex; gap:3px;}
+  .route-item .up-down button{padding:4px 7px; font-size:.75rem;}
+
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0;}
+  .switch{width:42px; height:24px; border-radius:14px; background:var(--line); position:relative; flex-shrink:0; border:none;}
+  .switch.on{background:var(--moss);}
+  .switch::after{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s;}
+  .switch.on::after{left:21px;}
+
+  .trip-card{display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  .trip-card .info strong{display:block; font-size:.95rem;}
+  .trip-card .info span{font-size:.75rem; color:var(--ink-soft);}
+
+  .modal-bg{position:fixed; inset:0; background:rgba(43,33,26,.55); z-index:50; display:none; align-items:flex-end; justify-content:center;}
+  .modal-bg.active{display:flex;}
+  .modal{background:var(--bg); width:100%; max-width:640px; max-height:88vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);}
+  .modal .close-row{display:flex; justify-content:flex-end; margin-bottom:4px;}
+  .modal .close-row button{background:transparent; color:var(--ink-soft); font-size:1.3rem; padding:2px 8px;}
+  .photo-preview{width:100%; max-height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px; display:none;}
+  .toast{position:fixed; bottom:88px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:10px 18px; border-radius:20px; font-size:.85rem; z-index:60; opacity:0; pointer-events:none; transition:opacity .2s;}
+  .toast.show{opacity:1;}
+  .section-gap{margin-top:18px;}
+  .fab{
+    position:fixed; right:16px; bottom:86px; z-index:25;
+    width:56px; height:56px; border-radius:50%; background:var(--clay); color:#fff;
+    font-size:1.6rem; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.25);
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <svg width="34" height="34" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#2B211A"/><circle cx="50" cy="50" r="34" fill="none" stroke="#C99A3E" stroke-width="4"/><path d="M50 20 L58 50 L50 80 L42 50 Z" fill="#A8562E"/><circle cx="50" cy="50" r="6" fill="#EDE4D3"/></svg>
+  <div class="title">
+    <small>Offline &middot; sem internet</small>
+    <strong>Rastro</strong>
+  </div>
+</header>
+
+<div class="trip-banner" id="tripBanner" style="display:none;">
+  <span id="tripBannerText"></span>
+  <button onclick="showScreen('viagem')">Abrir</button>
+</div>
+
+<main>
+
+  <!-- VIAGENS -->
+  <section class="screen" id="screen-viagens">
+    <h1>Viagens</h1>
+    <p>Crie uma viagem para agrupar os pontos, montar a rota e compartilhar depois.</p>
+    <div id="tripsList"></div>
+    <button class="btn-block section-gap" onclick="openNewTripModal()">＋ Nova viagem</button>
+    <div class="section-gap">
+      <button class="ghost btn-block" onclick="showScreen('pontos'); filterTrip=null; renderPoiList();">📦 Ver acervo geral de pontos</button>
+    </div>
+  </section>
+
+  <!-- VIAGEM ATIVA (detalhe) -->
+  <section class="screen" id="screen-viagem">
+    <h1 id="viagemTitulo">Viagem</h1>
+    <p id="viagemSub"></p>
+    <div class="card">
+      <div class="btn-row">
+        <button onclick="quickMarkPoint()">📍 Marcar ponto agora</button>
+        <button class="secondary" onclick="showScreen('pontos'); filterTrip=currentTripId; renderPoiList();">📋 Ver pontos da viagem</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <strong>Ponto de partida</strong>
+          <p id="origemInfo" style="margin:2px 0 0;">Nenhum definido</p>
+        </div>
+        <button class="ghost" onclick="marcarOrigem()">Marcar</button>
+      </div>
+    </div>
+    <div class="btn-row section-gap">
+      <button class="secondary" onclick="showScreen('rota')">🧭 Montar rota</button>
+      <button class="ghost" onclick="exportTrip(currentTripId)">📤 Compartilhar viagem</button>
+    </div>
+    <div class="section-gap">
+      <button class="danger ghost btn-block" style="color:var(--danger); border-color:var(--danger);" onclick="deleteTrip(currentTripId)">Excluir viagem</button>
+    </div>
+  </section>
+
+  <!-- PONTOS (lista) -->
+  <section class="screen" id="screen-pontos">
+    <h1>Pontos de interesse</h1>
+    <div class="filter-row" id="catFilterRow"></div>
+    <div class="card" id="poiListCard">
+      <div id="poiList"></div>
+    </div>
+  </section>
+
+  <!-- MAPA ESQUEMÁTICO -->
+  <section class="screen" id="screen-mapa">
+    <h1>Mapa esquemático</h1>
+    <p>Posição relativa (distância e direção) a partir do ponto de referência. Não é um mapa real de ruas.</p>
+    <div class="btn-row" style="margin-bottom:10px;">
+      <button class="ghost" onclick="usarLocalAtualComoReferencia()">📡 Usar minha posição agora</button>
+    </div>
+    <div class="map-wrap">
+      <canvas id="poiCanvas" width="600" height="600"></canvas>
+    </div>
+    <div class="map-legend"><span id="mapRefLabel">Referência: —</span><span id="mapScaleLabel"></span></div>
+    <div class="card section-gap">
+      <h2>🐾 Trilha (minhas pegadas)</h2>
+      <p id="trilhaStatus">Nenhuma trilha ativa. Mantenha esta tela aberta enquanto grava.</p>
+      <div class="btn-row">
+        <button id="btnTrilhaStart" onclick="iniciarTrilha()">▶️ Iniciar trilha</button>
+        <button id="btnTrilhaStop" class="danger" onclick="pararTrilha()" style="display:none;">⏹️ Parar trilha</button>
+      </div>
+    </div>
+    <div class="card section-gap" id="mapTapInfo" style="display:none;"></div>
+  </section>
+
+  <!-- ROTA -->
+  <section class="screen" id="screen-rota">
+    <h1>Montar rota</h1>
+    <p>Toque nos pontos da lista para adicionar/remover da rota, ou reordene com as setas.</p>
+    <div class="btn-row" style="margin-bottom:10px;">
+      <button class="secondary" onclick="otimizarRota()">✨ Otimizar ordem</button>
+      <button class="ghost" onclick="limparRota()">Limpar rota</button>
+    </div>
+    <div class="card">
+      <h2>Rota atual</h2>
+      <div id="routeOrderedList"></div>
+      <div class="toggle-row">
+        <div><strong>🔄 Retornar</strong><p style="margin:2px 0 0;">Voltar ao ponto de partida ao final</p></div>
+        <button class="switch" id="switchRetorno" onclick="toggleRetorno()"></button>
+      </div>
+      <button class="btn-block" style="margin-top:8px;" onclick="abrirNoGoogleMaps()">🗺️ Abrir rota no Google Maps</button>
+    </div>
+    <div class="card">
+      <h2>Adicionar pontos à rota</h2>
+      <div id="routeAddList"></div>
+    </div>
+  </section>
+
+</main>
+
+<button class="fab" id="fabAdd" onclick="quickMarkPoint()" title="Marcar ponto">📍</button>
+
+<nav class="tabbar">
+  <button data-tab="viagens" onclick="showScreen('viagens')"><span class="ic">🚗</span>Viagens</button>
+  <button data-tab="pontos" onclick="showScreen('pontos')"><span class="ic">📋</span>Pontos</button>
+  <button data-tab="mapa" onclick="showScreen('mapa')"><span class="ic">🧭</span>Mapa</button>
+  <button data-tab="rota" onclick="showScreen('rota')"><span class="ic">🛣️</span>Rota</button>
+  <button data-tab="ajustes" onclick="showScreen('ajustes')"><span class="ic">⚙️</span>Ajustes</button>
+</nav>
+
+<!-- AJUSTES / BACKUP -->
+<section class="screen" id="screen-ajustes">
+  <div style="padding:0 0 90px;">
+    <h1 style="padding:14px 14px 0;">Ajustes e backup</h1>
+    <div class="card" style="margin:14px;">
+      <h2>Categorias personalizadas</h2>
+      <div id="customCatList"></div>
+      <button class="ghost btn-block" onclick="openNewCategoryModal()">＋ Criar novo tipo de ponto</button>
+    </div>
+    <div class="card" style="margin:14px;">
+      <h2>Backup</h2>
+      <p>Exporte tudo (viagens, pontos e categorias) em um arquivo JSON para guardar no Drive/WhatsApp, ou importe um backup anterior.</p>
+      <div class="btn-row">
+        <button onclick="exportAll()">📤 Exportar tudo</button>
+        <button class="secondary" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importAll(event)">
+    </div>
+  </div>
+</section>
+
+<!-- MODAL: EDITAR/DETALHAR PONTO -->
+<div class="modal-bg" id="modalPoi">
+  <div class="modal">
+    <div class="close-row"><button onclick="closeModal('modalPoi')">✕</button></div>
+    <h2 id="modalPoiTitle">Ponto</h2>
+    <img id="modalPoiPhoto" class="photo-preview">
+    <label class="field-label">Nome</label>
+    <input type="text" id="poiNome" placeholder="Ex: Cachoeira do Sossego">
+    <label class="field-label">Categoria</label>
+    <div class="cat-grid" id="poiCatGrid"></div>
+    <label class="field-label">Descrição / observações</label>
+    <textarea id="poiDescricao" placeholder="Como chegar, o que tem, dica..."></textarea>
+    <label class="field-label">Foto do local</label>
+    <input type="file" accept="image/*" capture="environment" onchange="handlePhotoSelect(event)">
+    <p id="poiCoordsLabel" style="margin-top:8px;"></p>
+    <div class="btn-row section-gap">
+      <button class="btn-block" onclick="savePoi()">Salvar</button>
+    </div>
+    <button class="ghost btn-block" style="margin-top:8px; color:var(--danger); border-color:var(--danger);" onclick="deleteCurrentPoi()">Excluir ponto</button>
+  </div>
+</div>
+
+<!-- MODAL: NOVA VIAGEM -->
+<div class="modal-bg" id="modalTrip">
+  <div class="modal">
+    <div class="close-row"><button onclick="closeModal('modalTrip')">✕</button></div>
+    <h2>Nova viagem</h2>
+    <label class="field-label">Nome da viagem</label>
+    <input type="text" id="tripNome" placeholder="Ex: Serra do Rio do Rastro">
+    <label class="field-label">Data</label>
+    <input type="date" id="tripData">
+    <button class="btn-block" onclick="createTrip()">Criar e abrir</button>
+  </div>
+</div>
+
+<!-- MODAL: NOVA CATEGORIA -->
+<div class="modal-bg" id="modalCat">
+  <div class="modal">
+    <div class="close-row"><button onclick="closeModal('modalCat')">✕</button></div>
+    <h2>Novo tipo de ponto</h2>
+    <label class="field-label">Nome</label>
+    <input type="text" id="catNome" placeholder="Ex: Mirante">
+    <label class="field-label">Ícone</label>
+    <div class="cat-grid" id="iconPickerGrid"></div>
+    <input type="hidden" id="catIconePicked" value="📍">
+    <button class="btn-block" onclick="createCategory()">Criar categoria</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======================= DADOS ======================= */
+const DEFAULT_CATS = [
+  {id:'igreja', nome:'Igreja', icone:'⛪'},
+  {id:'praca', nome:'Praça', icone:'🌳'},
+  {id:'camping', nome:'Camping', icone:'⛺'},
+  {id:'churrasco', nome:'Churrasco', icone:'🔥'},
+  {id:'comida', nome:'Comida', icone:'🍽️'},
+  {id:'restaurante', nome:'Restaurante', icone:'🍴'},
+  {id:'rio', nome:'Rio/Cachoeira', icone:'🌊'},
+  {id:'posto', nome:'Posto', icone:'⛽'},
+  {id:'oficina', nome:'Oficina', icone:'🔧'},
+  {id:'pousada', nome:'Pousada', icone:'🏠'},
+  {id:'atencao', nome:'Atenção na estrada', icone:'🚧'},
+  {id:'outro', nome:'Outro', icone:'📍'},
+];
+const ICON_CHOICES = ['📍','⭐','🏔️','🌅','🐄','🚜','🌉','🏕️','🎣','🥾','🛶','🏞️','🗿','🐎','🌵','🏁'];
+
+let db = {trips:[], points:[], customCats:[]};
+
+function loadDb(){
+  try{
+    const raw = localStorage.getItem('rastro_db_v1');
+    if(raw) db = JSON.parse(raw);
+  }catch(e){ console.error('Falha ao carregar dados', e); }
+  if(!db.trips) db.trips=[];
+  if(!db.points) db.points=[];
+  if(!db.customCats) db.customCats=[];
+}
+function saveDb(){
+  try{
+    localStorage.setItem('rastro_db_v1', JSON.stringify(db));
+  }catch(e){
+    toast('Erro ao salvar. Espaço pode estar cheio.');
+    console.error(e);
+  }
+}
+function allCats(){ return DEFAULT_CATS.concat(db.customCats); }
+function catById(id){ return allCats().find(c=>c.id===id) || allCats()[allCats().length-1]; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ======================= NAVEGAÇÃO ======================= */
+let currentTripId = null;
+let filterTrip = null; // null = acervo geral (todos), else tripId
+let currentCatFilter = 'todos';
+let editingPoiId = null;
+let selectedCatForModal = null;
+let pendingPhotoDataUrl = null;
+let mapRef = null; // {lat,lng,label}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+name);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+  document.getElementById('fabAdd').style.display = (name==='ajustes') ? 'none':'flex';
+  if(name==='viagens') renderTripsList();
+  if(name==='viagem') renderTripDetail();
+  if(name==='pontos') renderPoiList();
+  if(name==='mapa'){
+    renderMap();
+    document.getElementById('btnTrilhaStart').style.display = trilhaWatchId!=null ? 'none':'inline-block';
+    document.getElementById('btnTrilhaStop').style.display = trilhaWatchId!=null ? 'inline-block':'none';
+  }
+  if(name==='rota') renderRoute();
+  if(name==='ajustes') renderCustomCats();
+  updateTripBanner();
+}
+
+function updateTripBanner(){
+  const banner = document.getElementById('tripBanner');
+  if(currentTripId){
+    const t = db.trips.find(x=>x.id===currentTripId);
+    if(t){
+      banner.style.display='flex';
+      document.getElementById('tripBannerText').textContent = '🚗 Viagem ativa: '+t.nome;
+      return;
+    }
+  }
+  banner.style.display='none';
+}
+
+/* ======================= TOAST / MODAL ======================= */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function openModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+
+/* ======================= GEO ======================= */
+function getGps(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation){ reject(new Error('GPS indisponível')); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({lat:pos.coords.latitude, lng:pos.coords.longitude}),
+      err=>reject(err),
+      {enableHighAccuracy:true, timeout:12000}
+    );
+  });
+}
+function haversine(lat1,lng1,lat2,lng2){
+  const R=6371000;
+  const toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function bearing(lat1,lng1,lat2,lng2){
+  const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
+  const y=Math.sin(toRad(lng2-lng1))*Math.cos(toRad(lat2));
+  const x=Math.cos(toRad(lat1))*Math.sin(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(toRad(lng2-lng1));
+  return (toDeg(Math.atan2(y,x))+360)%360;
+}
+function fmtDist(m){
+  if(m<1000) return Math.round(m)+' m';
+  return (m/1000).toFixed(1)+' km';
+}
+
+/* ======================= VIAGENS ======================= */
+function renderTripsList(){
+  const wrap = document.getElementById('tripsList');
+  if(db.trips.length===0){
+    wrap.innerHTML = '<div class="empty-state"><span class="glyph">🗺️</span>Nenhuma viagem ainda. Crie a primeira para começar a marcar pontos.</div>';
+    return;
+  }
+  wrap.innerHTML='';
+  db.trips.slice().reverse().forEach(t=>{
+    const n = db.points.filter(p=>p.tripId===t.id).length;
+    const div=document.createElement('div');
+    div.className='card trip-card';
+    div.innerHTML = `<div class="info"><strong>${escapeHtml(t.nome)}</strong><span>${t.data?formatDateBr(t.data):'sem data'} · ${n} ponto(s)</span></div>`;
+    const btn=document.createElement('button');
+    btn.textContent='Abrir'; btn.className='ghost';
+    btn.onclick=()=>{ currentTripId=t.id; showScreen('viagem'); };
+    div.appendChild(btn);
+    wrap.appendChild(div);
+  });
+}
+function formatDateBr(iso){
+  const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`;
+}
+function openNewTripModal(){
+  document.getElementById('tripNome').value='';
+  document.getElementById('tripData').value = new Date().toISOString().slice(0,10);
+  openModal('modalTrip');
+}
+function createTrip(){
+  const nome=document.getElementById('tripNome').value.trim();
+  if(!nome){ toast('Dê um nome para a viagem'); return; }
+  const t={id:uid(), nome, data:document.getElementById('tripData').value, origemLat:null, origemLng:null, retorno:false, rota:[]};
+  db.trips.push(t); saveDb();
+  closeModal('modalTrip');
+  currentTripId=t.id;
+  showScreen('viagem');
+}
+function renderTripDetail(){
+  const t = db.trips.find(x=>x.id===currentTripId);
+  if(!t){ showScreen('viagens'); return; }
+  document.getElementById('viagemTitulo').textContent = t.nome;
+  const n = db.points.filter(p=>p.tripId===t.id).length;
+  document.getElementById('viagemSub').textContent = (t.data?formatDateBr(t.data)+' · ':'') + n + ' ponto(s) cadastrado(s)';
+  document.getElementById('origemInfo').textContent = t.origemLat!=null ? `${t.origemLat.toFixed(5)}, ${t.origemLng.toFixed(5)}` : 'Nenhum definido';
+}
+async function marcarOrigem(){
+  const t = db.trips.find(x=>x.id===currentTripId);
+  if(!t) return;
+  try{
+    toast('Obtendo posição...');
+    const pos = await getGps();
+    t.origemLat=pos.lat; t.origemLng=pos.lng;
+    saveDb(); renderTripDetail();
+    toast('Ponto de partida marcado');
+  }catch(e){ toast('Não foi possível obter o GPS'); }
+}
+function deleteTrip(id){
+  if(!confirm('Excluir esta viagem? Os pontos cadastrados nela permanecerão no acervo geral.')) return;
+  db.trips = db.trips.filter(t=>t.id!==id);
+  db.points.forEach(p=>{ if(p.tripId===id) p.tripId=null; });
+  saveDb();
+  currentTripId=null;
+  showScreen('viagens');
+}
+function exportTrip(tripId){
+  const t = db.trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const pts = db.points.filter(p=>p.tripId===tripId);
+  downloadJson({trip:t, points:pts, customCats:db.customCats}, 'viagem-'+t.nome.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.json');
+}
+
+/* ======================= PONTOS ======================= */
+async function quickMarkPoint(){
+  try{
+    toast('Obtendo posição GPS...');
+    const pos = await getGps();
+    const p = {
+      id: uid(), nome:'Ponto sem nome', catId:'outro',
+      lat:pos.lat, lng:pos.lng, tripId: currentTripId,
+      descricao:'', foto:null, detalhado:false, criadoEm:Date.now()
+    };
+    db.points.push(p); saveDb();
+    toast('Ponto marcado! Toque para completar depois.');
+    openPoiModal(p.id);
+  }catch(e){
+    toast('Não foi possível obter o GPS');
+  }
+}
+function renderCatFilterRow(){
+  const wrap=document.getElementById('catFilterRow');
+  wrap.innerHTML='';
+  const all=document.createElement('button');
+  all.className='filter-chip'+(currentCatFilter==='todos'?' active':'');
+  all.textContent='Todos'; all.onclick=()=>{currentCatFilter='todos'; renderPoiList();};
+  wrap.appendChild(all);
+  allCats().forEach(c=>{
+    const b=document.createElement('button');
+    b.className='filter-chip'+(currentCatFilter===c.id?' active':'');
+    b.textContent=c.icone+' '+c.nome;
+    b.onclick=()=>{currentCatFilter=c.id; renderPoiList();};
+    wrap.appendChild(b);
+  });
+}
+function renderPoiList(){
+  renderCatFilterRow();
+  const wrap=document.getElementById('poiList');
+  let pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
+  if(currentCatFilter!=='todos') pts = pts.filter(p=>p.catId===currentCatFilter);
+  if(pts.length===0){
+    wrap.innerHTML='<div class="empty-state"><span class="glyph">📍</span>Nenhum ponto por aqui ainda.</div>';
+    return;
+  }
+  wrap.innerHTML='';
+  pts.slice().reverse().forEach(p=>{
+    const c=catById(p.catId);
+    const div=document.createElement('div');
+    div.className='poi-item';
+    div.innerHTML = `<div class="ic">${c.icone}</div>
+      <div class="info"><div class="nome">${escapeHtml(p.nome)}${!p.detalhado?'<span class="badge-pend">completar</span>':''}</div>
+      <div class="meta">${c.nome}</div></div>`;
+    div.onclick=()=>openPoiModal(p.id);
+    wrap.appendChild(div);
+  });
+}
+function openPoiModal(id){
+  editingPoiId=id;
+  const p = db.points.find(x=>x.id===id);
+  document.getElementById('modalPoiTitle').textContent = p.detalhado? 'Editar ponto' : 'Completar ponto';
+  document.getElementById('poiNome').value = p.nome==='Ponto sem nome' ? '' : p.nome;
+  document.getElementById('poiDescricao').value = p.descricao||'';
+  document.getElementById('poiCoordsLabel').textContent = `📍 ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+  const img=document.getElementById('modalPoiPhoto');
+  if(p.foto){ img.src=p.foto; img.style.display='block'; } else { img.style.display='none'; }
+  pendingPhotoDataUrl = p.foto || null;
+  selectedCatForModal = p.catId;
+  renderCatGrid();
+  openModal('modalPoi');
+}
+function renderCatGrid(){
+  const grid=document.getElementById('poiCatGrid');
+  grid.innerHTML='';
+  allCats().forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cat-chip'+(selectedCatForModal===c.id?' selected':'');
+    d.innerHTML=`<span class="ic">${c.icone}</span>${c.nome}`;
+    d.onclick=()=>{ selectedCatForModal=c.id; renderCatGrid(); };
+    grid.appendChild(d);
+  });
+}
+function handlePhotoSelect(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = e=>{
+    img.onload = ()=>{
+      const maxW=800;
+      const scale = Math.min(1, maxW/img.width);
+      const canvas=document.createElement('canvas');
+      canvas.width=img.width*scale; canvas.height=img.height*scale;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      pendingPhotoDataUrl = canvas.toDataURL('image/jpeg',0.7);
+      const prev=document.getElementById('modalPoiPhoto');
+      prev.src=pendingPhotoDataUrl; prev.style.display='block';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function savePoi(){
+  const p = db.points.find(x=>x.id===editingPoiId);
+  if(!p) return;
+  const nome = document.getElementById('poiNome').value.trim();
+  p.nome = nome || 'Ponto sem nome';
+  p.catId = selectedCatForModal || 'outro';
+  p.descricao = document.getElementById('poiDescricao').value.trim();
+  p.foto = pendingPhotoDataUrl;
+  p.detalhado = true;
+  saveDb();
+  closeModal('modalPoi');
+  toast('Ponto salvo');
+  renderPoiList();
+}
+function deleteCurrentPoi(){
+  if(!confirm('Excluir este ponto?')) return;
+  db.points = db.points.filter(p=>p.id!==editingPoiId);
+  db.trips.forEach(t=>{ t.rota = (t.rota||[]).filter(id=>id!==editingPoiId); });
+  saveDb();
+  closeModal('modalPoi');
+  renderPoiList();
+}
+
+/* ======================= MAPA ESQUEMÁTICO ======================= */
+async function usarLocalAtualComoReferencia(){
+  try{
+    toast('Obtendo posição...');
+    const pos=await getGps();
+    mapRef={lat:pos.lat,lng:pos.lng,label:'Minha posição agora'};
+    renderMap();
+  }catch(e){ toast('GPS indisponível'); }
+}
+function getDefaultRef(){
+  const t = db.trips.find(x=>x.id===currentTripId);
+  if(t && t.origemLat!=null) return {lat:t.origemLat,lng:t.origemLng,label:'Partida da viagem'};
+  const pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
+  if(pts.length>0) return {lat:pts[0].lat,lng:pts[0].lng,label:pts[0].nome};
+  return null;
+}
+function renderMap(){
+  if(!mapRef) mapRef = getDefaultRef();
+  const canvas=document.getElementById('poiCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#E4D9C0'; ctx.fillRect(0,0,W,H);
+  document.getElementById('mapRefLabel').textContent = mapRef ? 'Referência: '+mapRef.label : 'Referência: —';
+  if(!mapRef){
+    ctx.fillStyle='#5A4E40'; ctx.font='16px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('Marque um ponto ou defina a referência', cx, cy);
+    document.getElementById('mapScaleLabel').textContent='';
+    return;
+  }
+  const pts = (filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points)
+    .filter(p=>!(p.lat===mapRef.lat && p.lng===mapRef.lng));
+  const trilhas = currentTripId ? trilhasDaViagem(currentTripId).map(t=>t.pontos) : [];
+  if(trilhaBuffer.length>1) trilhas.push(trilhaBuffer);
+  let maxDist = 50;
+  const withGeo = pts.map(p=>{
+    const d=haversine(mapRef.lat,mapRef.lng,p.lat,p.lng);
+    const b=bearing(mapRef.lat,mapRef.lng,p.lat,p.lng);
+    return {p,d,b};
+  });
+  withGeo.forEach(x=>{ if(x.d>maxDist) maxDist=x.d; });
+  trilhas.forEach(trilha=>trilha.forEach(pt=>{
+    const d=haversine(mapRef.lat,mapRef.lng,pt.lat,pt.lng);
+    if(d>maxDist) maxDist=d;
+  }));
+  maxDist = maxDist*1.15;
+  const radiusPx = Math.min(W,H)/2 - 40;
+  // rings
+  ctx.strokeStyle='#C7B896'; ctx.fillStyle='#8A7A5C'; ctx.font='11px sans-serif'; ctx.textAlign='left';
+  [0.33,0.66,1].forEach(f=>{
+    ctx.beginPath(); ctx.arc(cx,cy,radiusPx*f,0,Math.PI*2); ctx.stroke();
+    ctx.fillText(fmtDist(maxDist*f), cx+6, cy-radiusPx*f+12);
+  });
+  // reference point
+  ctx.fillStyle='#2B211A';
+  ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#EDE4D3'; ctx.font='11px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('★', cx, cy+4);
+  // trilhas (linhas de percurso)
+  function toXY(lat,lng){
+    const d=haversine(mapRef.lat,mapRef.lng,lat,lng);
+    const b=bearing(mapRef.lat,mapRef.lng,lat,lng);
+    const rad=(b-90)*Math.PI/180;
+    const r=(d/maxDist)*radiusPx;
+    return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+  }
+  ctx.strokeStyle='#A8562E'; ctx.lineWidth=2.5; ctx.setLineDash([6,4]);
+  trilhas.forEach(trilha=>{
+    ctx.beginPath();
+    trilha.forEach((pt,i)=>{
+      const xy=toXY(pt.lat,pt.lng);
+      if(i===0) ctx.moveTo(xy.x,xy.y); else ctx.lineTo(xy.x,xy.y);
+    });
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  // points
+  window._mapHitTargets = [];
+  withGeo.forEach(({p,d,b})=>{
+    const rad = (b-90)*Math.PI/180; // 0deg(N) at top
+    const r = (d/maxDist)*radiusPx;
+    const x = cx + r*Math.cos(rad);
+    const y = cy + r*Math.sin(rad);
+    const c = catById(p.catId);
+    ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(c.icone, x, y);
+    window._mapHitTargets.push({x,y,p});
+  });
+  document.getElementById('mapScaleLabel').textContent = 'Raio: '+fmtDist(maxDist);
+}
+document.getElementById('poiCanvas').addEventListener('click', function(ev){
+  const rect=this.getBoundingClientRect();
+  const scaleX = this.width/rect.width, scaleY=this.height/rect.height;
+  const x=(ev.clientX-rect.left)*scaleX, y=(ev.clientY-rect.top)*scaleY;
+  const targets = window._mapHitTargets||[];
+  let hit=null;
+  targets.forEach(t=>{ if(Math.hypot(t.x-x,t.y-y)<22) hit=t; });
+  const info=document.getElementById('mapTapInfo');
+  if(hit){
+    const c=catById(hit.p.catId);
+    info.style.display='block';
+    info.innerHTML = `<strong>${c.icone} ${escapeHtml(hit.p.nome)}</strong><p style="margin:4px 0 8px;">${escapeHtml(hit.p.descricao||'')}</p>`;
+    const btn=document.createElement('button');
+    btn.textContent='Editar / ver detalhes'; btn.className='btn-block';
+    btn.onclick=()=>openPoiModal(hit.p.id);
+    info.appendChild(btn);
+  } else {
+    info.style.display='none';
+  }
+});
+
+/* ======================= TRILHA (PEGADAS) ======================= */
+let trilhaWatchId = null;
+let trilhaBuffer = []; // pontos sendo gravados na sessão atual
+const TRILHA_MIN_METROS = 80; // grava um novo ponto só se andou pelo menos isso desde o último
+
+function trilhasDaViagem(tripId){
+  const t = db.trips.find(x=>x.id===tripId);
+  if(!t) return [];
+  if(!t.trilhas) t.trilhas=[];
+  return t.trilhas;
+}
+function iniciarTrilha(){
+  if(!currentTripId){ toast('Abra uma viagem primeiro para gravar a trilha'); return; }
+  if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
+  trilhaBuffer = [];
+  document.getElementById('btnTrilhaStart').style.display='none';
+  document.getElementById('btnTrilhaStop').style.display='inline-block';
+  document.getElementById('trilhaStatus').textContent = 'Gravando... 0 pontos registrados.';
+  trilhaWatchId = navigator.geolocation.watchPosition(function(pos){
+    const {latitude:lat, longitude:lng} = pos.coords;
+    const last = trilhaBuffer[trilhaBuffer.length-1];
+    if(!last || haversine(last.lat,last.lng,lat,lng) >= TRILHA_MIN_METROS){
+      trilhaBuffer.push({lat,lng,t:Date.now()});
+      document.getElementById('trilhaStatus').textContent = 'Gravando... '+trilhaBuffer.length+' ponto(s) registrado(s).';
+      renderMap();
+    }
+  }, function(err){
+    console.error(err);
+  }, {enableHighAccuracy:true, maximumAge:5000});
+}
+function pararTrilha(){
+  if(trilhaWatchId!=null){ navigator.geolocation.clearWatch(trilhaWatchId); trilhaWatchId=null; }
+  document.getElementById('btnTrilhaStart').style.display='inline-block';
+  document.getElementById('btnTrilhaStop').style.display='none';
+  if(trilhaBuffer.length<2){
+    document.getElementById('trilhaStatus').textContent = 'Trilha muito curta, não foi salva.';
+    trilhaBuffer=[];
+    return;
+  }
+  const t = db.trips.find(x=>x.id===currentTripId);
+  if(t){
+    if(!t.trilhas) t.trilhas=[];
+    t.trilhas.push({id:uid(), pontos:trilhaBuffer, criadoEm:Date.now()});
+    saveDb();
+  }
+  document.getElementById('trilhaStatus').textContent = 'Trilha salva com '+trilhaBuffer.length+' pontos.';
+  trilhaBuffer=[];
+  renderMap();
+}
+
+/* ======================= ROTA ======================= */
+function currentTripObj(){ return db.trips.find(x=>x.id===currentTripId); }
+function renderRoute(){
+  const t = currentTripObj();
+  const wrapOrdered = document.getElementById('routeOrderedList');
+  const wrapAdd = document.getElementById('routeAddList');
+  const sw = document.getElementById('switchRetorno');
+  if(!t){
+    wrapOrdered.innerHTML = '<div class="empty-state">Abra uma viagem para montar a rota.</div>';
+    wrapAdd.innerHTML='';
+    return;
+  }
+  sw.classList.toggle('on', !!t.retorno);
+  const rota = t.rota || [];
+  wrapOrdered.innerHTML = rota.length===0 ? '<p>Nenhum ponto na rota ainda.</p>' : '';
+  rota.forEach((pid,idx)=>{
+    const p = db.points.find(x=>x.id===pid);
+    if(!p) return;
+    const div=document.createElement('div');
+    div.className='route-item';
+    div.innerHTML = `<div class="num">${idx+1}</div><div class="info">${escapeHtml(p.nome)}</div>`;
+    const controls=document.createElement('div'); controls.className='up-down';
+    const up=document.createElement('button'); up.textContent='↑'; up.onclick=()=>moveRoute(idx,-1);
+    const down=document.createElement('button'); down.textContent='↓'; down.onclick=()=>moveRoute(idx,1);
+    const rm=document.createElement('button'); rm.textContent='✕'; rm.onclick=()=>toggleInRoute(pid);
+    controls.appendChild(up); controls.appendChild(down); controls.appendChild(rm);
+    div.appendChild(controls);
+    wrapOrdered.appendChild(div);
+  });
+  const pts = db.points.filter(p=>p.tripId===currentTripId && !rota.includes(p.id));
+  wrapAdd.innerHTML = pts.length===0 ? '<p>Todos os pontos já estão na rota.</p>' : '';
+  pts.forEach(p=>{
+    const c=catById(p.catId);
+    const div=document.createElement('div');
+    div.className='poi-item';
+    div.innerHTML = `<div class="ic">${c.icone}</div><div class="info"><div class="nome">${escapeHtml(p.nome)}</div></div><div class="check">＋</div>`;
+    div.onclick=()=>toggleInRoute(p.id);
+    wrapAdd.appendChild(div);
+  });
+}
+function toggleInRoute(pid){
+  const t = currentTripObj(); if(!t) return;
+  t.rota = t.rota || [];
+  if(t.rota.includes(pid)) t.rota = t.rota.filter(x=>x!==pid);
+  else t.rota.push(pid);
+  saveDb(); renderRoute();
+}
+function moveRoute(idx,dir){
+  const t = currentTripObj(); if(!t) return;
+  const arr=t.rota; const ni=idx+dir;
+  if(ni<0||ni>=arr.length) return;
+  [arr[idx],arr[ni]]=[arr[ni],arr[idx]];
+  saveDb(); renderRoute();
+}
+function limparRota(){
+  const t = currentTripObj(); if(!t) return;
+  if(!confirm('Limpar todos os pontos da rota?')) return;
+  t.rota=[]; saveDb(); renderRoute();
+}
+function toggleRetorno(){
+  const t = currentTripObj(); if(!t) return;
+  t.retorno = !t.retorno;
+  saveDb(); renderRoute();
+}
+function otimizarRota(){
+  const t = currentTripObj(); if(!t || !t.rota || t.rota.length<2) return;
+  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
+  let startLat, startLng;
+  if(t.origemLat!=null){ startLat=t.origemLat; startLng=t.origemLng; }
+  else { startLat=pts[0].lat; startLng=pts[0].lng; }
+  const remaining = pts.slice();
+  const ordered=[];
+  let curLat=startLat, curLng=startLng;
+  while(remaining.length){
+    let bestIdx=0, bestDist=Infinity;
+    remaining.forEach((p,i)=>{
+      const d=haversine(curLat,curLng,p.lat,p.lng);
+      if(d<bestDist){ bestDist=d; bestIdx=i; }
+    });
+    const next = remaining.splice(bestIdx,1)[0];
+    ordered.push(next.id);
+    curLat=next.lat; curLng=next.lng;
+  }
+  t.rota = ordered;
+  saveDb(); renderRoute();
+  toast('Rota otimizada por proximidade');
+}
+function abrirNoGoogleMaps(){
+  const t = currentTripObj();
+  if(!t || !t.rota || t.rota.length===0){ toast('Adicione pontos à rota primeiro'); return; }
+  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
+  let coords = pts.map(p=>`${p.lat},${p.lng}`);
+  let origin = t.origemLat!=null ? `${t.origemLat},${t.origemLng}` : coords[0];
+  let stops = t.origemLat!=null ? coords : coords.slice(1);
+  let destination;
+  if(t.retorno){
+    destination = origin;
+  } else {
+    destination = stops.length ? stops[stops.length-1] : origin;
+    stops = stops.slice(0,-1);
+  }
+  const waypoints = stops.slice(0,9).join('|');
+  let url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}`;
+  if(waypoints) url += `&waypoints=${encodeURIComponent(waypoints)}`;
+  window.open(url, '_blank');
+}
+
+/* ======================= CATEGORIAS PERSONALIZADAS ======================= */
+function renderCustomCats(){
+  const wrap=document.getElementById('customCatList');
+  if(db.customCats.length===0){ wrap.innerHTML='<p>Nenhuma categoria personalizada ainda.</p>'; return; }
+  wrap.innerHTML='';
+  db.customCats.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='poi-item';
+    div.innerHTML = `<div class="ic">${c.icone}</div><div class="info"><div class="nome">${escapeHtml(c.nome)}</div></div>`;
+    const rm=document.createElement('button'); rm.className='ghost'; rm.textContent='Remover';
+    rm.onclick=()=>{ db.customCats = db.customCats.filter(x=>x.id!==c.id); saveDb(); renderCustomCats(); };
+    div.appendChild(rm);
+    wrap.appendChild(div);
+  });
+}
+function openNewCategoryModal(){
+  document.getElementById('catNome').value='';
+  document.getElementById('catIconePicked').value='📍';
+  const grid=document.getElementById('iconPickerGrid');
+  grid.innerHTML='';
+  ICON_CHOICES.forEach(ic=>{
+    const d=document.createElement('div');
+    d.className='cat-chip'+(ic==='📍'?' selected':'');
+    d.innerHTML=`<span class="ic">${ic}</span>`;
+    d.onclick=()=>{
+      document.getElementById('catIconePicked').value=ic;
+      Array.from(grid.children).forEach(ch=>ch.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    grid.appendChild(d);
+  });
+  openModal('modalCat');
+}
+function createCategory(){
+  const nome=document.getElementById('catNome').value.trim();
+  if(!nome){ toast('Dê um nome para a categoria'); return; }
+  const icone=document.getElementById('catIconePicked').value;
+  db.customCats.push({id:'c_'+uid(), nome, icone});
+  saveDb();
+  closeModal('modalCat');
+  renderCustomCats();
+  toast('Categoria criada');
+}
+
+/* ======================= BACKUP ======================= */
+function downloadJson(obj, filename){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function exportAll(){
+  downloadJson(db, 'rastro-backup-'+new Date().toISOString().slice(0,10)+'.json');
+  toast('Backup exportado');
+}
+function importAll(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const incoming = JSON.parse(e.target.result);
+      const mode = incoming.trip ? 'trip' : 'full';
+      if(mode==='trip'){
+        // pacote de viagem única compartilhada
+        if(!db.trips.find(t=>t.id===incoming.trip.id)) db.trips.push(incoming.trip);
+        (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
+        (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
+        toast('Viagem importada');
+      } else {
+        if(confirm('Importar como backup completo? OK = mesclar com os dados atuais, Cancelar = substituir tudo')){
+          incoming.trips.forEach(t=>{ if(!db.trips.find(x=>x.id===t.id)) db.trips.push(t); });
+          incoming.points.forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
+          (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
+        } else {
+          db = incoming;
+        }
+        toast('Backup importado');
+      }
+      saveDb();
+      showScreen('viagens');
+    }catch(err){
+      toast('Arquivo inválido');
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+  ev.target.value='';
+}
+
+/* ======================= UTIL ======================= */
+function escapeHtml(str){
+  return (str||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ======================= INIT ======================= */
+window.addEventListener('load', function(){
+  loadDb();
+  showScreen('viagens');
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log('SW não registrado (ok em file://): ', e); });
+  }
+});
+</script>
+</body>
+</html>

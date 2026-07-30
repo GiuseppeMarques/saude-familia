@@ -1,0 +1,15 @@
+{
+  "name": "Rastro — Pontos de Interesse",
+  "short_name": "Rastro",
+  "start_url": "./pontos-interesse.html",
+  "display": "standalone",
+  "background_color": "#EDE4D3",
+  "theme_color": "#2B211A",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232B211A'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23C99A3E' stroke-width='4'/%3E%3Cpath d='M50 20 L58 50 L50 80 L42 50 Z' fill='%23A8562E'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23EDE4D3'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
