@@ -998,22 +998,13 @@ function setupPWA(){
     link.href = URL.createObjectURL(manifestBlob);
     document.head.appendChild(link);
 
-    if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
-      const swCode = `
-        const CACHE='fv-cache-v3';
-        self.addEventListener('install', e=>{ self.skipWaiting(); });
-        self.addEventListener('activate', e=>{ self.clients.claim(); });
-        self.addEventListener('fetch', e=>{
-          e.respondWith(
-            caches.open(CACHE).then(cache=>
-              fetch(e.request).then(res=>{ cache.put(e.request, res.clone()); return res; })
-                .catch(()=> cache.match(e.request))
-            )
-          );
-        });
-      `;
-      const swBlob = new Blob([swCode], {type:'application/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err=>console.warn('SW não registrado:', err));
+    // IMPORTANTE: o Chrome bloqueia registro de Service Worker via blob: URL (erro de segurança
+    // silencioso, sempre falhava). Por isso o SW precisa ser um arquivo real "sw.js" hospedado ao
+    // lado deste HTML (ex: GitHub Pages/Netlify). Em arquivo local (file://) o navegador não
+    // permite Service Worker de forma alguma — restrição da plataforma, não bug daqui; o app
+    // simplesmente roda sem cache de SW nesse caso (não precisa, já que não tem dependência externa).
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('./sw.js').catch(err=>console.warn('SW não registrado:', err));
     }
   }catch(e){ console.warn('PWA setup falhou:', e); }
 }
