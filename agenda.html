@@ -257,15 +257,13 @@ textarea{resize:none;}
       <button class="tab" data-view="week" onclick="setView('week')">Semana</button>
       <button class="tab" data-view="month" onclick="setView('month')">Mês</button>
       <button class="tab" data-view="annual" onclick="setView('annual')">Ano</button>
+      <button class="tab" data-view="loans" onclick="setView('loans')">📦 Lembretes</button>
+      <button class="tab" data-view="backup" onclick="setView('backup')">💾 Backup</button>
     </div>
     <div class="nav-row">
       <button class="nav-btn" onclick="navPrev()">‹</button>
       <span class="nav-title" id="nav-title"></span>
-      <div style="display:flex;align-items:center;gap:2px">
-        <button class="nav-btn" onclick="exportBackup()" title="Exportar backup" style="font-size:16px">⬇️</button>
-        <button class="nav-btn" onclick="document.getElementById('import-file').click()" title="Importar backup" style="font-size:16px">⬆️</button>
-        <input id="import-file" type="file" accept="application/json" style="display:none" onchange="importBackup(this)"/>
-      </div>
+      
       <button class="nav-btn" onclick="navNext()">›</button>
     </div>
   </div>
@@ -325,7 +323,11 @@ const PRIORITIES=[
 const LETTERS=["A","B","C","D","E"];
 const RECUR_OPTS=[
   {id:"",label:"Nunca"},
+  {id:"daily",label:"Diário"},
   {id:"weekly",label:"Semanal"},
+  {id:"weekday",label:"Dia da semana"},
+  {id:"monthday",label:"Dia do mês"},
+  {id:"firstweek",label:"1ª semana do mês"},
   {id:"monthly",label:"Mensal"},
   {id:"yearly",label:"Anual"},
 ];
@@ -368,12 +370,13 @@ function loadState(){
   S.tasks=ls("agd_t4",[]);
   S.journal=ls("agd_j4",{});
   S.princDay=ls("agd_p4",{});
+  S.loans=ls("agd_loans",[]);
   S.notifOk=safeNotifOk();
   try{
     localStorage.setItem("__test__","1");localStorage.removeItem("__test__");
   }catch{_usingMemFallback=true;}
 }
-function persist(){ss("agd_t4",S.tasks);ss("agd_j4",S.journal);ss("agd_p4",S.princDay);}
+function persist(){ss("agd_t4",S.tasks);ss("agd_loans",S.loans);ss("agd_j4",S.journal);ss("agd_p4",S.princDay);}
 
 // ─── BACKUP (export/import JSON) ───────────────────────────────────────────────
 function exportBackup(){
@@ -414,8 +417,8 @@ function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace
 function isOverdue(t){
   if(t.done||!t.deadline)return false;
   const td=todayISO();
-  if(t.deadline<td)return true;
-  if(t.deadline===td&&t.deadlineTime){const n=new Date();const cur=`${p2(n.getHours())}:${p2(n.getMinutes())}`;return t.deadlineTime<cur;}
+  // Se prazo já passou OU é hoje e não foi concluída → urgente+importante
+  if(t.deadline<=td)return true;
   return false;
 }
 function effPrio(t){if(isOverdue(t))return PRIORITIES[0];return PRIORITIES.find(p=>p.id===t.priority)||PRIORITIES[3];}
@@ -439,6 +442,7 @@ function uiTasksForDate(ds){
 
 // ─── RENDER ───────────────────────────────────────────────────────────────────
 function render(){
+  if(S.view==='loans'||S.view==='backup') return;
   updateTabs();updateNavTitle();
   const c=document.getElementById("content");
   if(S.view==="day") c.innerHTML=renderDay();
@@ -755,7 +759,159 @@ function bindLiveInputs(){
 }
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
-function setView(v){S.view=v;S.weekOffset=0;render();}
+function setView(v){
+  S.view=v;S.weekOffset=0;
+  // Show/hide special views
+  // Update tab active state
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.view===v);
+  });
+  // Show/hide main calendar area
+  const isSpecial = v==='loans'||v==='backup';
+  const contentDiv = document.getElementById('content');
+  if(contentDiv) contentDiv.style.display = isSpecial?'none':'';
+  // Also hide view-loans and view-backup when not active
+  const vl = document.getElementById('view-loans');
+  const vb = document.getElementById('view-backup');
+  if(vl) vl.style.display = v==='loans'?'block':'none';
+  if(vb) vb.style.display = v==='backup'?'block':'none';
+  if(v==='loans'){renderLoans();return;}
+  if(v==='backup')return;
+  render();
+}
+
+// ── LEMBRETES ──────────────────────────────
+var _loanEditId=null, _loanTipo='dei', filtroEmp='todos';
+
+function abrirNovoEmprestimo(){
+  _loanEditId=null;_loanTipo='dei';
+  document.getElementById('loan-modal-title').textContent='Novo Lembrete';
+  ['loan-item','loan-pessoa','loan-obs'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('loan-data').value=todayISO();
+  document.getElementById('loan-devolucao').value='';
+  selLoanTipo(document.querySelector('#loan-tipo-grid [data-t="dei"]'));
+  document.getElementById('mo-loan').style.display='flex';
+}
+function fecharMoLoan(){document.getElementById('mo-loan').style.display='none';}
+function selLoanTipo(el){
+  _loanTipo=el.dataset.t;
+  document.querySelectorAll('#loan-tipo-grid button').forEach(b=>{
+    const act=b.dataset.t===_loanTipo;
+    b.style.background=act?'#3B82F6':'#f8fafc';
+    b.style.color=act?'#fff':'#1e293b';
+    b.style.borderColor=act?'#3B82F6':'#e2e8f0';
+  });
+}
+function salvarLoan(){
+  const item=document.getElementById('loan-item').value.trim();
+  const pessoa=document.getElementById('loan-pessoa').value.trim();
+  if(!item||!pessoa){alert('Informe o item e a pessoa.');return;}
+  const loan={
+    id:_loanEditId||Date.now().toString(36),
+    tipo:_loanTipo,item,pessoa,
+    data:document.getElementById('loan-data').value,
+    devolucao:document.getElementById('loan-devolucao').value,
+    obs:document.getElementById('loan-obs').value.trim(),
+    devolvido:false,criadoEm:new Date().toISOString()
+  };
+  if(!S.loans)S.loans=[];
+  if(_loanEditId){
+    const i=S.loans.findIndex(l=>l.id===_loanEditId);
+    if(i>=0)S.loans[i]={...S.loans[i],...loan};
+  } else {
+    S.loans.push(loan);
+  }
+  persist();fecharMoLoan();renderLoans();
+}
+function marcarDevolvido(id){
+  const l=S.loans.find(x=>x.id===id);if(!l)return;
+  l.devolvido=!l.devolvido;persist();renderLoans();
+}
+function editarLoan(id){
+  const l=S.loans.find(x=>x.id===id);if(!l)return;
+  _loanEditId=id;_loanTipo=l.tipo;
+  document.getElementById('loan-modal-title').textContent='Editar Lembrete';
+  document.getElementById('loan-item').value=l.item||'';
+  document.getElementById('loan-pessoa').value=l.pessoa||'';
+  document.getElementById('loan-data').value=l.data||'';
+  document.getElementById('loan-devolucao').value=l.devolucao||'';
+  document.getElementById('loan-obs').value=l.obs||'';
+  selLoanTipo(document.querySelector(`#loan-tipo-grid [data-t="${l.tipo}"]`));
+  document.getElementById('mo-loan').style.display='flex';
+}
+function excluirLoan(id){
+  if(!confirm('Excluir este lembrete?'))return;
+  S.loans=S.loans.filter(l=>l.id!==id);
+  persist();renderLoans();
+}
+function renderLoans(){
+  const el=document.getElementById('loans-list');if(!el)return;
+  const lista=(S.loans||[]).filter(l=>{
+    if(filtroEmp==='dei')return l.tipo==='dei';
+    if(filtroEmp==='recebi')return l.tipo==='recebi';
+    return true;
+  }).sort((a,b)=>(a.devolvido?1:-1)-(b.devolvido?1:-1));
+  // Update filter buttons
+  ['todos','dei','recebi'].forEach(f=>{
+    const btn=document.getElementById('fEmp'+f.charAt(0).toUpperCase()+f.slice(1));
+    if(btn){btn.style.background=filtroEmp===f?'#3B82F6':'#fff';btn.style.color=filtroEmp===f?'#fff':'#1e293b';btn.style.borderColor=filtroEmp===f?'#3B82F6':'#ddd';}
+  });
+  if(!lista.length){
+    el.innerHTML='<div style="text-align:center;padding:30px;color:#94a3b8;"><div style="font-size:2rem;">📦</div><p>Nenhum lembrete de item registrado.</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  lista.forEach(l=>{
+    const hoje=todayISO();
+    const atrasado=l.devolucao&&l.devolucao<hoje&&!l.devolvido;
+    const card=document.createElement('div');
+    card.style.cssText=`background:${l.devolvido?'#f0fdf4':'#fff'};border:1.5px solid ${atrasado?'#ef4444':l.devolvido?'#86efac':'#e2e8f0'};border-radius:12px;padding:12px;margin-bottom:8px;`;
+    card.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="font-size:1.2rem;">${l.tipo==='dei'?'📤':'📥'}</span>
+      <div style="flex:1;">
+        <div style="font-size:.9rem;font-weight:700;${l.devolvido?'text-decoration:line-through;color:#94a3b8;':''}">${esc(l.item)}</div>
+        <div style="font-size:.75rem;color:#64748b;">${l.tipo==='dei'?'Para:':'De:'} <b>${esc(l.pessoa)}</b> · ${l.data||'—'}</div>
+        ${l.devolucao?`<div style="font-size:.72rem;color:${atrasado?'#ef4444':'#64748b'};">${atrasado?'⚠️ Atrasado!':''} Devolução: ${l.devolucao}</div>`:''}
+        ${l.obs?`<div style="font-size:.72rem;color:#94a3b8;margin-top:2px;">${esc(l.obs)}</div>`:''}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="marcarDevolvido('${l.id}')" style="flex:1;padding:6px;border-radius:7px;border:none;background:${l.devolvido?'#f1f5f9':'#16a34a'};color:${l.devolvido?'#64748b':'#fff'};font-size:.78rem;font-weight:700;cursor:pointer;">${l.devolvido?'↩ Desfazer':'✓ Devolvido'}</button>
+      <button onclick="editarLoan('${l.id}')" style="padding:6px 10px;border-radius:7px;border:1px solid #e2e8f0;background:#f8fafc;font-size:.78rem;cursor:pointer;">✏️</button>
+      <button onclick="excluirLoan('${l.id}')" style="padding:6px 10px;border-radius:7px;border:1px solid #fecaca;background:#fef2f2;font-size:.78rem;cursor:pointer;">🗑️</button>
+    </div>`;
+    el.appendChild(card);
+  });
+}
+
+// ── BACKUP COMPLETO ──────────────────────────
+function exportBackupFull(){
+  const data={tasks:S.tasks,journal:S.journal,princDay:S.princDay,loans:S.loans||[],exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;
+  a.download=`agenda-backup-${todayISO()}.json`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importBackupFull(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!confirm(`Importar backup de ${d.exportedAt||'data desconhecida'}?\nIsso substituirá todos os dados atuais.`))return;
+      if(d.tasks)S.tasks=d.tasks;
+      if(d.journal)S.journal=d.journal;
+      if(d.princDay)S.princDay=d.princDay;
+      if(d.loans)S.loans=d.loans;
+      persist();render();
+      alert('✅ Backup restaurado com sucesso!');
+    }catch(err){alert('Erro ao importar: '+err.message);}
+  };
+  reader.readAsText(file);
+}
 function navPrev(){
   if(S.view==="annual")S.year--;
   else if(S.view==="month"){if(S.month===0){S.month=11;S.year--;}else S.month--;}
@@ -871,7 +1027,23 @@ function addInterval(dateStr,recurrence,n){
   if(!dateStr)return"";
   const[y,m,d]=dateStr.split("-").map(Number);
   const dt=new Date(y,m-1,d);
-  if(recurrence==="weekly")dt.setDate(dt.getDate()+7*n);
+  if(recurrence==="daily")dt.setDate(dt.getDate()+n);
+  else if(recurrence==="weekly")dt.setDate(dt.getDate()+7*n);
+  else if(recurrence==="weekday"){
+    // Repeat on same weekday each week
+    dt.setDate(dt.getDate()+7*n);
+  }
+  else if(recurrence==="monthday"){
+    // Repeat on same day each month
+    dt.setMonth(dt.getMonth()+n);
+  }
+  else if(recurrence==="firstweek"){
+    // Repeat on first occurrence of same weekday each month
+    const dow=dt.getDay();
+    dt.setMonth(dt.getMonth()+n);
+    dt.setDate(1);
+    while(dt.getDay()!==dow)dt.setDate(dt.getDate()+1);
+  }
   else if(recurrence==="monthly")dt.setMonth(dt.getMonth()+n);
   else if(recurrence==="yearly")dt.setFullYear(dt.getFullYear()+n);
   return dStr(dt);
