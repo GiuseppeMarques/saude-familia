@@ -147,6 +147,12 @@
     font-size:1.6rem; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.25);
   }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+#leafletMap{width:100%;height:62vh;border-radius:12px;margin-top:8px;display:none;}
+.city-lbl{background:none!important;border:none!important;box-shadow:none!important;
+  color:#1e293b;font-size:10px;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff;}
+</style>
 </head>
 <body>
 
@@ -185,6 +191,7 @@
         <button onclick="quickMarkPoint()">📍 Marcar ponto agora</button>
         <button class="secondary" onclick="showScreen('pontos'); filterTrip=currentTripId; renderPoiList();">📋 Ver pontos da viagem</button>
       </div>
+      <div style="margin-top:8px;"><button class="secondary" style="width:100%;" onclick="abrirAcervo()">📦 Adicionar pontos do acervo</button></div>
     </div>
     <div class="card">
       <div class="toggle-row">
@@ -218,27 +225,36 @@
   <section class="screen" id="screen-mapa">
     <h1>Mapa</h1>
     <div class="filter-row">
-      <button class="filter-chip" id="tabBussola" onclick="setMapMode('bussola')">🧭 Bússola</button>
-      <button class="filter-chip" id="tabSC" onclick="setMapMode('sc')">🗺️ Santa Catarina</button>
-      <button class="filter-chip" id="tabBrasil" onclick="setMapMode('brasil')">🇧🇷 Brasil</button>
-      <button class="filter-chip" id="tabSudAmerica" onclick="setMapMode('sudamerica')">🌎 América do Sul</button>
+      <button class="filter-chip active" id="tabBussola" onclick="setMapMode('bussola')">🧭 Bússola</button>
+      <button class="filter-chip" id="tabMapa" onclick="setMapMode('mapa')">🗺️ Mapa</button>
     </div>
-    <p id="mapModeDesc">Posição relativa (distância e direção) a partir do ponto de referência. Não é um mapa real de ruas.</p>
+    <p id="mapModeDesc">Posição relativa dos seus pontos a partir do ponto de referência.</p>
     <div class="btn-row" id="refBtnRow" style="margin-bottom:6px;">
       <button class="ghost" onclick="usarLocalAtualComoReferencia()">📡 Usar minha posição agora</button>
     </div>
     <div class="filter-row" id="raioRow"></div>
     <div class="map-wrap">
-      <canvas id="poiCanvas" width="600" height="600"></canvas>
+      
+    <canvas id="poiCanvas" width="600" height="600"></canvas>
+    <!-- CONTROLES LEAFLET -->
+    <div id="leafletControls" style="display:none;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;" id="zoomBtns">
+        <button class="ghost" onclick="leafletZoom(-27.5,-50.5,7)">🗺️ SC</button>
+        <button class="ghost" onclick="leafletZoom(-25.4,-49.3,8)">🌿 PR</button>
+        <button class="ghost" onclick="leafletZoom(-30.0,-51.2,8)">⛅ RS</button>
+        <button class="ghost" onclick="leafletZoom(-27.7,-49.3,11)">📍 Rancho Queimado</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
+        <span style="font-size:.75rem;font-weight:700;color:#334155;">Camada:</span>
+        <button class="filter-chip active" id="tileRua" onclick="setTile('rua')">🏙️ Ruas</button>
+        <button class="filter-chip" id="tileSat" onclick="setTile('satelite')">🛰️ Satélite</button>
+        <button class="filter-chip" id="tileRelevo" onclick="setTile('relevo')">🏔️ Relevo</button>
+      </div>
+    </div>
+    <div id="leafletMap"></div>
     </div>
     <div class="map-legend"><span id="mapRefLabel">Referência: —</span><span id="mapScaleLabel"></span></div>
-    <div class="card section-gap">
-      <h2>🐾 Trilha (minhas pegadas)</h2>
-      <p id="trilhaStatus">Nenhuma trilha ativa. Mantenha esta tela aberta enquanto grava.</p>
-      <div class="btn-row">
-        <button id="btnTrilhaStart" onclick="iniciarTrilha()">▶️ Iniciar trilha</button>
-        <button id="btnTrilhaStop" class="danger" onclick="pararTrilha()" style="display:none;">⏹️ Parar trilha</button>
-      </div>
+    
     </div>
     <div class="card section-gap" id="mapTapInfo" style="display:none;"></div>
   </section>
@@ -254,12 +270,27 @@
     <div class="card">
       <h2>Rota atual</h2>
       <div id="routeOrderedList"></div>
+      <div style="margin:10px 0 6px;">
+        <strong style="font-size:.84rem;">Meio de transporte</strong>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;" id="modoGrid">
+          <div class="filter-chip active" data-modo="driving" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚗<br><span style="font-size:.72rem;">Carro</span></div>
+          <div class="filter-chip" data-modo="walking" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚶<br><span style="font-size:.72rem;">A pé</span></div>
+          <div class="filter-chip" data-modo="bicycling" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚲<br><span style="font-size:.72rem;">Bicicleta</span></div>
+        </div>
+      </div>
       <div class="toggle-row">
         <div><strong>🔄 Retornar</strong><p style="margin:2px 0 0;">Voltar ao ponto de partida ao final</p></div>
         <button class="switch" id="switchRetorno" onclick="toggleRetorno()"></button>
       </div>
-      <button class="btn-block" style="margin-top:8px;" onclick="abrirNoGoogleMaps()">🗺️ Abrir rota no Google Maps</button>
-      <button class="ghost btn-block" style="margin-top:8px;" onclick="exportRoute()">📤 Compartilhar rota</button>
+      <div style="background:#f8fafc;border-radius:10px;padding:10px;margin:10px 0;">
+        <strong style="font-size:.84rem;">💾 Salvar rota</strong>
+        <input type="text" id="rotaNome" placeholder="Nome da rota…" style="width:100%;margin-top:6px;padding:7px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:.88rem;box-sizing:border-box;">
+        <button onclick="salvarRota()" style="width:100%;margin-top:6px;padding:9px;background:#334155;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;">Salvar ✓</button>
+      </div>
+      <div id="rotasSalvas"></div>
+      <button class="btn-block" style="margin-top:8px;" onclick="navegarNoMaps()">🗺️ Navegar (Google Maps / Waze)</button>
+      <button class="ghost btn-block" style="margin-top:4px;" onclick="verRotaNoMapa()">🧭 Ver rota no mapa do app</button>
+      <button class="ghost btn-block" style="margin-top:4px;" onclick="exportRoute()">📤 Compartilhar rota</button>
     </div>
     <div class="card">
       <h2>Adicionar pontos à rota</h2>
@@ -267,14 +298,59 @@
     </div>
   </section>
 
+
+  <!-- TRILHA -->
+  <section class="screen" id="screen-trilha">
+    <h1>🐾 Trilha / Percurso</h1>
+    <!-- STATUS GRAVAÇÃO -->
+    <div id="trilhaStatusCard" style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div id="trilhaIndicator" style="width:12px;height:12px;border-radius:50%;background:#86efac;"></div>
+        <div>
+          <div style="font-size:.88rem;font-weight:800;color:#15803d;">Gravação de trilha</div>
+          <div id="trilhaStatus" style="font-size:.75rem;color:#16a34a;">Inativo</div>
+        </div>
+        <div id="trilhaTimer" style="margin-left:auto;font-size:1.1rem;font-weight:800;color:#15803d;display:none;">00:00</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="btnTrilhaStart" onclick="iniciarTrilha()" style="flex:1;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:800;cursor:pointer;">▶️ Iniciar</button>
+        <button id="btnTrilhaStop" onclick="pararTrilha()" style="flex:1;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:800;cursor:pointer;display:none;">⏹️ Parar e Salvar</button>
+      </div>
+    </div>
+
+    <!-- MARCAR PONTO DURANTE TRILHA — botão único, sem campo de texto -->
+    <div id="trilhaAddPonto" style="display:none;margin-bottom:12px;">
+      <button onclick="marcarPontoNaTrilha()" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:14px;padding:18px;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,.4);letter-spacing:.5px;">
+        📍 MARCAR PONTO
+      </button>
+      <div style="text-align:center;font-size:.7rem;color:#64748b;margin-top:5px;">Salva automaticamente — edite depois com calma</div>
+    </div>
+
+    <!-- PONTOS MARCADOS NA TRILHA -->
+    <div id="trilhaPontosList">
+      <div class="empty-state" style="padding:20px;text-align:center;color:#94a3b8;">
+        <span style="font-size:2rem;">🐾</span>
+        <p>Inicie uma trilha para começar a gravar seu percurso.</p>
+        <p style="font-size:.75rem;">Você pode marcar pontos de interesse durante a gravação.</p>
+      </div>
+    </div>
+
+    <!-- TRILHAS SALVAS -->
+    <div style="margin-top:16px;">
+      <div style="font-size:.82rem;font-weight:800;color:#334155;margin-bottom:8px;">📁 Trilhas salvas</div>
+      <div id="trilhasSalvasList"></div>
+    </div>
+  </section>
+
 </main>
 
-<button class="fab" id="fabAdd" onclick="quickMarkPoint()" title="Marcar ponto">📍</button>
+<button class="fab" id="fabAdd" onclick="quickMarkPoint()" style="font-size:.85rem;font-weight:800;" title="Novo Ponto">＋ Ponto</button>
 
 <nav class="tabbar">
   <button data-tab="viagens" onclick="showScreen('viagens')"><span class="ic">🚗</span>Viagens</button>
   <button data-tab="pontos" onclick="showScreen('pontos')"><span class="ic">📋</span>Pontos</button>
   <button data-tab="mapa" onclick="showScreen('mapa')"><span class="ic">🧭</span>Mapa</button>
+  <button data-tab="trilha" onclick="showScreen('trilha')"><span class="ic">🐾</span>Trilha</button>
   <button data-tab="rota" onclick="showScreen('rota')"><span class="ic">🛣️</span>Rota</button>
   <button data-tab="ajustes" onclick="showScreen('ajustes')"><span class="ic">⚙️</span>Ajustes</button>
 </nav>
@@ -416,7 +492,8 @@ function showScreen(name){
     document.getElementById('btnTrilhaStart').style.display = trilhaWatchId!=null ? 'none':'inline-block';
     document.getElementById('btnTrilhaStop').style.display = trilhaWatchId!=null ? 'inline-block':'none';
   }
-  if(name==='rota') renderRoute();
+  if(name==='rota'){ renderRoute(); renderRotasSalvas(); }
+  if(name==='trilha') renderTrilhaScreen();
   if(name==='ajustes') renderCustomCats();
   updateTripBanner();
 }
@@ -602,7 +679,9 @@ function openPoiModal(id){
   document.getElementById('modalPoiTitle').textContent = p.detalhado? 'Editar ponto' : 'Completar ponto';
   document.getElementById('poiNome').value = p.nome==='Ponto sem nome' ? '' : p.nome;
   document.getElementById('poiDescricao').value = p.descricao||'';
-  document.getElementById('poiCoordsLabel').textContent = `📍 ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+  document.getElementById('poiCoordsLabel').textContent = (p.lat&&p.lng) ? 'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5) : 'Sem GPS — insira as coordenadas abaixo';
+  document.getElementById('poiLatInput').value = p.lat || '';
+  document.getElementById('poiLngInput').value = p.lng || '';
   const img=document.getElementById('modalPoiPhoto');
   if(p.foto){ img.src=p.foto; img.style.display='block'; } else { img.style.display='none'; }
   pendingPhotoDataUrl = p.foto || null;
@@ -651,6 +730,10 @@ function savePoi(){
   p.descricao = document.getElementById('poiDescricao').value.trim();
   p.foto = pendingPhotoDataUrl;
   p.detalhado = true;
+  // Lat/lng manual
+  const latV = parseFloat(document.getElementById('poiLatInput').value);
+  const lngV = parseFloat(document.getElementById('poiLngInput').value);
+  if(!isNaN(latV) && !isNaN(lngV)){ p.lat=latV; p.lng=lngV; }
   saveDb();
   closeModal('modalPoi');
   toast('Ponto salvo');
@@ -706,29 +789,39 @@ function renderRaioRow(){
 }
 function setMapMode(mode){
   mapMode = mode;
-  ['tabBussola','tabSC','tabBrasil','tabSudAmerica'].forEach(function(id){
-    var el=document.getElementById(id);if(el)el.classList.remove('active');
-  });
-  var tabMap={bussola:'tabBussola',sc:'tabSC',brasil:'tabBrasil',sudamerica:'tabSudAmerica'};
-  var activeTab=document.getElementById(tabMap[mode]);
-  if(activeTab)activeTab.classList.add('active');
-  var descs={
-    bussola:'Posição relativa (distância e direção) a partir do ponto de referência.',
-    sc:'Santa Catarina — mesorregiões e principais municípios.',
-    brasil:'Brasil — estados e capitais.',
-    sudamerica:'América do Sul — países e capitais.'
-  };
-  document.getElementById('mapModeDesc').textContent = descs[mode]||'';
-  document.getElementById('refBtnRow').style.display = mode==='bussola' ? 'flex' : 'none';
-  document.getElementById('mapTapInfo').style.display = 'none';
+  const isBus = mode === 'bussola';
+  const tB = document.getElementById('tabBussola');
+  const tM = document.getElementById('tabMapa');
+  if(tB) tB.classList.toggle('active', isBus);
+  if(tM) tM.classList.toggle('active', !isBus);
+  const cv = document.getElementById('poiCanvas');
+  const lc = document.getElementById('leafletControls');
+  const lm = document.getElementById('leafletMap');
+  const rr = document.getElementById('refBtnRow');
+  const ti = document.getElementById('mapTapInfo');
+  const md = document.getElementById('mapModeDesc');
+  if(isBus){
+    if(cv) cv.style.display = 'block';
+    if(lc) lc.style.display = 'none';
+    if(lm) lm.style.display = 'none';
+    if(rr) rr.style.display = '';
+    if(md) md.textContent = 'Posição relativa dos seus pontos a partir do ponto de referência.';
+    renderBussolaMap();
+  } else {
+    if(cv) cv.style.display = 'none';
+    if(lc) lc.style.display = 'block';
+    if(lm) lm.style.display = 'block';
+    if(rr) rr.style.display = 'none';
+    if(md) md.textContent = 'Mapa real OpenStreetMap — requer internet para carregar.';
+    setTimeout(()=>{ initLeaflet(); if(_lmap){ _lmap.invalidateSize(); renderLeafletPOIs(); }}, 150);
+  }
+  if(ti) ti.style.display = 'none';
   renderRaioRow();
-  renderMap();
 }
+
 function renderMap(){
-  if(mapMode==='sc') renderSCMap();
-  else if(mapMode==='brasil') renderBrasilMap();
-  else if(mapMode==='sudamerica') renderSudAmericaMap();
-  else renderBussolaMap();
+  if(mapMode==='bussola') renderBussolaMap();
+  else if(_lmap) renderLeafletPOIs();
 }
 function renderBussolaMap(){
   if(!mapRef) mapRef = getDefaultRef();
@@ -1251,194 +1344,720 @@ window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log('SW não registrado (ok em file://): ', e); });
   }
 });
-// ── DADOS DOS MAPAS ──────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// LEAFLET + MAPA REAL
+// ══════════════════════════════════════════════════════════════
+let _lmap = null;
+let _lmarkers = [];
+let _rotaLayer = null;
+let _tileLayer = null;
 
-// SANTA CATARINA — mesorregiões simplificadas
-var SC_BOUNDS = {latMin:-29.4, latMax:-25.9, lngMin:-54.0, lngMax:-48.3};
-var SC_ESTADOS = [
-  {nome:'SC', cor:'#C8D8A8', contorno:[ [-26.0,-53.8],[-26.0,-53.0],[-26.3,-52.0],[-26.2,-51.0],[-26.5,-50.0],[-26.9,-49.0],[-27.1,-48.6],[-27.8,-48.5],[-28.5,-49.0],[-29.0,-49.8],[-29.3,-50.5],[-29.4,-51.5],[-29.3,-52.5],[-28.8,-53.5],[-28.0,-54.0],[-27.0,-54.0],[-26.5,-53.8],[-26.0,-53.8] ]},
-];
-var SC_CIDADES = [
-  {nome:'Florianópolis',lat:-27.595,lng:-48.548,cap:true},
-  {nome:'Joinville',lat:-26.304,lng:-48.846},
-  {nome:'Blumenau',lat:-26.919,lng:-49.066},
-  {nome:'Chapecó',lat:-27.101,lng:-52.615},
-  {nome:'Lages',lat:-27.816,lng:-50.326},
-  {nome:'Criciúma',lat:-28.678,lng:-49.370},
-  {nome:'Itajaí',lat:-26.908,lng:-48.662},
-  {nome:'Jaraguá do Sul',lat:-26.486,lng:-49.071},
-  {nome:'Balneário Camboriú',lat:-26.990,lng:-48.634},
-  {nome:'São José',lat:-27.594,lng:-48.635},
-  {nome:'Caçador',lat:-26.775,lng:-51.016},
-  {nome:'Tubarão',lat:-28.467,lng:-49.010},
-];
-
-// BRASIL — estados simplificados (centroides para labels)
-var BR_BOUNDS = {latMin:-34.0, latMax:5.5, lngMin:-74.0, lngMax:-34.0};
-var BR_ESTADOS = [
-  {uf:'AC',nome:'Acre',lat:-9.0,lng:-70.5},
-  {uf:'AL',nome:'Alagoas',lat:-9.5,lng:-36.5},
-  {uf:'AM',nome:'Amazonas',lat:-3.5,lng:-65.0},
-  {uf:'AP',nome:'Amapá',lat:1.5,lng:-52.0},
-  {uf:'BA',nome:'Bahia',lat:-12.5,lng:-41.5},
-  {uf:'CE',nome:'Ceará',lat:-5.0,lng:-39.5},
-  {uf:'DF',nome:'Distrito Federal',lat:-15.78,lng:-47.93},
-  {uf:'ES',nome:'Espírito Santo',lat:-19.5,lng:-40.5},
-  {uf:'GO',nome:'Goiás',lat:-15.5,lng:-49.5},
-  {uf:'MA',nome:'Maranhão',lat:-5.0,lng:-45.5},
-  {uf:'MG',nome:'Minas Gerais',lat:-18.5,lng:-44.5},
-  {uf:'MS',nome:'Mato Grosso do Sul',lat:-20.5,lng:-54.5},
-  {uf:'MT',nome:'Mato Grosso',lat:-13.0,lng:-56.0},
-  {uf:'PA',nome:'Pará',lat:-3.5,lng:-52.0},
-  {uf:'PB',nome:'Paraíba',lat:-7.0,lng:-36.5},
-  {uf:'PE',nome:'Pernambuco',lat:-8.5,lng:-37.5},
-  {uf:'PI',nome:'Piauí',lat:-7.0,lng:-42.5},
-  {uf:'PR',nome:'Paraná',lat:-24.5,lng:-51.5},
-  {uf:'RJ',nome:'Rio de Janeiro',lat:-22.5,lng:-43.0},
-  {uf:'RN',nome:'Rio Grande do Norte',lat:-5.5,lng:-36.5},
-  {uf:'RO',nome:'Rondônia',lat:-11.0,lng:-63.0},
-  {uf:'RR',nome:'Roraima',lat:2.0,lng:-61.5},
-  {uf:'RS',nome:'Rio Grande do Sul',lat:-29.5,lng:-53.0},
-  {uf:'SC',nome:'Santa Catarina',lat:-27.3,lng:-50.5},
-  {uf:'SE',nome:'Sergipe',lat:-10.5,lng:-37.5},
-  {uf:'SP',nome:'São Paulo',lat:-22.0,lng:-48.5},
-  {uf:'TO',nome:'Tocantins',lat:-10.0,lng:-48.0},
-  {uf:'AM',nome:'Amazonas',lat:-3.5,lng:-65.0},
-];
-
-// AMÉRICAS DO SUL — países (centroides)
-var SA_BOUNDS = {latMin:-56.0, latMax:13.0, lngMin:-82.0, lngMax:-34.0};
-var SA_PAISES = [
-  {nome:'Brasil',lat:-10.0,lng:-55.0,cor:'#C8D8A8'},
-  {nome:'Argentina',lat:-35.0,lng:-65.0,cor:'#D4E8C8'},
-  {nome:'Chile',lat:-35.0,lng:-71.0,cor:'#E8D4C8'},
-  {nome:'Uruguai',lat:-33.0,lng:-56.0,cor:'#C8E8D4'},
-  {nome:'Paraguai',lat:-23.0,lng:-58.0,cor:'#E8E8C8'},
-  {nome:'Bolívia',lat:-17.0,lng:-65.0,cor:'#D4C8E8'},
-  {nome:'Peru',lat:-10.0,lng:-75.0,cor:'#E8C8D4'},
-  {nome:'Colômbia',lat:4.0,lng:-74.0,cor:'#C8E8E8'},
-  {nome:'Venezuela',lat:8.0,lng:-66.0,cor:'#E8D4E8'},
-  {nome:'Equador',lat:-2.0,lng:-78.0,cor:'#D4E8E8'},
-  {nome:'Guiana',lat:5.0,lng:-59.0,cor:'#E8E8D4'},
-  {nome:'Suriname',lat:4.0,lng:-56.0,cor:'#D4D4E8'},
-  {nome:'Guiana Francesa',lat:4.0,lng:-53.0,cor:'#E8D4D4'},
-];
-
-function coordToXY(lat, lng, bounds, W, H){
-  var x = (lng - bounds.lngMin) / (bounds.lngMax - bounds.lngMin) * W;
-  var y = (bounds.latMax - lat) / (bounds.latMax - bounds.latMin) * H;
-  return {x:x, y:y};
-}
-
-function renderSCMap(){
-  var canvas=document.getElementById('poiCanvas');
-  var ctx=canvas.getContext('2d');
-  var W=canvas.width, H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#AFC4C2'; ctx.fillRect(0,0,W,H);
-
-  // Desenhar contorno SC
-  SC_ESTADOS.forEach(function(e){
-    ctx.beginPath();
-    e.contorno.forEach(function(pt,i){
-      var p=coordToXY(pt[0],pt[1],SC_BOUNDS,W,H);
-      if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
-    });
-    ctx.closePath();
-    ctx.fillStyle=e.cor;ctx.fill();
-    ctx.strokeStyle='#8A7A5C';ctx.lineWidth=2;ctx.stroke();
-  });
-
-  // Grade
-  ctx.strokeStyle='rgba(0,0,0,.1)';ctx.lineWidth=0.5;ctx.fillStyle='#555';ctx.font='9px sans-serif';
-  for(var lat=Math.ceil(SC_BOUNDS.latMin);lat<=SC_BOUNDS.latMax;lat++){
-    var p=coordToXY(lat,SC_BOUNDS.lngMin,SC_BOUNDS,W,H);
-    ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(W,p.y);ctx.stroke();
-    ctx.fillText(lat+'°',2,p.y-2);
+const TILES = {
+  rua: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attr: '© OpenStreetMap'
+  },
+  satelite: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attr: '© Esri'
+  },
+  relevo: {
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    attr: '© OpenTopoMap'
   }
+};
 
-  // Cidades
-  SC_CIDADES.forEach(function(c){
-    var p=coordToXY(c.lat,c.lng,SC_BOUNDS,W,H);
-    ctx.beginPath();ctx.arc(p.x,p.y,c.cap?5:3,0,Math.PI*2);
-    ctx.fillStyle=c.cap?'#1e293b':'#5A4E40';ctx.fill();
-    ctx.font=(c.cap?'bold ':'')+' 10px sans-serif';ctx.fillStyle='#1e293b';
-    ctx.textAlign='left';ctx.fillText(c.nome,p.x+5,p.y+3);
-  });
+const CIDADES_SUL = [
+  {n:"Curitiba",lat:-25.429,lng:-49.271,t:"cap"},
+  {n:"Porto Alegre",lat:-30.034,lng:-51.217,t:"cap"},
+  {n:"Florianópolis",lat:-27.595,lng:-48.548,t:"cap"},
+  {n:"Joinville",lat:-26.304,lng:-48.846,t:"gde"},
+  {n:"Blumenau",lat:-26.919,lng:-49.066,t:"gde"},
+  {n:"Chapecó",lat:-27.101,lng:-52.615,t:"gde"},
+  {n:"Lages",lat:-27.816,lng:-50.326,t:"gde"},
+  {n:"Criciúma",lat:-28.678,lng:-49.370,t:"gde"},
+  {n:"Itajaí",lat:-26.908,lng:-48.662,t:"gde"},
+  {n:"Rio do Sul",lat:-27.214,lng:-49.641,t:"med"},
+  {n:"Caçador",lat:-26.775,lng:-51.016,t:"med"},
+  {n:"Tubarão",lat:-28.467,lng:-49.010,t:"med"},
+  {n:"Brusque",lat:-27.098,lng:-48.918,t:"med"},
+  {n:"Rancho Queimado",lat:-27.675,lng:-49.013,t:"viz"},
+  {n:"Alfredo Wagner",lat:-27.697,lng:-49.337,t:"viz"},
+  {n:"Leoberto Leal",lat:-27.534,lng:-49.063,t:"viz"},
+  {n:"Angelina",lat:-27.567,lng:-49.001,t:"viz"},
+  {n:"São Bonifácio",lat:-27.904,lng:-48.933,t:"viz"},
+  {n:"Santo Amaro da Imperatriz",lat:-27.693,lng:-48.797,t:"viz"},
+  {n:"Anitápolis",lat:-27.907,lng:-49.131,t:"viz"},
+  {n:"Águas Mornas",lat:-27.716,lng:-48.827,t:"viz"},
+  {n:"São Pedro de Alcântara",lat:-27.614,lng:-48.820,t:"viz"},
+  {n:"Antônio Carlos",lat:-27.475,lng:-48.745,t:"viz"},
+  {n:"Paulo Lopes",lat:-27.961,lng:-48.680,t:"viz"},
+  {n:"Garopaba",lat:-28.026,lng:-48.618,t:"viz"},
+];
 
-  // POIs
-  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,SC_BOUNDS,W,H);});
-  document.getElementById('mapRefLabel').textContent='Santa Catarina';
-  document.getElementById('mapScaleLabel').textContent='Contorno estilizado';
+function initLeaflet(){
+  if(_lmap) return;
+  const el = document.getElementById('leafletMap');
+  if(!el) return;
+  // Carregar Leaflet JS se ainda não carregou
+  if(typeof L === 'undefined'){
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload = function(){ _initLeafletMap(); };
+    s.onerror = function(){ if(el) el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;">Mapa requer conexão com internet.</div>'; };
+    document.head.appendChild(s);
+    return;
+  }
+  _initLeafletMap();
+}
+function _initLeafletMap(){
+  const el = document.getElementById('leafletMap');
+  if(!el||_lmap) return;
+  try{
+    _lmap = L.map('leafletMap', {zoomControl:true}).setView([-27.5,-50.5], 7);
+    const t = TILES.rua;
+    _tileLayer = L.tileLayer(t.url, {attribution:t.attr, maxZoom:19}).addTo(_lmap);
+    // Cidades de referência
+    const cor={cap:"#0f172a",gde:"#334155",med:"#64748b",viz:"#15803d"};
+    const raio={cap:7,gde:5,med:4,viz:5};
+    CIDADES_SUL.forEach(c=>{
+      const mk = L.circleMarker([c.lat,c.lng],{
+        radius:raio[c.t]||4, fillColor:cor[c.t]||"#64748b",
+        color:"#fff", weight:1.5, fillOpacity:0.9
+      }).addTo(_lmap).bindPopup(c.n);
+      if(c.t==="cap"||c.t==="viz"||c.t==="gde"){
+        mk.bindTooltip(c.n,{permanent:true,direction:"right",offset:[raio[c.t]+3,0],className:"city-lbl"});
+      }
+    });
+    _lmap.on('click', e=>{
+      const info = document.getElementById('mapTapInfo');
+      if(info){ info.style.display='block'; info.textContent=`Lat: ${e.latlng.lat.toFixed(5)} Lng: ${e.latlng.lng.toFixed(5)}`; }
+    });
+    setTimeout(()=>_lmap.invalidateSize(), 300);
+  }catch(e){ console.log('Leaflet erro:', e); }
 }
 
-function renderBrasilMap(){
-  var canvas=document.getElementById('poiCanvas');
-  var ctx=canvas.getContext('2d');
-  var W=canvas.width,H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#AFC4C2';ctx.fillRect(0,0,W,H);
-
-  // Fundo Brasil
-  ctx.fillStyle='#DCCFA8';
-  ctx.fillRect(W*0.1,H*0.05,W*0.8,H*0.9);
-  ctx.strokeStyle='#8A7A5C';ctx.lineWidth=1.5;
-  ctx.strokeRect(W*0.1,H*0.05,W*0.8,H*0.9);
-
-  // Estados como pontos com label
-  BR_ESTADOS.forEach(function(e){
-    var p=coordToXY(e.lat,e.lng,BR_BOUNDS,W,H);
-    if(p.x<0||p.x>W||p.y<0||p.y>H)return;
-    ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
-    ctx.fillStyle='#334155';ctx.fill();
-    ctx.font='bold 8px sans-serif';ctx.fillStyle='#1e293b';
-    ctx.textAlign='center';ctx.fillText(e.uf,p.x,p.y-6);
+function setTile(tipo){
+  ['tileRua','tileSat','tileRelevo'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.classList.remove('active');
   });
-
-  // POIs
-  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,BR_BOUNDS,W,H);});
-  document.getElementById('mapRefLabel').textContent='Brasil — estados';
-  document.getElementById('mapScaleLabel').textContent='Contorno simplificado';
+  const ids={rua:'tileRua',satelite:'tileSat',relevo:'tileRelevo'};
+  const el=document.getElementById(ids[tipo]);if(el)el.classList.add('active');
+  if(!_lmap||!_tileLayer) return;
+  const t=TILES[tipo];if(!t)return;
+  _lmap.removeLayer(_tileLayer);
+  _tileLayer = L.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_lmap);
 }
 
-function renderSudAmericaMap(){
-  var canvas=document.getElementById('poiCanvas');
-  var ctx=canvas.getContext('2d');
-  var W=canvas.width,H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#AFC4C2';ctx.fillRect(0,0,W,H);
-
-  // Países como regiões coloridas com label
-  SA_PAISES.forEach(function(p){
-    var pos=coordToXY(p.lat,p.lng,SA_BOUNDS,W,H);
-    // Círculo colorido representando o país
-    ctx.beginPath();ctx.arc(pos.x,pos.y,18,0,Math.PI*2);
-    ctx.fillStyle=p.cor;ctx.fill();
-    ctx.strokeStyle='#8A7A5C';ctx.lineWidth=1;ctx.stroke();
-    ctx.font='bold 9px sans-serif';ctx.fillStyle='#1e293b';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(p.nome,pos.x,pos.y);
+function renderLeafletPOIs(){
+  if(!_lmap) return;
+  _lmarkers.forEach(m=>_lmap.removeLayer(m));
+  _lmarkers=[];
+  const pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
+  pts.forEach(p=>{
+    if(!p.lat||!p.lng) return;
+    const c=catById(p.catId);
+    const icon=L.divIcon({
+      className:"",
+      html:`<div style="font-size:1.5rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">${c.icone}</div>`,
+      iconSize:[28,28],iconAnchor:[14,14]
+    });
+    const mk=L.marker([p.lat,p.lng],{icon}).addTo(_lmap)
+      .bindPopup(`<b>${p.nome||"Sem nome"}</b>${p.descricao?"<br>"+p.descricao.slice(0,80):""}`);
+    _lmarkers.push(mk);
   });
-
-  // POIs
-  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,SA_BOUNDS,W,H);});
-  document.getElementById('mapRefLabel').textContent='América do Sul';
-  document.getElementById('mapScaleLabel').textContent='Países — representação esquemática';
+  if(_lmarkers.length>0){
+    try{ _lmap.fitBounds(L.featureGroup(_lmarkers).getBounds().pad(0.3)); }catch(e){}
+  }
 }
 
-function renderPOIsOnMap(ctx,W,H,toXY){
-  window._mapHitTargets = window._mapHitTargets || [];
-  var pts = filterTrip ? db.points.filter(function(p){return p.tripId===filterTrip;}) : db.points;
-  pts.forEach(function(p){
-    var pos=toXY(p.lat,p.lng);
-    if(pos.x<0||pos.x>W||pos.y<0||pos.y>H)return;
-    var c=catById(p.catId);
-    ctx.font='18px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(c.icone,pos.x,pos.y);
-    window._mapHitTargets.push({x:pos.x,y:pos.y,p:p});
+function leafletZoom(lat,lng,zoom){
+  setMapMode('mapa');
+  if(_lmap) setTimeout(()=>_lmap.setView([lat,lng],zoom), 200);
+}
+
+// ══════════════════════════════════════════════════════════════
+// ACERVO
+// ══════════════════════════════════════════════════════════════
+function abrirAcervo(){
+  if(!currentTripId){ toast('Nenhuma viagem ativa'); return; }
+  document.getElementById('acervoBusca').value='';
+  renderAcervo();
+  document.getElementById('modalAcervo').style.display='block';
+}
+function fecharAcervo(){
+  document.getElementById('modalAcervo').style.display='none';
+  renderTripDetail();
+}
+function renderAcervo(){
+  const el=document.getElementById('acervoLista');if(!el)return;
+  const q=(document.getElementById('acervoBusca').value||'').toLowerCase();
+  const naViagem=db.points.filter(p=>p.tripId===currentTripId);
+  const disponiveis=db.points.filter(p=>{
+    if(p.tripId===currentTripId)return false;
+    if(q&&!(p.nome||'').toLowerCase().includes(q)&&!(p.descricao||'').toLowerCase().includes(q))return false;
+    return true;
   });
+  el.innerHTML='';
+  const mkRow=(p,naV)=>{
+    const c=catById(p.catId);
+    const row=document.createElement('div');
+    row.style.cssText=`display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;margin-bottom:5px;${naV?"background:#f0fdf4;":"background:#f8fafc;border:1.5px solid #e2e8f0;"}`;
+    const ico=document.createElement('span');ico.style.fontSize='1.2rem';ico.textContent=c.icone;
+    const info=document.createElement('div');info.style.flex='1';
+    const nm=document.createElement('div');nm.style.cssText='font-size:.85rem;font-weight:600;';nm.textContent=p.nome||'Sem nome';
+    info.appendChild(nm);
+    if(p.descricao){const ds=document.createElement('div');ds.style.cssText='font-size:.72rem;color:#64748b;';ds.textContent=p.descricao.slice(0,50);info.appendChild(ds);}
+    const btn=document.createElement('button');
+    if(naV){
+      btn.textContent='Remover';btn.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;font-size:.75rem;font-weight:700;cursor:pointer;';
+      btn.onclick=()=>{const pt=db.points.find(x=>x.id===p.id);if(pt){pt.tripId=null;saveDb();renderAcervo();}};
+    }else{
+      btn.textContent='+ Add';btn.style.cssText='background:#1e293b;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:.78rem;font-weight:700;cursor:pointer;';
+      btn.onclick=()=>{const pt=db.points.find(x=>x.id===p.id);if(pt){pt.tripId=currentTripId;saveDb();renderAcervo();}};
+    }
+    row.appendChild(ico);row.appendChild(info);row.appendChild(btn);el.appendChild(row);
+  };
+  if(naViagem.length){
+    const h=document.createElement('div');h.style.cssText='font-size:.72rem;font-weight:800;color:#16a34a;margin-bottom:6px;';h.textContent=`✅ Já na viagem (${naViagem.length})`;el.appendChild(h);
+    naViagem.forEach(p=>mkRow(p,true));
+    const sep=document.createElement('div');sep.style.cssText='height:1px;background:#e2e8f0;margin:10px 0;';el.appendChild(sep);
+  }
+  if(!disponiveis.length){
+    const empty=document.createElement('div');empty.style.cssText='text-align:center;color:#94a3b8;padding:20px;font-size:.85rem;';
+    empty.textContent=q?'Nenhum resultado.':'Nenhum ponto disponível no acervo.';el.appendChild(empty);
+  }else{
+    const h=document.createElement('div');h.style.cssText='font-size:.72rem;font-weight:800;color:#64748b;margin-bottom:6px;';h.textContent=`📦 Acervo (${disponiveis.length})`;el.appendChild(h);
+    disponiveis.forEach(p=>mkRow(p,false));
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ROTA COM MEIO DE TRANSPORTE
+// ══════════════════════════════════════════════════════════════
+let modoRota='driving';
+
+function selModoRota(el){
+  document.querySelectorAll('#modoGrid .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  modoRota=el.dataset.modo;
+}
+
+function navegarNoMaps(){
+  const t=currentTripObj();
+  if(!t||!t.rota||!t.rota.length){ toast('Adicione pontos à rota primeiro'); return; }
+  const pts=t.rota.map(id=>db.points.find(p=>p.id===id)).filter(p=>p&&p.lat&&p.lng);
+  if(!pts.length){ toast('Pontos sem coordenadas GPS'); return; }
+  if(pts.length===1){
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${pts[0].lat},${pts[0].lng}&travelmode=${modoRota}`,'_blank');
+    return;
+  }
+  const origem=pts[0],destino=pts[pts.length-1];
+  const intermediarios=pts.slice(1,-1).map(p=>`${p.lat},${p.lng}`).join('|');
+  const url=`https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${destino.lat},${destino.lng}${intermediarios?'&waypoints='+encodeURIComponent(intermediarios):''}&travelmode=${modoRota}`;
+  window.open(url,'_blank');
+}
+
+function verRotaNoMapa(){
+  const t=currentTripObj();
+  if(!t||!t.rota||t.rota.length<2){ toast('Adicione pelo menos 2 pontos à rota'); return; }
+  const pts=t.rota.map(id=>db.points.find(p=>p.id===id)).filter(p=>p&&p.lat&&p.lng);
+  if(pts.length<2){ toast('Pontos sem coordenadas GPS'); return; }
+  showScreen('mapa');
+  setMapMode('mapa');
+  setTimeout(()=>{
+    initLeaflet();
+    if(!_lmap) return;
+    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
+    const latlngs=pts.map(p=>[p.lat,p.lng]);
+    _rotaLayer=L.polyline(latlngs,{color:'#3b82f6',weight:4,opacity:.85,dashArray:'8,4'}).addTo(_lmap);
+    const mIcon={driving:'🚗',walking:'🚶',bicycling:'🚲'}[modoRota]||'📍';
+    pts.forEach((p,i)=>{
+      const icon=L.divIcon({
+        className:'',
+        html:`<div style="background:#3b82f6;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.3);">${i===0?mIcon:i+1}</div>`,
+        iconSize:[26,26],iconAnchor:[13,13]
+      });
+      L.marker([p.lat,p.lng],{icon}).addTo(_lmap).bindPopup(`<b>${i+1}. ${p.nome||'Ponto'}</b>`);
+    });
+    try{ _lmap.fitBounds(_rotaLayer.getBounds().pad(0.2)); }catch(e){}
+  }, 300);
+}
+
+function salvarRota(){
+  const nome=document.getElementById('rotaNome').value.trim();
+  if(!nome){ toast('Informe um nome para a rota'); return; }
+  const t=currentTripObj();
+  const pts=t&&t.rota?t.rota.slice():[];
+  if(pts.length<2){ toast('Adicione pelo menos 2 pontos à rota'); return; }
+  if(!db.rotasSalvas) db.rotasSalvas=[];
+  db.rotasSalvas.push({id:uid(),nome,modo:modoRota,pontos:pts,data:new Date().toISOString().slice(0,10)});
+  saveDb();
+  document.getElementById('rotaNome').value='';
+  renderRotasSalvas();
+  toast('Rota salva: '+nome);
+}
+
+function renderRotasSalvas(){
+  const el=document.getElementById('rotasSalvas');if(!el)return;
+  const lista=db.rotasSalvas||[];
+  if(!lista.length){el.innerHTML='';return;}
+  const mIcon={driving:'🚗',walking:'🚶',bicycling:'🚲'};
+  let h='<div style="font-size:.78rem;font-weight:800;color:#334155;margin-bottom:8px;margin-top:4px;">📁 Rotas salvas</div>';
+  lista.forEach((r,i)=>{
+    h+=`<div style="background:#f1f5f9;border-radius:9px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:1.1rem;">${mIcon[r.modo]||'🗺️'}</span>
+      <div style="flex:1;"><div style="font-size:.85rem;font-weight:700;">${escapeHtml(r.nome)}</div>
+      <div style="font-size:.7rem;color:#64748b;">${r.pontos?r.pontos.length:0} pontos · ${r.data}</div></div>
+      <button data-i="${i}" onclick="carregarRota(parseInt(this.dataset.i))" style="background:#1e293b;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:.75rem;font-weight:700;cursor:pointer;">Carregar</button>
+      <button data-i="${i}" onclick="excluirRota(parseInt(this.dataset.i))" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 6px;font-size:.75rem;cursor:pointer;margin-left:3px;">✕</button>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+function carregarRota(i){
+  const r=(db.rotasSalvas||[])[i];if(!r)return;
+  const t=currentTripObj();if(!t){toast('Abra uma viagem primeiro');return;}
+  t.rota=r.pontos.slice();
+  modoRota=r.modo||'driving';
+  document.querySelectorAll('#modoGrid .filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.modo===modoRota));
+  saveDb();
+  renderRoute();
+  toast('Rota carregada: '+r.nome);
+}
+
+function excluirRota(i){
+  if(!confirm('Excluir esta rota?'))return;
+  (db.rotasSalvas||[]).splice(i,1);
+  saveDb();renderRotasSalvas();
+}
+
+function usarGpsNoPoi(){
+  toast('Obtendo GPS...');
+  getGps().then(pos=>{
+    document.getElementById('poiLatInput').value = pos.lat.toFixed(6);
+    document.getElementById('poiLngInput').value = pos.lng.toFixed(6);
+    document.getElementById('poiCoordsLabel').textContent = 'GPS: '+pos.lat.toFixed(5)+', '+pos.lng.toFixed(5);
+    toast('Posição capturada ✅');
+  }).catch(()=>toast('Não foi possível obter o GPS'));
+}
+
+function colarCoordsMaps(){
+  const txt = prompt('Cole as coordenadas do Google Maps\nEx: -27.697, -49.337 ou -27.697,-49.337');
+  if(!txt) return;
+  const m = txt.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+  if(!m){ toast('Formato inválido. Use: -27.697, -49.337'); return; }
+  document.getElementById('poiLatInput').value = parseFloat(m[1]).toFixed(6);
+  document.getElementById('poiLngInput').value = parseFloat(m[2]).toFixed(6);
+  document.getElementById('poiCoordsLabel').textContent = 'Coords: '+m[1]+', '+m[2];
+  toast('Coordenadas inseridas ✅');
+}
+
+// Botão pra adicionar ponto sem GPS (só lat/lng ou vazio)
+function adicionarPontoManual(){
+  const p = {
+    id:uid(), nome:'Ponto sem nome', catId:'outro',
+    lat:null, lng:null, tripId:currentTripId,
+    descricao:'', foto:null, detalhado:false, criadoEm:Date.now()
+  };
+  db.points.push(p); saveDb();
+  openPoiModal(p.id);
+}
+
+// ══════════════════════════════════════════════════════════════
+// TRILHA — TELA DEDICADA
+// ══════════════════════════════════════════════════════════════
+let _trilhaTimer = null;
+let _trilhaStart = null;
+let _trilhaPontosSession = [];
+
+function renderTrilhaScreen(){
+  renderTrilhaPontos();
+  renderTrilhasSalvas();
+  const ativa = trilhaWatchId != null;
+  const btnS = document.getElementById('btnTrilhaStart');
+  const btnP = document.getElementById('btnTrilhaStop');
+  const addDiv = document.getElementById('trilhaAddPonto');
+  const ind = document.getElementById('trilhaIndicator');
+  const timer = document.getElementById('trilhaTimer');
+  if(btnS) btnS.style.display = ativa ? 'none' : 'block';
+  if(btnP) btnP.style.display = ativa ? 'block' : 'none';
+  if(addDiv) addDiv.style.display = ativa ? 'block' : 'none';
+  if(ind) ind.style.background = ativa ? '#16a34a' : '#86efac';
+  if(timer) timer.style.display = ativa ? 'block' : 'none';
+  if(ativa && !_trilhaStart){ _trilhaStart = Date.now(); }
+}
+
+function renderTrilhaPontos(){
+  const el = document.getElementById('trilhaPontosList'); if(!el) return;
+  if(!_trilhaPontosSession.length && trilhaWatchId == null){
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;"><span style="font-size:2rem;">🐾</span><p>Inicie uma trilha para gravar seu percurso.</p></div>';
+    return;
+  }
+  if(!_trilhaPontosSession.length){
+    el.innerHTML = '<div style="text-align:center;padding:12px;color:#64748b;font-size:.82rem;">Nenhum ponto marcado ainda — toque em "Marcar posição atual" durante a trilha.</div>';
+    return;
+  }
+  const h = document.createElement('div');
+  h.style.cssText='font-size:.78rem;font-weight:800;color:#334155;margin-bottom:8px;';
+  h.textContent='📍 Pontos desta trilha ('+_trilhaPontosSession.length+') — toque em ✏️ para editar';
+  el.appendChild(h);
+  _trilhaPontosSession.forEach(function(p,i){
+    const row=document.createElement('div');
+    row.style.cssText='background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;';
+    const num=document.createElement('div');
+    num.style.cssText='background:#3b82f6;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;';
+    num.textContent=i+1;
+    const info=document.createElement('div');
+    info.style.flex='1';
+    info.innerHTML='<div style="font-size:.85rem;font-weight:700;">'+(p.nome||'Ponto '+(i+1))+'</div>'
+      +'<div style="font-size:.7rem;color:#64748b;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>';
+    const btn=document.createElement('button');
+    btn.textContent='✏️';
+    btn.style.cssText='background:none;border:1.5px solid #e2e8f0;border-radius:7px;padding:5px 8px;font-size:.9rem;cursor:pointer;';
+    btn.title='Editar depois';
+    btn.onclick=(function(id){ return function(){ openPoiModal(id); }; })(p.id);
+    row.appendChild(num);row.appendChild(info);row.appendChild(btn);
+    el.appendChild(row);
+  });
+}
+
+function renderTrilhasSalvas(){
+  const el = document.getElementById('trilhasSalvasList'); if(!el) return;
+  el.innerHTML = '';
+  const t = currentTripObj();
+  const trilhasViagem = t && t.trilhas ? t.trilhas : [];
+  const trilhasLivres = db.trilhasLivres || [];
+  const todas = trilhasViagem.map(function(tr){ return {tr:tr,tipo:'viagem'}; })
+    .concat(trilhasLivres.map(function(tr){ return {tr:tr,tipo:'livre'}; }));
+  if(!todas.length){
+    el.innerHTML = '<div style="font-size:.78rem;color:#94a3b8;">Nenhuma trilha salva ainda.</div>';
+    return;
+  }
+  todas.forEach(function(item,i){
+    const tr=item.tr, tipo=item.tipo;
+    const nGps = tr.pontos ? tr.pontos.length : 0;
+    const nPts = tr.pontosIds ? tr.pontosIds.length : 0;
+    const data = tr.criadoEm ? new Date(tr.criadoEm).toLocaleDateString('pt-BR') : '';
+    const nome = tr.nome || ('Trilha '+(i+1));
+    // Card principal
+    const card=document.createElement('div');
+    card.style.cssText='background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;';
+    // Header
+    const hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    hdr.innerHTML='<span style="font-size:1.2rem;">🐾</span>'
+      +'<div style="flex:1;"><div style="font-size:.88rem;font-weight:800;">'+escapeHtml(nome)
+      +(tipo==='livre'?' <span style="font-size:.68rem;background:#ede9fe;color:#7c3aed;padding:2px 6px;border-radius:10px;">Livre</span>':'')+'</div>'
+      +'<div style="font-size:.7rem;color:#64748b;">'+nGps+' pts GPS'+(nPts?' · '+nPts+' ponto'+(nPts>1?'s':'')+' marcado'+(nPts>1?'s':''):'')+'  · '+data+'</div></div>';
+    card.appendChild(hdr);
+    // Pontos marcados
+    if(tr.pontosIds && tr.pontosIds.length){
+      const ptsDiv=document.createElement('div');
+      ptsDiv.style.cssText='margin-bottom:8px;';
+      tr.pontosIds.forEach(function(pid){
+        const pt=db.points.find(function(x){return x.id===pid;});
+        if(!pt) return;
+        const prow=document.createElement('div');
+        prow.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 7px;background:#fff;border-radius:7px;margin-bottom:4px;border:1px solid #e2e8f0;';
+        prow.innerHTML='<span style="font-size:.9rem;">📍</span>'
+          +'<div style="flex:1;font-size:.78rem;font-weight:600;">'+(pt.nome||'Sem nome')+'</div>';
+        const editBtn=document.createElement('button');
+        editBtn.textContent='✏️';
+        editBtn.style.cssText='background:none;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:.8rem;';
+        editBtn.onclick=(function(id){return function(){openPoiModal(id);};})(pt.id);
+        prow.appendChild(editBtn);
+        ptsDiv.appendChild(prow);
+      });
+      card.appendChild(ptsDiv);
+    }
+    // Botões
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;gap:6px;';
+    const btnMapa=document.createElement('button');
+    btnMapa.textContent='🗺️ Ver no mapa';
+    btnMapa.style.cssText='flex:1;background:#1e293b;color:#fff;border:none;border-radius:8px;padding:8px;font-size:.78rem;font-weight:700;cursor:pointer;';
+    btnMapa.onclick=(function(idx,tp){return function(){verTrilhaNoMapaIdx(idx,tp);};})(i,tipo);
+    const btnShare=document.createElement('button');
+    btnShare.textContent='📤 Compartilhar';
+    btnShare.style.cssText='flex:1;background:#f1f5f9;color:#334155;border:none;border-radius:8px;padding:8px;font-size:.78rem;font-weight:700;cursor:pointer;';
+    btnShare.onclick=(function(idx,tp){return function(){compartilharTrilha(idx,tp);};})(i,tipo);
+    btns.appendChild(btnMapa);btns.appendChild(btnShare);
+    card.appendChild(btns);
+    el.appendChild(card);
+  });
+}
+
+function verTrilhaNoMapaIdx(i,tipo){
+  const todas = (currentTripObj()&&currentTripObj().trilhas ? currentTripObj().trilhas.map(function(tr){return{tr,tipo:'viagem'};}) : [])
+    .concat((db.trilhasLivres||[]).map(function(tr){return{tr,tipo:'livre'};}));
+  if(!todas[i]) return;
+  const trilha=todas[i].tr;
+  showScreen('mapa'); setMapMode('mapa');
+  setTimeout(function(){
+    initLeaflet(); if(!_lmap) return;
+    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
+    const latlngs=trilha.pontos.map(function(p){return[p.lat,p.lng];});
+    _rotaLayer=L.polyline(latlngs,{color:'#16a34a',weight:4,opacity:.85}).addTo(_lmap);
+    try{_lmap.fitBounds(_rotaLayer.getBounds().pad(0.2));}catch(e){}
+    toast('Trilha exibida no mapa');
+  }, 300);
+}
+
+function marcarPontoNaTrilha(){
+  // Ponto sem viagem fica no acervo geral (tripId=null)
+  const num = _trilhaPontosSession.length + 1;
+  const nome = 'Ponto ' + num;
+  // Feedback visual imediato
+  const btn = document.querySelector('#trilhaAddPonto button');
+  if(btn){ btn.textContent = '⏳ Capturando GPS…'; btn.disabled = true; }
+  getGps().then(function(pos){
+    const p = {
+      id:uid(), nome:nome, catId:'outro',
+      lat:pos.lat, lng:pos.lng, tripId:currentTripId,
+      descricao:'Marcado durante trilha — editar depois',
+      foto:null, detalhado:false, criadoEm:Date.now()
+    };
+    db.points.push(p);
+    saveDb();
+    _trilhaPontosSession.push({id:p.id, nome:nome, lat:pos.lat, lng:pos.lng});
+    renderTrilhaPontos();
+    toast('✅ '+nome+' salvo!');
+    if(btn){ btn.textContent = '📍 MARCAR PONTO'; btn.disabled = false; }
+  }).catch(function(){
+    toast('Não foi possível obter o GPS');
+    if(btn){ btn.textContent = '📍 MARCAR PONTO'; btn.disabled = false; }
+  });
+}
+
+function verTrilhaNoMapa(i){
+  const t = currentTripObj();
+  if(!t||!t.trilhas||!t.trilhas[i]) return;
+  const trilha = t.trilhas[i];
+  showScreen('mapa');
+  setMapMode('mapa');
+  setTimeout(function(){
+    initLeaflet();
+    if(!_lmap) return;
+    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
+    const latlngs = trilha.pontos.map(function(p){ return [p.lat, p.lng]; });
+    _rotaLayer = L.polyline(latlngs, {color:'#16a34a', weight:4, opacity:.85}).addTo(_lmap);
+    try{ _lmap.fitBounds(_rotaLayer.getBounds().pad(0.2)); }catch(e){}
+    toast('Trilha '+(i+1)+' exibida no mapa');
+  }, 300);
+}
+
+// Sobrescrever iniciarTrilha para atualizar a tela dedicada
+const _origIniciarTrilha = iniciarTrilha;
+iniciarTrilha = function(){
+  // Trilha pode ser gravada sem viagem — pontos ficam sem tripId
+  _trilhaPontosSession = [];
+  if(currentTripId){
+    _origIniciarTrilha(); // usa a função original que já gerencia trilhaWatchId
+  } else {
+    // Sem viagem: gravar trilha livre
+    if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
+    trilhaBuffer = [];
+    document.getElementById('trilhaStatus').textContent = 'Gravando percurso livre…';
+    trilhaWatchId = navigator.geolocation.watchPosition(
+      function(pos){ trilhaBuffer.push({lat:pos.coords.latitude, lng:pos.coords.longitude, ts:Date.now()}); },
+      function(){ },
+      {enableHighAccuracy:true, maximumAge:5000, timeout:10000}
+    );
+  }
+  // Atualizar UI da tela trilha
+  const addDiv = document.getElementById('trilhaAddPonto');
+  const ind = document.getElementById('trilhaIndicator');
+  const btnS = document.getElementById('btnTrilhaStart');
+  const btnP = document.getElementById('btnTrilhaStop');
+  if(addDiv) addDiv.style.display = 'block';
+  if(ind) ind.style.background = '#16a34a';
+  if(btnS) btnS.style.display = 'none';
+  if(btnP) btnP.style.display = 'block';
+  // Timer
+  _trilhaStart = Date.now();
+  _trilhaTimer = setInterval(function(){
+    const el = document.getElementById('trilhaTimer');
+    if(!el) return;
+    const s = Math.floor((Date.now()-_trilhaStart)/1000);
+    const m = Math.floor(s/60);
+    el.style.display = 'block';
+    el.textContent = String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  }, 1000);
+  renderTrilhaPontos();
+};
+
+var _trilhaBufferTemp = [];
+var _trilhaPontosTemp = [];
+
+const _origPararTrilha = pararTrilha;
+pararTrilha = function(){
+  // Parar GPS watch
+  if(trilhaWatchId!=null){ navigator.geolocation.clearWatch(trilhaWatchId); trilhaWatchId=null; }
+  if(_trilhaTimer){ clearInterval(_trilhaTimer); _trilhaTimer=null; }
+  // Esconder botão parar, mostrar iniciar
+  const addDiv = document.getElementById('trilhaAddPonto');
+  const ind = document.getElementById('trilhaIndicator');
+  const btnS = document.getElementById('btnTrilhaStart');
+  const btnP = document.getElementById('btnTrilhaStop');
+  const timer = document.getElementById('trilhaTimer');
+  if(addDiv) addDiv.style.display = 'none';
+  if(ind) ind.style.background = '#86efac';
+  if(btnS) btnS.style.display = 'block';
+  if(btnP) btnP.style.display = 'none';
+  if(timer) timer.style.display = 'none';
+  // Guardar buffer temporário e abrir modal de nome
+  _trilhaBufferTemp = trilhaBuffer ? trilhaBuffer.slice() : [];
+  _trilhaPontosTemp = _trilhaPontosSession ? _trilhaPontosSession.slice() : [];
+  trilhaBuffer = [];
+  if(_trilhaBufferTemp.length < 2 && _trilhaPontosTemp.length === 0){
+    document.getElementById('trilhaStatus').textContent = 'Trilha muito curta, não foi salva.';
+    _trilhaPontosSession = [];
+    renderTrilhaPontos();
+    return;
+  }
+  // Mostrar modal de nome
+  const info = document.getElementById('trilhaNomePontosInfo');
+  if(info){
+    const nGps = _trilhaBufferTemp.length;
+    const nPts = _trilhaPontosTemp.length;
+    info.textContent = nGps+' pontos GPS gravados'+(nPts?' · '+nPts+' ponto'+(nPts>1?'s':'')+' marcado'+(nPts>1?'s':''):'');
+  }
+  document.getElementById('trilhaNomeInput').value = '';
+  openModal('modalNomeTrilha');
+};
+
+function salvarTrilhaComNome(){
+  const nome = document.getElementById('trilhaNomeInput').value.trim() || ('Trilha '+new Date().toLocaleDateString('pt-BR'));
+  const trilhaId = uid();
+  // Vincular pontos marcados a esta trilha
+  _trilhaPontosTemp.forEach(function(p){
+    const pt = db.points.find(function(x){ return x.id===p.id; });
+    if(pt){ pt.trilhaId = trilhaId; pt.trilhaNome = nome; }
+  });
+  // Salvar trilha
+  const trilhaObj = {
+    id: trilhaId,
+    nome: nome,
+    pontos: _trilhaBufferTemp,
+    pontosIds: _trilhaPontosTemp.map(function(p){ return p.id; }),
+    criadoEm: Date.now()
+  };
+  if(currentTripId){
+    const t = db.trips.find(function(x){ return x.id===currentTripId; });
+    if(t){ if(!t.trilhas) t.trilhas=[]; t.trilhas.push(trilhaObj); }
+  } else {
+    if(!db.trilhasLivres) db.trilhasLivres=[];
+    db.trilhasLivres.push(trilhaObj);
+  }
+  saveDb();
+  closeModal('modalNomeTrilha');
+  document.getElementById('trilhaStatus').textContent = 'Trilha "'+nome+'" salva!';
+  _trilhaPontosSession = [];
+  _trilhaPontosTemp = [];
+  _trilhaBufferTemp = [];
+  renderTrilhaPontos();
+  renderTrilhasSalvas();
+  toast('Trilha "'+nome+'" salva ✅');
+}
+
+function descartarTrilha(){
+  closeModal('modalNomeTrilha');
+  _trilhaPontosSession = [];
+  _trilhaPontosTemp = [];
+  _trilhaBufferTemp = [];
+  document.getElementById('trilhaStatus').textContent = 'Trilha descartada.';
+  renderTrilhaPontos();
+}
+
+function compartilharTrilha(i,tipo){
+  const todas = (currentTripObj()&&currentTripObj().trilhas ? currentTripObj().trilhas.map(function(tr){return{tr,tipo:'viagem'};}) : [])
+    .concat((db.trilhasLivres||[]).map(function(tr){return{tr,tipo:'livre'};}));
+  if(!todas[i]) return;
+  const trilha=todas[i].tr;
+  const nome=trilha.nome||'Trilha';
+  // Pegar pontos marcados
+  const pts = trilha.pontosIds ? trilha.pontosIds.map(function(pid){
+    return db.points.find(function(x){return x.id===pid;});
+  }).filter(Boolean) : [];
+  // Pegar pontos GPS (máx 10 waypoints para o Maps)
+  const gps = trilha.pontos || [];
+  let url = '';
+  if(pts.length >= 2){
+    // Usar pontos marcados como waypoints no Maps
+    const coords = pts.map(function(p){return p.lat+','+p.lng;});
+    const origem=coords[0], destino=coords[coords.length-1];
+    const mid=coords.slice(1,-1).join('|');
+    url='https://www.google.com/maps/dir/?api=1&origin='+origem+'&destination='+destino+(mid?'&waypoints='+encodeURIComponent(mid):'');
+  } else if(pts.length===1){
+    url='https://www.google.com/maps/search/?api=1&query='+pts[0].lat+','+pts[0].lng;
+  } else if(gps.length>=2){
+    // Pegar início e fim da trilha GPS
+    const p0=gps[0], pN=gps[gps.length-1];
+    // Pegar até 8 pontos intermediários espaçados
+    const step=Math.max(1,Math.floor(gps.length/8));
+    const mid=[];
+    for(let k=step;k<gps.length-1;k+=step) mid.push(gps[k].lat+','+gps[k].lng);
+    url='https://www.google.com/maps/dir/?api=1&origin='+p0.lat+','+p0.lng+'&destination='+pN.lat+','+pN.lng+(mid.length?'&waypoints='+encodeURIComponent(mid.join('|')):'');
+  } else {
+    toast('Trilha sem pontos suficientes para compartilhar.');
+    return;
+  }
+  // Montar mensagem
+  var linhas = ['🐾 *'+nome+'*',''];
+  if(pts.length){
+    linhas.push('📍 Pontos:');
+    pts.forEach(function(p,j){ linhas.push((j+1)+'. '+(p.nome||'Ponto')+(p.descricao?' — '+p.descricao.slice(0,40):'')); });
+    linhas.push('');
+  }
+  linhas.push('🗺️ Ver no mapa:');
+  linhas.push(url);
+  const msg = linhas.join('\n');
+  // Tentar Web Share API
+  if(navigator.share){
+    navigator.share({title:nome, text:msg, url:url}).catch(function(){});
+  } else {
+    // Fallback: copiar para clipboard e abrir WhatsApp
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(msg).then(function(){
+        toast('Copiado! Cole no WhatsApp.');
+        setTimeout(function(){
+          window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+        },500);
+      });
+    } else {
+      window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+    }
+  }
 }
 
 </script>
+<div id="modalAcervo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;overflow-y:auto;padding:16px;">
+  <div style="background:#fff;border-radius:16px;padding:16px;max-width:480px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <strong>📦 Adicionar do acervo</strong>
+      <button onclick="fecharAcervo()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;">✕</button>
+    </div>
+    <input type="text" id="acervoBusca" placeholder="🔍 Buscar…" oninput="renderAcervo()"
+      style="width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;margin-bottom:10px;box-sizing:border-box;">
+    <div id="acervoLista" style="max-height:55vh;overflow-y:auto;"></div>
+    <button onclick="fecharAcervo()" style="width:100%;margin-top:12px;padding:11px;background:#334155;color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;">Concluir ✓</button>
+  </div>
+
+<!-- MODAL NOME DA TRILHA -->
+<div id="modalNomeTrilha" class="modal-bg">
+  <div class="modal" style="padding:20px;">
+    <h2 style="margin-bottom:8px;">🐾 Salvar trilha</h2>
+    <p style="font-size:.78rem;color:#64748b;margin-bottom:14px;">Dê um nome para identificar este percurso depois.</p>
+    <input type="text" id="trilhaNomeInput" placeholder="Ex: Estrada do Engenho, Trilha da Serra…"
+      style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:.95rem;box-sizing:border-box;margin-bottom:8px;">
+    <div id="trilhaNomePontosInfo" style="font-size:.75rem;color:#64748b;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="salvarTrilhaComNome()" style="flex:2;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.92rem;font-weight:800;cursor:pointer;">Salvar ✓</button>
+      <button onclick="descartarTrilha()" style="flex:1;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:12px;font-size:.88rem;font-weight:700;cursor:pointer;">Descartar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
