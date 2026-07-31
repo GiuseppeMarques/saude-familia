@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giuseppe-apps-v6';
+const CACHE_NAME = 'giuseppe-apps-v7';
 const ASSETS = [
   './index.html',
   './pontos-interesse.html',
@@ -6,7 +6,11 @@ const ASSETS = [
   './agenda.html',
   './Perito.html',
   './vistoria.html',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './manifest-perito.webmanifest',
+  './manifest-vistoria.webmanifest',
+  './icon-perito.svg',
+  './icon-vistoria.svg'
 ];
 self.addEventListener('install',function(e){self.skipWaiting();e.waitUntil(caches.open(CACHE_NAME).then(function(c){return c.addAll(ASSETS).catch(function(){});}));});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ns){return Promise.all(ns.filter(function(n){return n!==CACHE_NAME;}).map(function(n){return caches.delete(n);}));}));self.clients.claim();});

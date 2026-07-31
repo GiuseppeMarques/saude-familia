@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#16213e"/></linearGradient></defs>
+<rect width="512" height="512" rx="115" fill="url(#bg2)"/>
+<circle cx="210" cy="210" r="110" fill="none" stroke="#C0272D" stroke-width="28"/>
+<circle cx="210" cy="210" r="82" fill="#fff" opacity=".08"/>
+<path d="M210 155 Q225 175 215 195 Q235 175 230 155 Q250 185 240 215 Q255 200 250 175 Q275 210 260 240 Q248 265 210 270 Q172 265 160 240 Q145 210 170 175 Q165 200 180 215 Q170 185 190 155 Q185 175 205 195 Q195 175 210 155Z" fill="#FF6B35"/>
+<path d="M210 175 Q220 190 213 205 Q225 192 222 175 Q238 200 228 222 Q222 238 210 242 Q198 238 192 222 Q182 200 198 175 Q195 192 207 205 Q200 190 210 175Z" fill="#FFD700"/>
+<rect x="290" y="290" width="32" height="95" rx="16" transform="rotate(45 290 290)" fill="#C0272D"/>
+<path d="M310 120 Q340 108 370 120 L370 168 Q340 190 310 168 Z" fill="#C0272D"/>
+<text x="340" y="162" font-family="Arial" font-size="20" font-weight="900" fill="#fff" text-anchor="middle">SC</text>
+<text x="256" y="430" font-family="Arial" font-size="38" font-weight="900" fill="#C0272D" text-anchor="middle" letter-spacing="4">PERITO</text>
+</svg>

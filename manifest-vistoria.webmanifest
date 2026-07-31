@@ -1,0 +1,22 @@
+{
+  "name": "Vistoria CBMSC",
+  "short_name": "Vistoria",
+  "start_url": "./vistoria.html",
+  "display": "standalone",
+  "background_color": "#C0272D",
+  "theme_color": "#C0272D",
+  "icons": [
+    {
+      "src": "./icon-vistoria.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-vistoria.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
