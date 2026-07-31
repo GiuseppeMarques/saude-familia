@@ -1,4 +1,4 @@
-const CACHE_NAME = 'giuseppe-apps-v4';
+const CACHE_NAME = 'giuseppe-apps-v5';
 const ASSETS = [
   './index.html',
   './pontos-interesse.html',
