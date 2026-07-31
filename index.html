@@ -871,8 +871,8 @@ var LB={doenca:'Doença',medicacao:'Medicação',consulta:'Consulta',exame:'Exam
 // ── HELPERS ─────────────────────────────
 function ls(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function lg(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
-function set(id,v){document.getElementById(id).value=v;}
-function get(id){return document.getElementById(id).value;}
+function set(id,v){var el=document.getElementById(id);if(el)el.value=v;}
+function get(id){var el=document.getElementById(id);return el?el.value:'';}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 function gId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function fD(d){if(!d)return'';var p=String(d).slice(0,10).split('-');return p[2]+'/'+p[1]+'/'+p[0];}
@@ -1069,7 +1069,7 @@ function selPerfil(id){
   var hj=new Date().toISOString().slice(0,10);var hr=new Date().toTimeString().slice(0,5);
   set('eData',hj);set('eHora',hr);set('mD1',hj);set('mH1',hr);
   showTab('hoje',document.querySelector('.tab'));
-  renderHoje();renderBkp();renderEst();renderConsLista();setupAcTodos();renderNotifBanner();if(Notification.permission==='granted'&&!_swReg)registrarSW();
+  renderHoje();renderBkp();renderEst();renderConsLista();setupAcTodos();renderNotifBanner();if(('Notification' in window && Notification.permission==='granted')&&!_swReg)registrarSW();
 }
 function voltarPerfis(){pid=null;mostrarPerfis();}
 function abrirNP(){set('npNm','');set('npAv','👤');initNasc('npN','');setFase('npFase','adulto');abrirModal('ovNP');}
@@ -1544,9 +1544,9 @@ function addConsMed(){
   document.getElementById('cMedPerCust').style.display='none';
   document.getElementById('cMedDurCust').style.display='none';
   document.querySelectorAll('#cPerGrid .tyo').forEach(function(x){x.classList.remove('on');});
-  document.querySelector('#cPerGrid [data-p="8"]').classList.add('on');
+  var cp8=document.querySelector('#cPerGrid [data-p="8"]');if(cp8)cp8.classList.add('on');
   document.querySelectorAll('#cDurGrid .tyo').forEach(function(x){x.classList.remove('on');});
-  document.querySelector('#cDurGrid [data-d="5"]').classList.add('on');
+  var cd5=document.querySelector('#cDurGrid [data-d="5"]');if(cd5)cd5.classList.add('on');
   renderConsMedList();
 }
 function remConsMed(i){cMeds.splice(i,1);renderConsMedList();}
@@ -1611,99 +1611,137 @@ function editarConsulta(id){
 }
 
 function salvarConsulta(){
-  var mdc=getConsMdcVal();
-  var dt=get('cData');if(!dt){alert('Informe a data da consulta.');return;}
-  var hr=get('cHora');
+  if(!pid){alert('Selecione um perfil antes de salvar.');return;}
+  var mdc=get('cMdcSel')==='__outro__'?get('cMdcTxt').trim():get('cMdcSel');
+  var dt=get('cData');
+  if(!dt){alert('Informe a data da consulta.');return;}
+  var hr=get('cHora')||'08:00';
   var motivo=get('cMotivo').trim();
   var diag=get('cDiag').trim();
   var obs=get('cObs').trim();
-  var retD=get('cRetD');var retH=get('cRetH');var retObs=get('cRetObs').trim();
+  var retD=get('cRetD');
+  var retH=get('cRetH')||'';
+  var retObs=get('cRetObs').trim();
 
-  // Evento principal da consulta
-  var ev={
-    id:cEditId||gId(),tipo:'consulta',
+  // Garantir array do perfil
+  if(!EV[pid])EV[pid]=[];
+  if(!MD[pid])MD[pid]=[];
+
+  // ── EDIÇÃO ──────────────────────────────────────
+  if(cEditId){
+    var evs=EV[pid];
+    var i=evs.findIndex(function(e){return e.id===cEditId;});
+    if(i>=0){
+      evs[i].nome='Consulta'+(mdc?' — '+mdc:'');
+      evs[i].data=dt+'T'+hr;
+      evs[i].hora=hr;
+      evs[i].sintomas=motivo;
+      evs[i].medico=mdc;
+      evs[i].obs=obs;
+      evs[i].cDiag=diag;
+      evs[i].cMeds=cMeds.slice();
+      evs[i].cExs=cExs.slice();
+      evs[i].cRetD=retD;
+      evs[i].cRetH=retH;
+      evs[i].cRetObs=retObs;
+      evs[i].editPor=audit();
+    }
+    salvar();
+    fModal('ovCons');
+    renderConsLista();renderTl();renderStats();renderMeds();renderHoje();
+    return;
+  }
+
+  // ── NOVA CONSULTA ────────────────────────────────
+  var consId=gId();
+
+  // 1. Consulta principal
+  EV[pid].push({
+    id:consId,tipo:'consulta',
     nome:'Consulta'+(mdc?' — '+mdc:''),
-    data:dt+'T'+(hr||'00:00'),hora:hr,
-    sintomas:motivo,
-    medicacao:cMeds.map(function(m){return m.nome+(m.dose?' '+m.dose:'');}).join(', '),
-    medico:mdc,obs:obs,
-    cDiag:diag,cMeds:cMeds,cExs:cExs,
+    data:dt+'T'+hr,hora:hr,
+    sintomas:motivo,medicacao:'',medico:mdc,obs:obs,
+    cDiag:diag,cMeds:cMeds.slice(),cExs:cExs.slice(),
     cRetD:retD,cRetH:retH,cRetObs:retObs,
     fotos:[],atualizacoes:[],por:audit()
-  };
+  });
 
-  if(cEditId){
-    var evs=getEv();var i=evs.findIndex(function(e){return e.id===cEditId;});
-    if(i>=0){ev.por=evs[i].por;ev.editPor=audit();evs[i]=ev;}
-  } else {
-    if(!EV[pid])EV[pid]=[];
-    EV[pid].push(ev);
-
-    // Gerar exames pendentes no histórico
-    cExs.forEach(function(ex){
-      EV[pid].push({
-        id:gId(),tipo:'exame',
-        nome:ex.nome,
-        data:dt+'T'+(hr||'00:00'),hora:hr,
-        sintomas:'Solicitado na consulta de '+fD(dt)+(mdc?' com '+mdc:''),
-        medicacao:'',medico:mdc,obs:'',
-        pendente:true,consId:ev.id,resultado:'',
-        fotos:[],atualizacoes:[],por:audit()
-      });
+  // 2. Exames — um evento por exame, pendente
+  cExs.forEach(function(ex){
+    EV[pid].push({
+      id:gId(),tipo:'exame',
+      nome:ex.nome,
+      data:dt+'T'+hr,hora:hr,
+      sintomas:'Solicitado em consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+      medicacao:'',medico:mdc,obs:'',
+      pendente:true,resultado:'',consId:consId,
+      fotos:[],atualizacoes:[],por:audit()
     });
+  });
 
-    // Gerar retorno na aba Consultas (editável)
-    if(retD){
-      var retEv={
-        id:gId(),tipo:'consulta',
-        nome:'Retorno'+(mdc?' — '+mdc:''),
-        data:retD+'T'+(retH||'00:00'),hora:retH||'',
-        sintomas:retObs||'Retorno agendado da consulta de '+fD(dt),
-        medicacao:'',medico:mdc,obs:'',
-        cMeds:[],cExs:[],cDiag:'',
-        cRetD:'',cRetH:'',cRetObs:'',
-        fotos:[],atualizacoes:[],por:audit(),
-        retornoData:true,consOrigemId:ev.id
-      };
-      EV[pid].push(retEv);
-    }
-
-        // Medicações prescritas → histórico + aba Medicações com dados completos
-    cMeds.forEach(function(m){
-      EV[pid].push({
-        id:gId(),tipo:'medicacao',nome:m.nome,
-        data:dt+'T'+(hr||'00:00'),hora:hr,
-        sintomas:'Prescrito na consulta de '+fD(dt)+(mdc?' com '+mdc:''),
-        medicacao:m.nome+(m.dose?' — '+m.dose:''),
-        medico:mdc,obs:m.obs||'',fotos:[],atualizacoes:[],por:audit()
-      });
-      var periH=m.periH||8;var durD=m.durD||5;
-      var d1=m.d1||dt;var h1=m.h1||hr||'08:00';
-      var sl=calcSlots(d1,h1,periH,durD);
-      if(!MD[pid])MD[pid]=[];
-      MD[pid].push({
-        id:gId(),nome:m.nome,mdcNm:mdc,
-        dose:m.dose||'',via:m.via||'Oral',
-        periH:periH,durD:durD,cont:durD==='c',
-        primD:d1+'T'+h1,slots:sl,inter:[],
-        obs:m.obs||('Prescrito na consulta de '+fD(dt)),
-        ativo:true,status:'ativo',
-        qtd:m.qtd||0,unid:m.unid||'comprimidos',
-        diasAv:7,qtdU:0,por:audit(),consOrigemId:ev.id
-      });
+  // 3. Retorno — nova consulta agendada
+  if(retD){
+    EV[pid].push({
+      id:gId(),tipo:'consulta',
+      nome:'Retorno'+(mdc?' — '+mdc:''),
+      data:retD+'T'+(retH||'08:00'),hora:retH||'',
+      sintomas:retObs||('Retorno da consulta de '+fD(dt)),
+      medicacao:'',medico:mdc,obs:'',
+      cDiag:'',cMeds:[],cExs:[],cRetD:'',cRetH:'',cRetObs:'',
+      fotos:[],atualizacoes:[],por:audit(),
+      retornoData:true,consOrigemId:consId
     });
-
   }
 
-  salvar();fModal('ovCons');
-  renderConsLista();renderTl();renderStats();renderMeds();renderHoje();renderEst();
+  // 4. Medicações — histórico + aba Medicações
+  cMeds.forEach(function(m){
+    // Evento no histórico
+    EV[pid].push({
+      id:gId(),tipo:'medicacao',
+      nome:m.nome,
+      data:dt+'T'+hr,hora:hr,
+      sintomas:'Prescrito em consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+      medicacao:m.nome+(m.dose?' — '+m.dose:''),
+      medico:mdc,obs:m.obs||'',
+      fotos:[],atualizacoes:[],por:audit()
+    });
+    // Cadastro na aba Medicações com slots
+    var periH=m.periH||8;
+    var durD=m.durD||5;
+    var d1=m.d1||dt;
+    var h1=m.h1||hr;
+    var slots=calcSlots(d1,h1,periH,durD);
+    MD[pid].push({
+      id:gId(),nome:m.nome,mdcNm:mdc,
+      dose:m.dose||'',via:m.via||'Oral',
+      periH:periH,durD:durD,cont:durD==='c',
+      primD:d1+'T'+h1,slots:slots,inter:[],
+      obs:m.obs||('Prescrito em consulta de '+fD(dt)),
+      ativo:true,status:'ativo',
+      qtd:m.qtd||0,unid:m.unid||'comprimidos',
+      diasAv:7,qtdU:0,por:audit(),consOrigemId:consId
+    });
+  });
+
+  // Salvar e atualizar todas as abas
+  salvar();
+  fModal('ovCons');
+  renderConsLista();
+  renderTl();
+  renderStats();
+  renderMeds();
+  renderHoje();
+  renderEst();
   agendarTodosAlarmes();
 
-  if(!cEditId&&(cMeds.length||cExs.length||retD)){
-    var msg='Consulta salva!';if(cMeds.length)msg+=' '+cMeds.length+' med(s) registrada(s).';if(cExs.length)msg+=' '+cExs.length+' exame(s) pendente(s).';if(retD)msg+=' Retorno em '+fD(retD)+'.';
-    alert(msg);
-  }
+  // Confirmação
+  var partes=[];
+  if(cMeds.length) partes.push(cMeds.length+' medicação(ões) cadastrada(s)');
+  if(cExs.length) partes.push(cExs.length+' exame(s) pendente(s)');
+  if(retD) partes.push('retorno em '+fD(retD));
+  if(partes.length) alert('✅ Consulta salva!\n'+partes.join('\n'));
 }
+
 
 function renderConsLista(){
   var el=document.getElementById('consOut');if(!el)return;
@@ -1874,11 +1912,11 @@ function enviarMensagemSW(msg){
   _swReg.active.postMessage(msg);
 }
 
-function renderNotifBanner(){
+function renderNotifBanner(){if(typeof Notification==='undefined')return;
   var el = document.getElementById('notifBan');
   if(!el) return;
-  if(!('Notification' in window)){el.innerHTML='';return;}
-  if(Notification.permission === 'granted'){
+  if(!('Notification' in window)){if(el)el.innerHTML='';return;}
+  if(('Notification' in window && Notification.permission === 'granted')){
     el.innerHTML = '<div style="background:var(--grnp);border:1.5px solid var(--grn);border-radius:var(--rs);padding:8px 11px;margin-bottom:9px;display:flex;align-items:center;gap:8px;"><div style="font-size:1rem;">🔔</div><div style="flex:1;font-size:.76rem;font-weight:700;color:#2d7a58;">Notificações e alarmes ativos.</div><button onclick="agendarTodosAlarmes()" style="background:var(--grn);color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:.7rem;font-weight:800;cursor:pointer;">↻ Reagendar</button></div>';
   } else {
     el.innerHTML = '<div style="background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:8px 11px;margin-bottom:9px;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="pedirPermissaoNotif()"><div style="font-size:1rem;">🔕</div><div style="flex:1;font-size:.76rem;font-weight:700;color:var(--t3);">Ativar alarmes de medicação e consulta →</div><div style="font-size:.73rem;font-weight:800;color:var(--pri);">Ativar</div></div>';
