@@ -1,8 +1,11 @@
-const CACHE_NAME = 'giuseppe-apps-v2';
+const CACHE_NAME = 'giuseppe-apps-v4';
 const ASSETS = [
   './index.html',
   './pontos-interesse.html',
   './financeiro-veiculos-1.html',
+  './agenda.html',
+  './Perito.html',
+  './vistoria.html',
   './manifest.webmanifest'
 ];
 
