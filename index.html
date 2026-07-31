@@ -24,7 +24,8 @@
   --sh:0 2px 12px rgba(124,92,191,.10);
   --r:16px;--rs:10px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:'Nunito',sans-serif;}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
 body{background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:80px;}
 
 /* TELAS */
@@ -1377,15 +1378,18 @@ function abrirDet(id){var e=getEv().find(function(x){return x.id===id;});if(!e)r
         ['Diagnóstico / Conduta',e.diagnostico||e.cDiag],
         ['Observações',e.obs]
       ].filter(function(f){return f[1];});
-      // Medicações prescritas
+      // Medicações prescritas — lista completa
       if(e.cMeds&&e.cMeds.length){
-        var mStr=e.cMeds.map(function(m){return m.nome+(m.dose?' — '+m.dose:'');}).join(', ');
-        cps.push(['💊 Medicações prescritas',mStr]);
+        var mHtml=e.cMeds.map(function(m){
+          var det=[m.dose,m.via,m.periH?'a cada '+m.periH+'h':'',m.durD==='c'?'Contínuo':(m.durD?m.durD+' dias':''),m.d1?'1ª dose: '+fD(m.d1)+(m.h1?' às '+m.h1:''):'',m.qtd?m.qtd+' '+esc(m.unid||''):''].filter(Boolean).join(' · ');
+          return '<div style="padding:5px 0;border-bottom:1px solid var(--bdr);"><b>💊 '+esc(m.nome)+'</b>'+(det?'<br><span style="font-size:.72rem;color:var(--t3);">'+det+'</span>':'')+(m.obs?'<br><span style="font-size:.7rem;color:var(--t2);">📝 '+esc(m.obs)+'</span>':'')+'</div>';
+        }).join('');
+        cps.push(['💊 Medicações prescritas','__HTML__'+mHtml]);
       }
       // Exames solicitados
       if(e.cExs&&e.cExs.length){
-        var exStr=e.cExs.map(function(x){return x.nome;}).join(', ');
-        cps.push(['🔬 Exames solicitados',exStr]);
+        var exHtml=e.cExs.map(function(x){return '<div style="padding:3px 0;">🔬 '+esc(x.nome)+'</div>';}).join('');
+        cps.push(['🔬 Exames solicitados','__HTML__'+exHtml]);
       }
       // Retorno
       if(e.cRetD)cps.push(['🔄 Retorno previsto',fD(e.cRetD)+(e.cRetH?' às '+e.cRetH:'')+(e.cRetObs?' — '+e.cRetObs:'')]);
@@ -1420,7 +1424,7 @@ var svH='';if(e.sv){var sv=e.sv;var it=[sv.t?'🌡️ '+sv.t+'°C':'',sv.fc?'❤
     if(e.tipo==='exame'&&(e.pendente||!e.resultado)){
       var eid=e.id;editExH='<button class="btn bG" style="margin-bottom:9px;" onclick="editarResultadoExame(this.dataset.id)" data-id="'+eid+'">🔬 Inserir Resultado</button>';
     }
-    var ftH='';if(e.fotos&&e.fotos.length)ftH='<div class="ds"><div class="dl">Fotos</div><div class="pgrid">'+e.fotos.map(function(f){return '<div class="pthumb" onclick="abrirFoto(\''+f.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"><img src="'+f+'" loading="lazy"></div>';}).join('')+'</div></div>';var dH='';if(e.tipo==='doenca'){var ab=!e.encerradaEm;var dias=calcDias(e.data.slice(0,10),ab?new Date().toISOString().slice(0,10):e.encerradaEm);var stH=ab?'<span class="stAb">🔴 Em curso · '+dias+' dia'+(dias!==1?'s':'')+'</span>':'<span class="stEnc">✅ Encerrada · '+dias+' dia'+(dias!==1?'s':'')+'</span>';var upds=e.atualizacoes||[];var uH=!upds.length?'<div style="font-size:.76rem;color:var(--t3);font-style:italic;padding:4px 0">Nenhuma atualização.</div>':'<div class="updL">'+upds.map(function(u,i){return '<div class="upd"><button class="updX" onclick="delUpd(\''+e.id+'\','+i+')">✕</button><div class="updD">📅 '+fD(u.data)+(u.hora?' · '+u.hora:'')+(u.por?' · <b>'+esc(u.por)+'</b>':'')+'</div>'+(u.sint||u.sintomas?'<div class="updT"><b>Sintomas:</b> '+esc(u.sint||u.sintomas)+'</div>':'')+(u.med||u.medicacao?'<div class="updT"><b>Medicação:</b> '+esc(u.med||u.medicacao)+'</div>':'')+'</div>';}).join('')+'</div>';var addH=ab?'<div class="addUpd"><div class="addUH">➕ Nova Atualização</div><div class="dr" style="margin-bottom:8px;"><div class="fg" style="margin-bottom:0"><label>Data</label><input type="date" class="fc" id="updD"></div><div class="fg" style="margin-bottom:0"><label>Hora</label><input type="time" class="fc" id="updH"></div></div><div class="fg"><label>Sintomas / Evolução</label><textarea class="fc" id="updS" style="min-height:46px;" placeholder="Como está hoje…"></textarea></div><div class="fg"><label>Medicação aplicada</label><input type="text" class="fc" id="updM" placeholder="Conforme prescrição"></div><button class="btn bP" style="margin-top:3px;" onclick="salvarUpd(\''+e.id+'\')">Salvar ✓</button></div>':'';var btnSt=ab?'<button class="btn bG" style="margin-bottom:9px;" onclick="encrarDoenca(\''+e.id+'\')">✅ Encerrar</button>':'<button class="btn bO" style="margin-bottom:9px;" onclick="reabrirDoenca(\''+e.id+'\')">🔄 Reabrir</button>';dH='<div class="ds"><div class="dl">Status</div><div style="margin-top:2px;">'+stH+'</div></div><div class="ds"><div class="dl">Atualizações</div>'+uH+addH+'</div>'+btnSt;}var bcl={doenca:'bdg-r',medicacao:'bdg-o',consulta:'bdg-b',exame:'bdg-g',alimentacao:'bdg-p',outro:'bdg-p'}[e.tipo]||'bdg-p';var auH=e.por?'<div class="ds"><div class="dl">Registro</div><div class="dv"><div class="audit" style="margin:0">Por <b>'+esc(e.por)+'</b></div>'+(e.editPor?'<div class="audit" style="margin:0">Ed. por <b>'+esc(e.editPor)+'</b></div>':'')+'</div></div>':'';document.getElementById('detOut').innerHTML=alH+bebeH+editExH+'<div style="display:flex;align-items:center;gap:7px;margin-bottom:11px;"><div style="width:32px;height:32px;border-radius:7px;background:var(--pp);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">'+(IC[e.tipo]||'📝')+'</div><div><div style="font-size:.95rem;font-weight:800;">'+esc(e.nome)+'</div><div style="font-size:.7rem;color:var(--t3);">'+fDT(e.data)+'</div></div><span class="bdg '+bcl+'" style="margin-left:auto;">'+(LB[e.tipo]||e.tipo)+'</span></div>'+svH+cps.map(function(f){return '<div class="ds"><div class="dl">'+f[0]+'</div><div class="dv">'+esc(f[1])+'</div></div>';}).join('')+dH+ftH+auH;document.getElementById('btnDel').onclick=function(){delEv(id);};if(e.tipo==='doenca'&&!e.encEm){setTimeout(function(){var ud=document.getElementById('updD'),uh=document.getElementById('updH');if(ud)ud.value=new Date().toISOString().slice(0,10);if(uh)uh.value=new Date().toTimeString().slice(0,5);},30);}abrirModal('ovDet');}
+    var ftH='';if(e.fotos&&e.fotos.length)ftH='<div class="ds"><div class="dl">Fotos</div><div class="pgrid">'+e.fotos.map(function(f){return '<div class="pthumb" onclick="abrirFoto(\''+f.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"><img src="'+f+'" loading="lazy"></div>';}).join('')+'</div></div>';var dH='';if(e.tipo==='doenca'){var ab=!e.encerradaEm;var dias=calcDias(e.data.slice(0,10),ab?new Date().toISOString().slice(0,10):e.encerradaEm);var stH=ab?'<span class="stAb">🔴 Em curso · '+dias+' dia'+(dias!==1?'s':'')+'</span>':'<span class="stEnc">✅ Encerrada · '+dias+' dia'+(dias!==1?'s':'')+'</span>';var upds=e.atualizacoes||[];var uH=!upds.length?'<div style="font-size:.76rem;color:var(--t3);font-style:italic;padding:4px 0">Nenhuma atualização.</div>':'<div class="updL">'+upds.map(function(u,i){return '<div class="upd"><button class="updX" onclick="delUpd(\''+e.id+'\','+i+')">✕</button><div class="updD">📅 '+fD(u.data)+(u.hora?' · '+u.hora:'')+(u.por?' · <b>'+esc(u.por)+'</b>':'')+'</div>'+(u.sint||u.sintomas?'<div class="updT"><b>Sintomas:</b> '+esc(u.sint||u.sintomas)+'</div>':'')+(u.med||u.medicacao?'<div class="updT"><b>Medicação:</b> '+esc(u.med||u.medicacao)+'</div>':'')+'</div>';}).join('')+'</div>';var addH=ab?'<div class="addUpd"><div class="addUH">➕ Nova Atualização</div><div class="dr" style="margin-bottom:8px;"><div class="fg" style="margin-bottom:0"><label>Data</label><input type="date" class="fc" id="updD"></div><div class="fg" style="margin-bottom:0"><label>Hora</label><input type="time" class="fc" id="updH"></div></div><div class="fg"><label>Sintomas / Evolução</label><textarea class="fc" id="updS" style="min-height:46px;" placeholder="Como está hoje…"></textarea></div><div class="fg"><label>Medicação aplicada</label><input type="text" class="fc" id="updM" placeholder="Conforme prescrição"></div><button class="btn bP" style="margin-top:3px;" onclick="salvarUpd(\''+e.id+'\')">Salvar ✓</button></div>':'';var btnSt=ab?'<button class="btn bG" style="margin-bottom:9px;" onclick="encrarDoenca(\''+e.id+'\')">✅ Encerrar</button>':'<button class="btn bO" style="margin-bottom:9px;" onclick="reabrirDoenca(\''+e.id+'\')">🔄 Reabrir</button>';dH='<div class="ds"><div class="dl">Status</div><div style="margin-top:2px;">'+stH+'</div></div><div class="ds"><div class="dl">Atualizações</div>'+uH+addH+'</div>'+btnSt;}var bcl={doenca:'bdg-r',medicacao:'bdg-o',consulta:'bdg-b',exame:'bdg-g',alimentacao:'bdg-p',outro:'bdg-p'}[e.tipo]||'bdg-p';var auH=e.por?'<div class="ds"><div class="dl">Registro</div><div class="dv"><div class="audit" style="margin:0">Por <b>'+esc(e.por)+'</b></div>'+(e.editPor?'<div class="audit" style="margin:0">Ed. por <b>'+esc(e.editPor)+'</b></div>':'')+'</div></div>':'';document.getElementById('detOut').innerHTML=alH+bebeH+editExH+'<div style="display:flex;align-items:center;gap:7px;margin-bottom:11px;"><div style="width:32px;height:32px;border-radius:7px;background:var(--pp);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">'+(IC[e.tipo]||'📝')+'</div><div><div style="font-size:.95rem;font-weight:800;">'+esc(e.nome)+'</div><div style="font-size:.7rem;color:var(--t3);">'+fDT(e.data)+'</div></div><span class="bdg '+bcl+'" style="margin-left:auto;">'+(LB[e.tipo]||e.tipo)+'</span></div>'+svH+cps.map(function(f){return '<div class="ds"><div class="dl">'+f[0]+'</div><div class="dv">'+(f[1].indexOf('__HTML__')===0?f[1].slice(8):esc(f[1]))+'</div></div>';}).join('')+dH+ftH+auH;document.getElementById('btnDel').onclick=function(){delEv(id);};if(e.tipo==='doenca'&&!e.encEm){setTimeout(function(){var ud=document.getElementById('updD'),uh=document.getElementById('updH');if(ud)ud.value=new Date().toISOString().slice(0,10);if(uh)uh.value=new Date().toTimeString().slice(0,5);},30);}abrirModal('ovDet');}
 function delEv(id){if(!confirm('Excluir?'))return;EV[pid]=getEv().filter(function(e){return e.id!==id;});salvar();renderTl();renderStats();fModal('ovDet');}
 function salvarUpd(id){var e=getEv().find(function(x){return x.id===id;});if(!e)return;var s=get('updS').trim(),m=get('updM').trim();if(!s&&!m){alert('Preencha pelo menos um campo.');return;}if(!e.atualizacoes)e.atualizacoes=[];e.atualizacoes.push({data:get('updD'),hora:get('updH'),sint:s,med:m,por:audit()});salvar();abrirDet(id);}
 function delUpd(id,i){var e=getEv().find(function(x){return x.id===id;});if(!e)return;if(!confirm('Excluir atualização?'))return;e.atualizacoes.splice(i,1);salvar();abrirDet(id);}
@@ -1692,7 +1696,7 @@ function salvarConsulta(){
   }
 
   salvar();fModal('ovCons');
-  renderConsLista();renderTl();renderStats();
+  renderConsLista();renderTl();renderStats();renderMeds();renderHoje();renderEst();
   agendarTodosAlarmes();
 
   if(!cEditId&&(cMeds.length||cExs.length||retD)){
@@ -1762,12 +1766,10 @@ var _swReg = null;
 
 function registrarSW(){
   if(!('serviceWorker' in navigator) || !('Notification' in window)) return;
-  // IMPORTANTE: o Chrome bloqueia registro de Service Worker via blob: URL (erro de segurança
-  // silencioso). Por isso o SW precisa ser um arquivo real "sw.js" hospedado ao lado deste HTML
-  // (ex: GitHub Pages/Netlify). Em arquivo local (file://) o navegador não permite Service Worker
-  // de forma alguma — isso é uma restrição da plataforma, não um bug daqui; nesse caso o app
-  // simplesmente funciona sem cache de SW e sem notificação em segundo plano.
-  navigator.serviceWorker.register('./sw.js', {scope: './'})
+  // Criar SW via Blob (funciona em arquivo hospedado)
+  var swBlob = new Blob(["\n// SERVICE WORKER — Saúde Família\nvar CACHE = 'sf-v1';\n\nself.addEventListener('install', function(e){\n  self.skipWaiting();\n});\n\nself.addEventListener('activate', function(e){\n  e.waitUntil(clients.claim());\n});\n\n// Recebe mensagem do app para agendar notificação\nself.addEventListener('message', function(e){\n  var data = e.data;\n  if(!data || data.type !== 'AGENDAR') return;\n  var delay = data.delay; // ms até disparar\n  if(delay < 0) return;\n  setTimeout(function(){\n    self.registration.showNotification(data.titulo, {\n      body: data.corpo,\n      icon: data.icon || '',\n      badge: data.icon || '',\n      tag: data.tag || 'sf',\n      vibrate: [300, 100, 300],\n      requireInteraction: true,\n      data: { url: self.registration.scope }\n    });\n  }, Math.min(delay, 2147483647)); // max setTimeout\n});\n\nself.addEventListener('notificationclick', function(e){\n  e.notification.close();\n  e.waitUntil(\n    clients.matchAll({type:'window'}).then(function(cs){\n      if(cs.length) return cs[0].focus();\n      return clients.openWindow(e.notification.data.url || '/');\n    })\n  );\n});\n"], {type:'application/javascript'});
+  var swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl, {scope: './'})
     .then(function(reg){
       _swReg = reg;
       console.log('SW registrado');
