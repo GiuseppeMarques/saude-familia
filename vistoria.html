@@ -24,6 +24,228 @@
     };img.src=ic;
   }catch(e){var ai=document.getElementById('aic_Vistoria');if(ai)ai.href=ic;}
 })();
+
+// ══ MAPA LEAFLET (sistema idêntico ao Pontos de Interesse) ══════
+var _lmapCBM=null, _tileCBM=null, _markersCBM=[], _poiEditCBM=null, _poiCatCBM='hidrante', _poiLatCBM=null, _poiLngCBM=null;
+
+var TILES_CBM={
+  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
+  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
+  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
+};
+
+var CIDADES_CBM=[
+  {n:'Florianópolis',lat:-27.595,lng:-48.548,t:'cap'},
+  {n:'Curitiba',lat:-25.429,lng:-49.271,t:'cap'},
+  {n:'Porto Alegre',lat:-30.034,lng:-51.217,t:'cap'},
+  {n:'Joinville',lat:-26.304,lng:-48.846,t:'gde'},
+  {n:'Blumenau',lat:-26.919,lng:-49.066,t:'gde'},
+  {n:'Chapecó',lat:-27.101,lng:-52.615,t:'gde'},
+  {n:'Lages',lat:-27.816,lng:-50.326,t:'gde'},
+  {n:'Rancho Queimado',lat:-27.675,lng:-49.013,t:'viz'},
+  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337,t:'viz'},
+  {n:'Leoberto Leal',lat:-27.534,lng:-49.063,t:'viz'},
+  {n:'Angelina',lat:-27.567,lng:-49.001,t:'viz'},
+  {n:'Santo Amaro',lat:-27.693,lng:-48.797,t:'viz'},
+  {n:'São Bonifácio',lat:-27.904,lng:-48.933,t:'viz'},
+  {n:'Anitápolis',lat:-27.907,lng:-49.131,t:'viz'},
+  {n:'Águas Mornas',lat:-27.716,lng:-48.827,t:'viz'},
+  {n:'Antônio Carlos',lat:-27.475,lng:-48.745,t:'viz'},
+];
+
+var CATS_CBM=[
+  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
+  {id:'manancial',nome:'Manancial',ico:'🌊'},
+  {id:'ponte',nome:'Ponte',ico:'🌉'},
+  {id:'edificacao',nome:'Edificação',ico:'🏢'},
+  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
+  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
+  {id:'referencia',nome:'Referência',ico:'📍'},
+];
+
+function getPOIsCBM(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return[];}}
+function savePOIsCBM(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
+
+function initMapCBM(mapDivId){
+  if(_lmapCBM) return;
+  var el=document.getElementById(mapDivId||'mapCBM');
+  if(!el)return;
+  if(typeof LF==='undefined'){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#888;font-size:.85rem;">Mapa requer conexão com internet.<br>Conecte-se e recarregue.</div>';
+    return;
+  }
+  // Force dimensions
+  el.style.width='100%';
+  el.style.height='52vh';
+  el.style.minHeight='300px';
+  el.style.display='block';
+  try{
+    _lmapCBM=LF.map(el,{zoomControl:true}).setView([-27.5,-49.0],9);
+    _tileCBM=LF.tileLayer(TILES_CBM.rua.url,{attribution:TILES_CBM.rua.attr,maxZoom:19}).addTo(_lmapCBM);
+    // Cidades de referência
+    var cor={cap:'#0f172a',gde:'#334155',med:'#64748b',viz:'#C0272D'};
+    var raio={cap:7,gde:5,med:4,viz:5};
+    CIDADES_CBM.forEach(function(c){
+      var mk=LF.circleMarker([c.lat,c.lng],{
+        radius:raio[c.t]||4,fillColor:cor[c.t]||'#64748b',
+        color:'#fff',weight:1.5,fillOpacity:0.9
+      }).addTo(_lmapCBM).bindPopup(c.n);
+      if(c.t==='cap'||c.t==='viz'||c.t==='gde'){
+        mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[raio[c.t]+3,0],
+          className:'city-lbl-cbm'});
+      }
+    });
+    // Clique no mapa → abre modal com coords preenchidas
+    _lmapCBM.on('click',function(e){
+      _poiLatCBM=e.latlng.lat;_poiLngCBM=e.latlng.lng;
+      var fl=document.getElementById('poi-lat-cbm');
+      var fl2=document.getElementById('poi-lng-cbm');
+      if(fl)fl.value=_poiLatCBM.toFixed(6);
+      if(fl2)fl2.value=_poiLngCBM.toFixed(6);
+      abrirModalPOICBM(null);
+    });
+    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();renderMarkersCBM();},400);
+  }catch(e){console.log('MapCBM erro:',e);}
+}
+
+function setTileCBM(tipo){
+  // Update button states
+  document.querySelectorAll('.tile-btn-cbm').forEach(function(b){
+    b.classList.toggle('active',b.dataset.tile===tipo);
+  });
+  if(!_lmapCBM||!_tileCBM)return;
+  _lmapCBM.removeLayer(_tileCBM);
+  var t=TILES_CBM[tipo];if(!t)return;
+  _tileCBM=LF.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_lmapCBM);
+}
+
+function renderMarkersCBM(){
+  if(!_lmapCBM)return;
+  _markersCBM.forEach(function(m){_lmapCBM.removeLayer(m);});_markersCBM=[];
+  getPOIsCBM().forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
+    var icon=LF.divIcon({
+      className:'',
+      html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',
+      iconSize:[28,28],iconAnchor:[14,14]
+    });
+    var mk=LF.marker([p.lat,p.lng],{icon:icon}).addTo(_lmapCBM)
+      .bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
+    _markersCBM.push(mk);
+  });
+}
+
+function usarGpsCBM(){
+  if(!navigator.geolocation){alert('GPS indisponível.');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _poiLatCBM=pos.coords.latitude;_poiLngCBM=pos.coords.longitude;
+    var fl=document.getElementById('poi-lat-cbm');
+    var fl2=document.getElementById('poi-lng-cbm');
+    if(fl)fl.value=_poiLatCBM.toFixed(6);
+    if(fl2)fl2.value=_poiLngCBM.toFixed(6);
+    if(_lmapCBM)_lmapCBM.setView([_poiLatCBM,_poiLngCBM],14);
+    alert('GPS capturado ✅');
+  },function(){alert('Não foi possível obter GPS.');});
+}
+
+function abrirModalPOICBM(id){
+  _poiEditCBM=id;
+  var m=document.getElementById('mo-poi-cbm');if(!m)return;
+  document.getElementById('mo-poi-cbm-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
+  renderCatGridCBM();
+  if(id){
+    var p=getPOIsCBM().find(function(x){return x.id===id;});
+    if(p){_poiCatCBM=p.cat;
+      document.getElementById('poi-nome-cbm').value=p.nome||'';
+      document.getElementById('poi-obs-cbm').value=p.obs||'';
+      document.getElementById('poi-lat-cbm').value=p.lat||'';
+      document.getElementById('poi-lng-cbm').value=p.lng||'';
+      _poiLatCBM=p.lat;_poiLngCBM=p.lng;
+    }
+  }else{
+    document.getElementById('poi-nome-cbm').value='';
+    document.getElementById('poi-obs-cbm').value='';
+    document.getElementById('poi-lat-cbm').value=_poiLatCBM?_poiLatCBM.toFixed(6):'';
+    document.getElementById('poi-lng-cbm').value=_poiLngCBM?_poiLngCBM.toFixed(6):'';
+  }
+  renderCatGridCBM();
+  m.style.display='flex';
+}
+function fecharModalPOICBM(){
+  var m=document.getElementById('mo-poi-cbm');if(m)m.style.display='none';
+  _poiLatCBM=null;_poiLngCBM=null;_poiEditCBM=null;
+}
+function renderCatGridCBM(){
+  var el=document.getElementById('cat-grid-cbm');if(!el)return;el.innerHTML='';
+  CATS_CBM.forEach(function(c){
+    var btn=document.createElement('button');
+    var act=c.id===_poiCatCBM;
+    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid '+(act?'#C0272D':'#e2e8f0')+';background:'+(act?'#C0272D':'#f8fafc')+';color:'+(act?'#fff':'#1c1c1e')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
+    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
+    btn.onclick=(function(cid){return function(){_poiCatCBM=cid;renderCatGridCBM();};})(c.id);
+    el.appendChild(btn);
+  });
+}
+function salvarPOICBM(){
+  var nome=document.getElementById('poi-nome-cbm').value.trim();if(!nome){alert('Informe o nome.');return;}
+  var lat=parseFloat(document.getElementById('poi-lat-cbm').value)||_poiLatCBM;
+  var lng=parseFloat(document.getElementById('poi-lng-cbm').value)||_poiLngCBM;
+  var obs=document.getElementById('poi-obs-cbm').value.trim();
+  var lista=getPOIsCBM();
+  if(_poiEditCBM){
+    var i=lista.findIndex(function(x){return x.id===_poiEditCBM;});
+    if(i>=0){lista[i].nome=nome;lista[i].cat=_poiCatCBM;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}
+  }else{
+    lista.push({id:Date.now().toString(36),nome:nome,cat:_poiCatCBM,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});
+  }
+  savePOIsCBM(lista);fecharModalPOICBM();renderListaPOICBM();renderMarkersCBM();
+}
+function renderListaPOICBM(){
+  var el=document.getElementById('lista-poi-cbm');if(!el)return;
+  var lista=getPOIsCBM();
+  if(!lista.length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;"><div style="font-size:2rem;">📍</div><p>Nenhum ponto. Toque no mapa ou em "Marcar Ponto".</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  lista.forEach(function(p){
+    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
+    var row=document.createElement('div');
+    row.style.cssText='background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1px solid #e5e5ea;';
+    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
+      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
+      +(p.obs?'<div style="font-size:11px;color:#6c6c70;">'+p.obs+'</div>':'')
+      +(p.lat?'<div style="font-size:10px;color:#6c6c70;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
+      +'</div>';
+    var btnE=document.createElement('button');btnE.textContent='✏️';
+    btnE.style.cssText='background:#f2f2f7;border:1px solid #e5e5ea;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;margin-right:4px;';
+    btnE.onclick=(function(id){return function(){abrirModalPOICBM(id);};})(p.id);
+    var btnD=document.createElement('button');btnD.textContent='🗑️';
+    btnD.style.cssText='background:#fff0f0;border:1px solid #ffcdd2;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;';
+    btnD.onclick=(function(id){return function(){if(confirm('Excluir?')){var l=getPOIsCBM().filter(function(x){return x.id!==id;});savePOIsCBM(l);renderListaPOICBM();renderMarkersCBM();}};})(p.id);
+    row.appendChild(btnE);row.appendChild(btnD);
+    el.appendChild(row);
+  });
+}
+
+function voltarPrincipalCBM(){
+  document.querySelectorAll(".s").forEach(function(s){s.style.display="none";});
+  var el=document.getElementById("s-home");if(el)el.style.display="block";
+  document.querySelectorAll(".ni").forEach(function(b){b.classList.remove("on");});
+  var nb=document.getElementById("ni-home");if(nb)nb.classList.add("on");
+}
+function irPontosCBM(){
+  navTo("pontos-cbm");
+  setTimeout(function(){
+    var mapEl=document.getElementById("mapCBM");
+    if(mapEl) mapEl.style.display="block";
+    initMapCBM("mapCBM");
+    renderListaPOICBM();
+    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();},200);
+  },100);
+}
+
 </script>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -256,10 +478,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-#mapPOI{width:100%;height:55vh;border-radius:10px;margin-bottom:10px;}
-.city-lbl-cbmsc{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;}
-</style>
+<script>var LF = window.L;</script>
 </head>
 <body>
 
@@ -462,7 +681,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
     Relatório
   </button>
-  <button class="ni" id="ni-pontos" onclick="navTo('pontos')">
+  <button class="ni" id="ni-pontos" onclick="irPontosCBM()">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
     Pontos
   </button>
@@ -2869,231 +3088,70 @@ document.getElementById('mun-novo').onkeydown=function(e){if(e.key==='Enter')adi
 document.getElementById('e-mun').onchange=function(){onMunChange(this);};
 document.getElementById('srch-vist-rota').oninput=function(){renderVistSelectRota(this.value);};
 
-// ══ PONTOS DE INTERESSE ══════════════════════════════════════
-var _mapPOI=null, _tilePOI=null, _markersPOI=[], _poiEditId=null, _poiCatSel='hidrante';
-var _poiLat=null, _poiLng=null;
-
-var CATS_POI=[
-  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
-  {id:'manancial',nome:'Manancial',ico:'🌊'},
-  {id:'ponte',nome:'Ponte',ico:'🌉'},
-  {id:'edificacao',nome:'Edificação',ico:'🏢'},
-  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
-  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
-  {id:'referencia',nome:'Referência',ico:'📍'},
-];
-
-var TILES_POI={
-  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
-  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
-  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
-};
-
-var CIDADES_POI=[
-  {n:'Florianópolis',lat:-27.595,lng:-48.548,t:'cap'},
-  {n:'Rancho Queimado',lat:-27.675,lng:-49.013,t:'viz'},
-  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337,t:'viz'},
-  {n:'Leoberto Leal',lat:-27.534,lng:-49.063,t:'viz'},
-  {n:'Angelina',lat:-27.567,lng:-49.001,t:'viz'},
-  {n:'Santo Amaro',lat:-27.693,lng:-48.797,t:'viz'},
-  {n:'São Bonifácio',lat:-27.904,lng:-48.933,t:'viz'},
-  {n:'Anitápolis',lat:-27.907,lng:-49.131,t:'viz'},
-  {n:'Águas Mornas',lat:-27.716,lng:-48.827,t:'viz'},
-  {n:'Antônio Carlos',lat:-27.475,lng:-48.745,t:'viz'},
-];
-
-function getPOIs(){
-  try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return [];}
-}
-function savePOIs(lista){localStorage.setItem('cbmsc_pois',JSON.stringify(lista));}
-
-function initMapPOI(){
-  if(_mapPOI) return;
-  var el=document.getElementById('mapPOI');if(!el)return;
-  if(typeof L==='undefined'){ el.innerHTML='<div style="padding:20px;text-align:center;color:#888;">Mapa requer conexão com internet.</div>'; return; }
-  _initMapPOIInner();
-}
-function _initMapPOIInner(){
-  if(_mapPOI) return;
-  var el=document.getElementById('mapPOI');if(!el)return;
-  try{
-    _mapPOI=L.map('mapPOI',{zoomControl:true}).setView([-27.5,-49.0],10);
-    _tilePOI=L.tileLayer(TILES_POI.rua.url,{attribution:TILES_POI.rua.attr,maxZoom:19}).addTo(_mapPOI);
-    CIDADES_POI.forEach(function(c){
-      var mk=L.circleMarker([c.lat,c.lng],{radius:c.t==='cap'?6:4,fillColor:c.t==='cap'?'#1C1C1E':'#C0272D',color:'#fff',weight:1.5,fillOpacity:0.9}).addTo(_mapPOI);
-      mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[6,0],className:'city-lbl-cbmsc'});
-    });
-    _mapPOI.on('click',function(e){
-      _poiLat=e.latlng.lat;_poiLng=e.latlng.lng;
-      document.getElementById('poi-lat').value=_poiLat.toFixed(6);
-      document.getElementById('poi-lng').value=_poiLng.toFixed(6);
-      document.getElementById('poi-gps-label').textContent='Selecionado no mapa: '+_poiLat.toFixed(5)+', '+_poiLng.toFixed(5);
-      abrirMoPOI(null);
-    });
-    setTimeout(function(){_mapPOI.invalidateSize();renderMarkersPOI();},300);
-  }catch(e){console.log('MapPOI erro:',e);}
-}
-function setTileV(tipo){
-  ['tileRuaV','tileSatV','tileRelevoV'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el){el.style.background=el.id==='tile'+tipo.charAt(0).toUpperCase()+tipo.slice(1)+'V'?'#C0272D':'var(--fundo)';el.style.color=el.id==='tile'+tipo.charAt(0).toUpperCase()+tipo.slice(1)+'V'?'#fff':'var(--texto)';}
-  });
-  if(!_mapPOI||!_tilePOI)return;
-  _mapPOI.removeLayer(_tilePOI);
-  var t=TILES_POI[tipo];
-  _tilePOI=L.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_mapPOI);
-}
-function renderMarkersPOI(){
-  if(!_mapPOI)return;
-  _markersPOI.forEach(function(m){_mapPOI.removeLayer(m);});_markersPOI=[];
-  getPOIs().forEach(function(p){
-    if(!p.lat||!p.lng)return;
-    var cat=CATS_POI.find(function(c){return c.id===p.cat;})||CATS_POI[6];
-    var icon=L.divIcon({className:'',html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
-    var mk=L.marker([p.lat,p.lng],{icon:icon}).addTo(_mapPOI).bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
-    _markersPOI.push(mk);
-  });
-}
-function renderListaPOI(){
-  var el=document.getElementById('listaPOI');if(!el)return;
-  var lista=getPOIs();
-  if(!lista.length){el.innerHTML='<div class="emp"><div class="emp-i">📍</div><div class="emp-t">Nenhum ponto cadastrado</div><div class="emp-s">Toque em "Marcar Ponto Aqui" ou no mapa para adicionar.</div></div>';return;}
-  el.innerHTML='';
-  lista.forEach(function(p,i){
-    var cat=CATS_POI.find(function(c){return c.id===p.cat;})||CATS_POI[6];
-    var row=document.createElement('div');
-    row.className='ci';row.style.display='flex';row.style.alignItems='center';row.style.gap='10px';
-    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
-      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
-      +(p.obs?'<div style="font-size:11px;color:var(--sub);">'+p.obs+'</div>':'')
-      +(p.lat?'<div style="font-size:10px;color:var(--sub);">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
-      +'</div>';
-    var btnEdit=document.createElement('button');
-    btnEdit.className='btn btn-sm';btnEdit.textContent='✏️';btnEdit.style.cssText='background:var(--fundo);border:1px solid var(--borda);';
-    btnEdit.onclick=(function(id){return function(){abrirMoPOI(id);};})(p.id);
-    var btnDel=document.createElement('button');
-    btnDel.className='btn btn-sm';btnDel.textContent='🗑️';btnDel.style.cssText='background:#FFF0F0;border:1px solid #FFCDD2;';
-    btnDel.onclick=(function(id){return function(){if(confirm('Excluir este ponto?')){var l=getPOIs().filter(function(x){return x.id!==id;});savePOIs(l);renderListaPOI();renderMarkersPOI();}};})(p.id);
-    row.appendChild(btnEdit);row.appendChild(btnDel);
-    el.appendChild(row);
-  });
-}
-function abrirMoPOI(id){
-  _poiEditId=id;
-  var m=document.getElementById('mo-poi');if(!m)return;
-  document.getElementById('mo-poi-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
-  renderCatGridPOI();
-  if(id){
-    var p=getPOIs().find(function(x){return x.id===id;});
-    if(p){
-      _poiCatSel=p.cat;_poiLat=p.lat;_poiLng=p.lng;
-      document.getElementById('poi-nome').value=p.nome||'';
-      document.getElementById('poi-obs').value=p.obs||'';
-      document.getElementById('poi-lat').value=p.lat||'';
-      document.getElementById('poi-lng').value=p.lng||'';
-      document.getElementById('poi-gps-label').textContent=p.lat?'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS';
-    }
-  } else {
-    document.getElementById('poi-nome').value='';
-    document.getElementById('poi-obs').value='';
-    if(!_poiLat){document.getElementById('poi-lat').value='';document.getElementById('poi-lng').value='';}
-    document.getElementById('poi-gps-label').textContent=_poiLat?'Selecionado: '+(_poiLat).toFixed(5)+', '+(_poiLng).toFixed(5):'Sem GPS — insira abaixo ou use botão';
-  }
-  renderCatGridPOI();
-  m.classList.add('on');
-}
-function fecharMoPOI(){
-  var m=document.getElementById('mo-poi');if(m)m.classList.remove('on');
-  _poiLat=null;_poiLng=null;_poiEditId=null;
-}
-function renderCatGridPOI(){
-  var el=document.getElementById('catGridPOI');if(!el)return;
-  el.innerHTML='';
-  CATS_POI.forEach(function(c){
-    var btn=document.createElement('button');
-    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid var(--borda);background:'+(c.id===_poiCatSel?'#C0272D':'var(--fundo)')+';color:'+(c.id===_poiCatSel?'#fff':'var(--texto)')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
-    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
-    btn.onclick=(function(cid){return function(){_poiCatSel=cid;renderCatGridPOI();};})(c.id);
-    el.appendChild(btn);
-  });
-}
-function usarGpsPOI(){
-  if(!navigator.geolocation){alert('GPS indisponível.');return;}
-  navigator.geolocation.getCurrentPosition(function(pos){
-    _poiLat=pos.coords.latitude;_poiLng=pos.coords.longitude;
-    document.getElementById('poi-lat').value=_poiLat.toFixed(6);
-    document.getElementById('poi-lng').value=_poiLng.toFixed(6);
-    document.getElementById('poi-gps-label').textContent='GPS: '+_poiLat.toFixed(5)+', '+_poiLng.toFixed(5);
-  },function(){alert('Não foi possível obter GPS.');});
-}
-function marcarPOI(){
-  _poiLat=null;_poiLng=null;_poiEditId=null;
-  abrirMoPOI(null);
-}
-function salvarPOI(){
-  var nome=document.getElementById('poi-nome').value.trim();if(!nome){alert('Informe o nome do ponto.');return;}
-  var lat=parseFloat(document.getElementById('poi-lat').value)||_poiLat;
-  var lng=parseFloat(document.getElementById('poi-lng').value)||_poiLng;
-  var obs=document.getElementById('poi-obs').value.trim();
-  var lista=getPOIs();
-  if(_poiEditId){
-    var i=lista.findIndex(function(x){return x.id===_poiEditId;});
-    if(i>=0){lista[i].nome=nome;lista[i].cat=_poiCatSel;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}
-  } else {
-    lista.push({id:Date.now().toString(36),nome:nome,cat:_poiCatSel,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});
-  }
-  savePOIs(lista);fecharMoPOI();renderListaPOI();renderMarkersPOI();
-}
 
 </script>
 
-<!-- TELA PONTOS DE INTERESSE -->
-<div class="scr" id="s-pontos" style="padding:14px 14px 100px;">
-  <div class="sec">Pontos de Interesse CBMSC</div>
-  <!-- MAPA -->
-  <div id="mapPOI"></div>
-  <!-- CAMADAS -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-    <button class="btn btn-sm" id="tileRuaV" onclick="setTileV('rua')" style="background:#C0272D;color:#fff;border:none;">🏙️ Ruas</button>
-    <button class="btn btn-sm" id="tileSatV" onclick="setTileV('satelite')" style="background:var(--fundo);border:1px solid var(--borda);">🛰️ Satélite</button>
-    <button class="btn btn-sm" id="tileRelevoV" onclick="setTileV('relevo')" style="background:var(--fundo);border:1px solid var(--borda);">🏔️ Relevo</button>
+
+
+
+<!-- PAINEL DE PONTOS/MAPA CBM -->
+<style>
+#mapCBM{width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;display:block;}
+.city-lbl-cbm{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff;}
+.tile-btn-cbm{padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:.78rem;font-weight:700;cursor:pointer;}
+.tile-btn-cbm.active{background:#C0272D;color:#fff;border-color:#C0272D;}
+</style>
+
+<!-- TELA PONTOS CBM -->
+<div id="s-pontos-cbm" class="s" style="padding:14px 14px 100px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div><strong style="font-size:1rem;">📍 Pontos de Interesse</strong><div style="font-size:.72rem;color:#6c6c70;">Compartilhado entre Perito e Vistoria</div></div>
+    <button onclick="voltarPrincipalCBM()" style="background:#f2f2f7;border:none;border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;">← Voltar</button>
   </div>
+  <!-- CAMADAS -->
+  <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+    <button class="tile-btn-cbm active" data-tile="rua" onclick="setTileCBM('rua')">🏙️ Ruas</button>
+    <button class="tile-btn-cbm" data-tile="satelite" onclick="setTileCBM('satelite')">🛰️ Satélite</button>
+    <button class="tile-btn-cbm" data-tile="relevo" onclick="setTileCBM('relevo')">🏔️ Relevo</button>
+    <button class="tile-btn-cbm" onclick="usarGpsCBM()" style="margin-left:auto;">📡 GPS</button>
+  </div>
+  <!-- MAPA -->
+  <div id="mapCBM" style="width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;background:#e8e8e8;"></div>
   <!-- BOTÃO MARCAR -->
-  <button class="btn btn-p" onclick="marcarPOI()" style="margin-bottom:10px;">📍 Marcar Ponto Aqui</button>
-  <!-- LISTA DE PONTOS -->
-  <div class="sec">Pontos salvos</div>
-  <div id="listaPOI"></div>
+  <button onclick="abrirModalPOICBM(null)" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.92rem;font-weight:800;cursor:pointer;margin-bottom:12px;">📍 Marcar Ponto</button>
+  <!-- LISTA -->
+  <div style="font-size:.75rem;font-weight:800;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Pontos salvos</div>
+  <div id="lista-poi-cbm"></div>
 </div>
 
-<!-- MODAL NOVO PONTO -->
-<div class="mo" id="mo-poi">
-  <div class="m">
-    <div class="m-t">
-      <span id="mo-poi-titulo">📍 Novo Ponto</span>
-      <button class="m-x" onclick="fecharMoPOI()">✕</button>
+<!-- MODAL PONTO CBM -->
+<div id="mo-poi-cbm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;">
+  <div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 16px 40px;width:100%;max-height:92vh;overflow-y:auto;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <span id="mo-poi-cbm-titulo" style="font-size:1rem;font-weight:800;">📍 Novo Ponto</span>
+      <button onclick="fecharModalPOICBM()" style="background:#f2f2f7;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
     </div>
-    <div class="fg">
-      <label class="fl">Categoria</label>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;" id="catGridPOI"></div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="cat-grid-cbm"></div>
     </div>
-    <div class="fg">
-      <label class="fl">Nome / Descrição</label>
-      <input type="text" class="fi" id="poi-nome" placeholder="Ex: Hidrante Rua das Flores, Manancial km 5…">
+    <div style="margin-bottom:10px;">
+      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Nome</label>
+      <input type="text" id="poi-nome-cbm" placeholder="Ex: Hidrante Rua das Flores…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.9rem;box-sizing:border-box;">
     </div>
-    <div class="fg">
-      <label class="fl">Observações</label>
-      <textarea class="ft" id="poi-obs" placeholder="Informações adicionais…" style="min-height:60px;"></textarea>
+    <div style="margin-bottom:10px;">
+      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Observações</label>
+      <textarea id="poi-obs-cbm" placeholder="Informações adicionais…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.85rem;resize:vertical;min-height:55px;box-sizing:border-box;font-family:inherit;"></textarea>
     </div>
-    <div style="background:var(--fundo);border-radius:8px;padding:10px;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;">COORDENADAS</div>
-      <div id="poi-gps-label" style="font-size:12px;color:var(--sub);margin-bottom:6px;">Sem GPS — insira abaixo ou use botão</div>
+    <div style="background:#f8fafc;border-radius:9px;padding:10px;margin-bottom:14px;">
+      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Coordenadas GPS</label>
       <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <input type="number" class="fi" id="poi-lat" placeholder="Latitude" step="0.00001" style="flex:1;">
-        <input type="number" class="fi" id="poi-lng" placeholder="Longitude" step="0.00001" style="flex:1;">
+        <input type="number" id="poi-lat-cbm" placeholder="Latitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
+        <input type="number" id="poi-lng-cbm" placeholder="Longitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
       </div>
-      <button class="btn btn-s btn-sm" onclick="usarGpsPOI()">📡 Usar GPS agora</button>
+      <button onclick="usarGpsCBM()" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:.82rem;cursor:pointer;">📡 Usar GPS agora</button>
     </div>
-    <button class="btn btn-p" onclick="salvarPOI()">Salvar Ponto ✓</button>
+    <button onclick="salvarPOICBM()" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;">Salvar Ponto ✓</button>
   </div>
 </div>
 
