@@ -211,6 +211,7 @@
     <div class="card" id="poiListCard">
       <div id="poiList"></div>
     </div>
+    <button class="ghost btn-block" onclick="exportAllPoints()">📤 Compartilhar todos os pontos</button>
   </section>
 
   <!-- MAPA -->
@@ -221,9 +222,10 @@
       <button class="filter-chip" id="tabRegiao" onclick="setMapMode('regiao')">🗺️ Região Sul</button>
     </div>
     <p id="mapModeDesc">Posição relativa (distância e direção) a partir do ponto de referência. Não é um mapa real de ruas.</p>
-    <div class="btn-row" id="refBtnRow" style="margin-bottom:10px;">
+    <div class="btn-row" id="refBtnRow" style="margin-bottom:6px;">
       <button class="ghost" onclick="usarLocalAtualComoReferencia()">📡 Usar minha posição agora</button>
     </div>
+    <div class="filter-row" id="raioRow"></div>
     <div class="map-wrap">
       <canvas id="poiCanvas" width="600" height="600"></canvas>
     </div>
@@ -255,6 +257,7 @@
         <button class="switch" id="switchRetorno" onclick="toggleRetorno()"></button>
       </div>
       <button class="btn-block" style="margin-top:8px;" onclick="abrirNoGoogleMaps()">🗺️ Abrir rota no Google Maps</button>
+      <button class="ghost btn-block" style="margin-top:8px;" onclick="exportRoute()">📤 Compartilhar rota</button>
     </div>
     <div class="card">
       <h2>Adicionar pontos à rota</h2>
@@ -313,6 +316,7 @@
     <div class="btn-row section-gap">
       <button class="btn-block" onclick="savePoi()">Salvar</button>
     </div>
+    <button class="ghost btn-block" style="margin-top:8px;" onclick="exportPoint(editingPoiId)">📤 Compartilhar este ponto</button>
     <button class="ghost btn-block" style="margin-top:8px; color:var(--danger); border-color:var(--danger);" onclick="deleteCurrentPoi()">Excluir ponto</button>
   </div>
 </div>
@@ -676,6 +680,28 @@ function getDefaultRef(){
   return null;
 }
 let mapMode = 'bussola';
+const RAIO_OPCOES = [
+  {label:'Automático', val:null},
+  {label:'200 m', val:200},
+  {label:'500 m', val:500},
+  {label:'1 km', val:1000},
+  {label:'5 km', val:5000},
+  {label:'20 km', val:20000},
+  {label:'50 km', val:50000},
+];
+let bussolaRaio = null; // null = automático (ajusta pro ponto mais distante)
+function renderRaioRow(){
+  const wrap=document.getElementById('raioRow');
+  wrap.style.display = mapMode==='bussola' ? 'flex' : 'none';
+  wrap.innerHTML='';
+  RAIO_OPCOES.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='filter-chip'+(bussolaRaio===o.val?' active':'');
+    b.textContent=o.label;
+    b.onclick=()=>{ bussolaRaio=o.val; renderRaioRow(); renderMap(); };
+    wrap.appendChild(b);
+  });
+}
 function setMapMode(mode){
   mapMode = mode;
   document.getElementById('tabBussola').classList.toggle('active', mode==='bussola');
@@ -685,6 +711,7 @@ function setMapMode(mode){
     : 'Visão geral fixa da Região Sul (RS, SC, PR) — contorno estilizado, não é uma carta precisa. Use as cidades e a grade de coordenadas como referência.';
   document.getElementById('refBtnRow').style.display = mode==='bussola' ? 'flex' : 'none';
   document.getElementById('mapTapInfo').style.display = 'none';
+  renderRaioRow();
   renderMap();
 }
 function renderMap(){
@@ -710,17 +737,25 @@ function renderBussolaMap(){
   const trilhas = currentTripId ? trilhasDaViagem(currentTripId).map(t=>t.pontos) : [];
   if(trilhaBuffer.length>1) trilhas.push(trilhaBuffer);
   let maxDist = 50;
-  const withGeo = pts.map(p=>{
+  let withGeo = pts.map(p=>{
     const d=haversine(mapRef.lat,mapRef.lng,p.lat,p.lng);
     const b=bearing(mapRef.lat,mapRef.lng,p.lat,p.lng);
     return {p,d,b};
   });
-  withGeo.forEach(x=>{ if(x.d>maxDist) maxDist=x.d; });
-  trilhas.forEach(trilha=>trilha.forEach(pt=>{
-    const d=haversine(mapRef.lat,mapRef.lng,pt.lat,pt.lng);
-    if(d>maxDist) maxDist=d;
-  }));
-  maxDist = maxDist*1.15;
+  let foraDoAlcance = 0;
+  if(bussolaRaio){
+    maxDist = bussolaRaio;
+    const antes = withGeo.length;
+    withGeo = withGeo.filter(x=>x.d<=maxDist);
+    foraDoAlcance = antes - withGeo.length;
+  } else {
+    withGeo.forEach(x=>{ if(x.d>maxDist) maxDist=x.d; });
+    trilhas.forEach(trilha=>trilha.forEach(pt=>{
+      const d=haversine(mapRef.lat,mapRef.lng,pt.lat,pt.lng);
+      if(d>maxDist) maxDist=d;
+    }));
+    maxDist = maxDist*1.15;
+  }
   const radiusPx = Math.min(W,H)/2 - 40;
   // rings
   ctx.strokeStyle='#C7B896'; ctx.fillStyle='#8A7A5C'; ctx.font='11px sans-serif'; ctx.textAlign='left';
@@ -763,7 +798,7 @@ function renderBussolaMap(){
     ctx.fillText(c.icone, x, y);
     window._mapHitTargets.push({x,y,p});
   });
-  document.getElementById('mapScaleLabel').textContent = 'Raio: '+fmtDist(maxDist);
+  document.getElementById('mapScaleLabel').textContent = 'Raio: '+fmtDist(maxDist) + (foraDoAlcance>0 ? ' · '+foraDoAlcance+' fora do alcance' : '');
 }
 
 /* ======================= MAPA REGIÃO SUL (fixo) ======================= */
@@ -1089,7 +1124,7 @@ function createCategory(){
   toast('Categoria criada');
 }
 
-/* ======================= BACKUP ======================= */
+/* ======================= BACKUP E COMPARTILHAMENTO ======================= */
 function downloadJson(obj, filename){
   const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -1098,9 +1133,45 @@ function downloadJson(obj, filename){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+async function shareOrDownload(obj, filename, tituloCompartilhamento){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
+  const file = new File([blob], filename, {type:'application/json'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file], title: tituloCompartilhamento||'Rastro'});
+      return;
+    }catch(e){
+      if(e.name==='AbortError') return; // usuário cancelou o compartilhamento
+    }
+  }
+  downloadJson(obj, filename);
+  toast('Arquivo baixado — anexe manualmente no WhatsApp/Drive');
+}
+function slug(s){ return (s||'arquivo').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+function exportTrip(tripId){
+  const t = db.trips.find(x=>x.id===tripId);
+  if(!t) return;
+  const pts = db.points.filter(p=>p.tripId===tripId);
+  shareOrDownload({tipo:'viagem', trip:t, points:pts, customCats:db.customCats}, 'viagem-'+slug(t.nome)+'.json', 'Viagem: '+t.nome);
+}
+function exportPoint(pid){
+  const p = db.points.find(x=>x.id===pid);
+  if(!p) return;
+  shareOrDownload({tipo:'ponto', point:p, categoria:catById(p.catId)}, 'ponto-'+slug(p.nome)+'.json', 'Ponto: '+p.nome);
+}
+function exportAllPoints(){
+  if(db.points.length===0){ toast('Nenhum ponto cadastrado ainda'); return; }
+  shareOrDownload({tipo:'pontos', points:db.points, customCats:db.customCats}, 'rastro-todos-os-pontos.json', 'Meus pontos — Rastro');
+}
+function exportRoute(){
+  const t = currentTripObj();
+  if(!t || !t.rota || t.rota.length===0){ toast('Monte a rota primeiro'); return; }
+  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
+  shareOrDownload({tipo:'rota', viagemNome:t.nome, origemLat:t.origemLat, origemLng:t.origemLng, retorno:t.retorno, points:pts, customCats:db.customCats}, 'rota-'+slug(t.nome)+'.json', 'Rota: '+t.nome);
+}
 function exportAll(){
-  downloadJson(db, 'rastro-backup-'+new Date().toISOString().slice(0,10)+'.json');
-  toast('Backup exportado');
+  shareOrDownload({tipo:'backup', ...db}, 'rastro-backup-'+new Date().toISOString().slice(0,10)+'.json', 'Backup completo — Rastro');
 }
 function importAll(ev){
   const file = ev.target.files[0];
@@ -1109,22 +1180,40 @@ function importAll(ev){
   reader.onload = e=>{
     try{
       const incoming = JSON.parse(e.target.result);
-      const mode = incoming.trip ? 'trip' : 'full';
-      if(mode==='trip'){
-        // pacote de viagem única compartilhada
+      const tipo = incoming.tipo || (incoming.trip ? 'viagem' : (incoming.trips ? 'backup' : null));
+      (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
+
+      if(tipo==='ponto'){
+        const p = incoming.point;
+        if(p && !db.points.find(x=>x.id===p.id)){ p.tripId=null; db.points.push(p); }
+        toast('Ponto importado no acervo geral');
+      } else if(tipo==='pontos'){
+        (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)){ p.tripId=null; db.points.push(p); } });
+        toast('Pontos importados no acervo geral');
+      } else if(tipo==='rota'){
+        const nome = 'Rota recebida: '+(incoming.viagemNome||'sem nome');
+        const novaViagem = {id:uid(), nome, data:new Date().toISOString().slice(0,10), origemLat:incoming.origemLat||null, origemLng:incoming.origemLng||null, retorno:!!incoming.retorno, rota:[]};
+        (incoming.points||[]).forEach(p=>{
+          if(!db.points.find(x=>x.id===p.id)){ p.tripId=novaViagem.id; db.points.push(p); }
+          novaViagem.rota.push(p.id);
+        });
+        db.trips.push(novaViagem);
+        toast('Rota importada como nova viagem');
+      } else if(tipo==='viagem'){
         if(!db.trips.find(t=>t.id===incoming.trip.id)) db.trips.push(incoming.trip);
         (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
-        (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
         toast('Viagem importada');
-      } else {
+      } else if(tipo==='backup'){
         if(confirm('Importar como backup completo? OK = mesclar com os dados atuais, Cancelar = substituir tudo')){
-          incoming.trips.forEach(t=>{ if(!db.trips.find(x=>x.id===t.id)) db.trips.push(t); });
-          incoming.points.forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
-          (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
+          (incoming.trips||[]).forEach(t=>{ if(!db.trips.find(x=>x.id===t.id)) db.trips.push(t); });
+          (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
         } else {
-          db = incoming;
+          db = {trips:incoming.trips||[], points:incoming.points||[], customCats:incoming.customCats||[]};
         }
         toast('Backup importado');
+      } else {
+        toast('Arquivo não reconhecido');
+        return;
       }
       saveDb();
       showScreen('viagens');
