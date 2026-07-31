@@ -918,13 +918,11 @@ function getPOIsP(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[
 function savePOIsP(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
 
 function irPontos(){
-  document.querySelectorAll('.page').forEach(function(p){p.style.display='none';});
-  document.getElementById('pg-pontos').style.display='block';
+  mudarPagina('pontos');
   setTimeout(function(){initMapPOIP();renderListaPOIP();},150);
 }
 function irLista(){
-  document.getElementById('pg-pontos').style.display='none';
-  document.getElementById('pg-lista').style.display='block';
+  mudarPagina('lista');
 }
 function initMapPOIP(){
   if(_mapPOIP)return;
@@ -1039,7 +1037,7 @@ function salvarPOIP(){
 </script>
 
 <!-- PÁGINA PONTOS DE INTERESSE -->
-<div id="pg-pontos" class="page" style="display:none;">
+<div id="pg-pontos" class="page">
   <div class="header">
     <div><h1>Pontos de Interesse</h1><h2>CBMSC — Campo</h2></div>
     <button class="btn btn-outline btn-sm" onclick="irLista()">← Voltar</button>
