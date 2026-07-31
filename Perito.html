@@ -90,6 +90,11 @@ textarea{resize:vertical;}
 .agente-group{margin-bottom:4px;}
 .agente-group summary{font-size:12px;font-weight:700;color:#555;padding:4px 0;cursor:pointer;}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+#mapPOI-p{width:100%;height:55vh;border-radius:10px;margin-bottom:10px;}
+.city-lbl-p{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;}
+</style>
 </head>
 <body>
 
@@ -97,7 +102,10 @@ textarea{resize:vertical;}
 <div id="pg-lista" class="page ativo">
   <div class="header">
     <div><h1>App do Perito</h1><h2>Laudo Pericial de Incêndio</h2></div>
-    <button class="btn btn-primary" onclick="abrirModalNovo()">+ Novo</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-outline btn-sm" onclick="irPontos()">📍 Pontos</button>
+      <button class="btn btn-primary" onclick="abrirModalNovo()">+ Novo</button>
+    </div>
   </div>
   <div style="margin-bottom:12px;">
     <input type="file" id="file-importar" accept=".json" style="display:none" onchange="importarArquivo(this)">
@@ -881,6 +889,207 @@ function baixarLaudo(){
 // INIT
 // =====================================================================
 renderLista();
+// ══ PONTOS DE INTERESSE PERITO (compartilha cbmsc_pois com Vistoria) ══
+var _mapPOIP=null, _tilePOIP=null, _markersPOIP=[], _poiPEditId=null, _poiPCatSel='hidrante';
+var _poiPLat=null, _poiPLng=null;
+
+var CATS_POIP=[
+  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
+  {id:'manancial',nome:'Manancial',ico:'🌊'},
+  {id:'ponte',nome:'Ponte',ico:'🌉'},
+  {id:'edificacao',nome:'Edificação',ico:'🏢'},
+  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
+  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
+  {id:'referencia',nome:'Referência',ico:'📍'},
+];
+var TILES_POIP={
+  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
+  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
+  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
+};
+var CIDADES_POIP=[
+  {n:'Florianópolis',lat:-27.595,lng:-48.548},{n:'Rancho Queimado',lat:-27.675,lng:-49.013},
+  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337},{n:'Leoberto Leal',lat:-27.534,lng:-49.063},
+  {n:'Angelina',lat:-27.567,lng:-49.001},{n:'Santo Amaro',lat:-27.693,lng:-48.797},
+  {n:'São Bonifácio',lat:-27.904,lng:-48.933},{n:'Anitápolis',lat:-27.907,lng:-49.131},
+  {n:'Águas Mornas',lat:-27.716,lng:-48.827},{n:'Antônio Carlos',lat:-27.475,lng:-48.745},
+];
+function getPOIsP(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return[];}}
+function savePOIsP(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
+
+function irPontos(){
+  document.querySelectorAll('.page').forEach(function(p){p.style.display='none';});
+  document.getElementById('pg-pontos').style.display='block';
+  setTimeout(function(){initMapPOIP();renderListaPOIP();},150);
+}
+function irLista(){
+  document.getElementById('pg-pontos').style.display='none';
+  document.getElementById('pg-lista').style.display='block';
+}
+function initMapPOIP(){
+  if(_mapPOIP)return;
+  var el=document.getElementById('mapPOI-p');if(!el)return;
+  if(typeof L==='undefined'){
+    var s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload=function(){_initMapPOIPInner();};document.head.appendChild(s);return;
+  }
+  _initMapPOIPInner();
+}
+function _initMapPOIPInner(){
+  if(_mapPOIP)return;
+  var el=document.getElementById('mapPOI-p');if(!el)return;
+  try{
+    _mapPOIP=L.map('mapPOI-p',{zoomControl:true}).setView([-27.5,-49.0],10);
+    _tilePOIP=L.tileLayer(TILES_POIP.rua.url,{attribution:TILES_POIP.rua.attr,maxZoom:19}).addTo(_mapPOIP);
+    CIDADES_POIP.forEach(function(c){
+      var mk=L.circleMarker([c.lat,c.lng],{radius:4,fillColor:'#7c3aed',color:'#fff',weight:1.5,fillOpacity:0.9}).addTo(_mapPOIP);
+      mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[6,0],className:'city-lbl-p'});
+    });
+    _mapPOIP.on('click',function(e){
+      _poiPLat=e.latlng.lat;_poiPLng=e.latlng.lng;
+      document.getElementById('poi-p-lat').value=_poiPLat.toFixed(6);
+      document.getElementById('poi-p-lng').value=_poiPLng.toFixed(6);
+      document.getElementById('poi-p-gps-label').textContent='Selecionado: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5);
+      abrirMoPOIP(null);
+    });
+    setTimeout(function(){_mapPOIP.invalidateSize();renderMarkersPOIP();},300);
+  }catch(e){console.log('MapPOIP erro:',e);}
+}
+function setTileP(tipo){
+  if(!_mapPOIP||!_tilePOIP)return;
+  _mapPOIP.removeLayer(_tilePOIP);
+  _tilePOIP=L.tileLayer(TILES_POIP[tipo].url,{attribution:TILES_POIP[tipo].attr,maxZoom:tipo==='relevo'?17:19}).addTo(_mapPOIP);
+}
+function renderMarkersPOIP(){
+  if(!_mapPOIP)return;
+  _markersPOIP.forEach(function(m){_mapPOIP.removeLayer(m);});_markersPOIP=[];
+  getPOIsP().forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var cat=CATS_POIP.find(function(c){return c.id===p.cat;})||CATS_POIP[6];
+    var icon=L.divIcon({className:'',html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    var mk=L.marker([p.lat,p.lng],{icon:icon}).addTo(_mapPOIP).bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
+    _markersPOIP.push(mk);
+  });
+}
+function renderListaPOIP(){
+  var el=document.getElementById('listaPOI-p');if(!el)return;
+  var lista=getPOIsP();
+  if(!lista.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#6c6c70;"><div style="font-size:2rem;">📍</div><div>Nenhum ponto cadastrado</div><div style="font-size:12px;margin-top:4px;">Toque no mapa ou em "Marcar Ponto"</div></div>';return;}
+  el.innerHTML='';
+  lista.forEach(function(p){
+    var cat=CATS_POIP.find(function(c){return c.id===p.cat;})||CATS_POIP[6];
+    var row=document.createElement('div');
+    row.style.cssText='background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1px solid #e5e5ea;';
+    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
+      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
+      +(p.obs?'<div style="font-size:11px;color:#6c6c70;">'+p.obs+'</div>':'')
+      +(p.lat?'<div style="font-size:10px;color:#6c6c70;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
+      +'</div>';
+    var btnE=document.createElement('button');btnE.textContent='✏️';
+    btnE.style.cssText='background:#f2f2f7;border:1px solid #e5e5ea;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;margin-right:4px;';
+    btnE.onclick=(function(id){return function(){abrirMoPOIP(id);};})(p.id);
+    var btnD=document.createElement('button');btnD.textContent='🗑️';
+    btnD.style.cssText='background:#fff0f0;border:1px solid #ffcdd2;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;';
+    btnD.onclick=(function(id){return function(){if(confirm('Excluir?')){var l=getPOIsP().filter(function(x){return x.id!==id;});savePOIsP(l);renderListaPOIP();renderMarkersPOIP();}};})(p.id);
+    row.appendChild(btnE);row.appendChild(btnD);el.appendChild(row);
+  });
+}
+function marcarPOIP(){_poiPLat=null;_poiPLng=null;_poiPEditId=null;abrirMoPOIP(null);}
+function abrirMoPOIP(id){
+  _poiPEditId=id;
+  var m=document.getElementById('mo-poi-p');if(!m)return;
+  document.getElementById('mo-poi-p-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
+  renderCatGridPOIP();
+  if(id){var p=getPOIsP().find(function(x){return x.id===id;});if(p){_poiPCatSel=p.cat;document.getElementById('poi-p-nome').value=p.nome||'';document.getElementById('poi-p-obs').value=p.obs||'';document.getElementById('poi-p-lat').value=p.lat||'';document.getElementById('poi-p-lng').value=p.lng||'';document.getElementById('poi-p-gps-label').textContent=p.lat?'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS';}}
+  else{document.getElementById('poi-p-nome').value='';document.getElementById('poi-p-obs').value='';if(!_poiPLat){document.getElementById('poi-p-lat').value='';document.getElementById('poi-p-lng').value='';}document.getElementById('poi-p-gps-label').textContent=_poiPLat?'Selecionado: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5):'Sem GPS';}
+  renderCatGridPOIP();
+  m.style.display='flex';
+}
+function fecharMoPOIP(){var m=document.getElementById('mo-poi-p');if(m)m.style.display='none';_poiPLat=null;_poiPLng=null;_poiPEditId=null;}
+function renderCatGridPOIP(){
+  var el=document.getElementById('catGridPOI-p');if(!el)return;el.innerHTML='';
+  CATS_POIP.forEach(function(c){
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid #e5e5ea;background:'+(c.id===_poiPCatSel?'#7c3aed':'#f2f2f7')+';color:'+(c.id===_poiPCatSel?'#fff':'#1c1c1e')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
+    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
+    btn.onclick=(function(cid){return function(){_poiPCatSel=cid;renderCatGridPOIP();};})(c.id);
+    el.appendChild(btn);
+  });
+}
+function usarGpsPOIP(){
+  if(!navigator.geolocation){alert('GPS indisponível.');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _poiPLat=pos.coords.latitude;_poiPLng=pos.coords.longitude;
+    document.getElementById('poi-p-lat').value=_poiPLat.toFixed(6);
+    document.getElementById('poi-p-lng').value=_poiPLng.toFixed(6);
+    document.getElementById('poi-p-gps-label').textContent='GPS: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5);
+  },function(){alert('Não foi possível obter GPS.');});
+}
+function salvarPOIP(){
+  var nome=document.getElementById('poi-p-nome').value.trim();if(!nome){alert('Informe o nome do ponto.');return;}
+  var lat=parseFloat(document.getElementById('poi-p-lat').value)||_poiPLat;
+  var lng=parseFloat(document.getElementById('poi-p-lng').value)||_poiPLng;
+  var obs=document.getElementById('poi-p-obs').value.trim();
+  var lista=getPOIsP();
+  if(_poiPEditId){var i=lista.findIndex(function(x){return x.id===_poiPEditId;});if(i>=0){lista[i].nome=nome;lista[i].cat=_poiPCatSel;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}}
+  else{lista.push({id:Date.now().toString(36),nome:nome,cat:_poiPCatSel,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});}
+  savePOIsP(lista);fecharMoPOIP();renderListaPOIP();renderMarkersPOIP();
+}
+
 </script>
+
+<!-- PÁGINA PONTOS DE INTERESSE -->
+<div id="pg-pontos" class="page" style="display:none;">
+  <div class="header">
+    <div><h1>Pontos de Interesse</h1><h2>CBMSC — Campo</h2></div>
+    <button class="btn btn-outline btn-sm" onclick="irLista()">← Voltar</button>
+  </div>
+  <div style="padding:12px;">
+    <!-- MAPA -->
+    <div id="mapPOI-p"></div>
+    <!-- CAMADAS -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" id="tileRuaP" onclick="setTileP('rua')">🏙️ Ruas</button>
+      <button class="btn btn-outline btn-sm" id="tileSatP" onclick="setTileP('satelite')">🛰️ Satélite</button>
+      <button class="btn btn-outline btn-sm" id="tileRelevoP" onclick="setTileP('relevo')">🏔️ Relevo</button>
+    </div>
+    <button class="btn btn-primary" onclick="marcarPOIP()" style="margin-bottom:12px;width:100%;">📍 Marcar Ponto Aqui</button>
+    <div style="font-size:11px;font-weight:700;color:#6B5C8A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Pontos salvos</div>
+    <div id="listaPOI-p"></div>
+  </div>
+</div>
+
+<!-- MODAL NOVO PONTO PERITO -->
+<div id="mo-poi-p" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;">
+  <div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 14px 38px;width:100%;max-height:92vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <span id="mo-poi-p-titulo" style="font-size:17px;font-weight:700;">📍 Novo Ponto</span>
+      <button onclick="fecharMoPOIP()" style="background:#f2f2f7;border:none;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;" id="catGridPOI-p"></div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Nome / Descrição</label>
+      <input type="text" id="poi-p-nome" placeholder="Ex: Hidrante Rua das Flores…" style="width:100%;padding:11px 13px;border:1.5px solid #e5e5ea;border-radius:10px;font-size:15px;box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Observações</label>
+      <textarea id="poi-p-obs" placeholder="Informações adicionais…" style="width:100%;padding:11px 13px;border:1.5px solid #e5e5ea;border-radius:10px;font-size:14px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box;"></textarea>
+    </div>
+    <div style="background:#f2f2f7;border-radius:8px;padding:10px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:#6c6c70;margin-bottom:6px;">COORDENADAS</div>
+      <div id="poi-p-gps-label" style="font-size:12px;color:#6c6c70;margin-bottom:6px;">Sem GPS</div>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <input type="number" id="poi-p-lat" placeholder="Latitude" step="0.00001" style="flex:1;padding:9px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:13px;">
+        <input type="number" id="poi-p-lng" placeholder="Longitude" step="0.00001" style="flex:1;padding:9px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:13px;">
+      </div>
+      <button onclick="usarGpsPOIP()" style="background:#fff;border:1px solid #e5e5ea;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;">📡 Usar GPS agora</button>
+    </div>
+    <button onclick="salvarPOIP()" style="width:100%;background:#7c3aed;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;">Salvar Ponto ✓</button>
+  </div>
+</div>
+
 </body>
 </html>
