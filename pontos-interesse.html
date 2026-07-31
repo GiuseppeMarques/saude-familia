@@ -219,7 +219,9 @@
     <h1>Mapa</h1>
     <div class="filter-row">
       <button class="filter-chip" id="tabBussola" onclick="setMapMode('bussola')">🧭 Bússola</button>
-      <button class="filter-chip" id="tabRegiao" onclick="setMapMode('regiao')">🗺️ Região Sul</button>
+      <button class="filter-chip" id="tabSC" onclick="setMapMode('sc')">🗺️ Santa Catarina</button>
+      <button class="filter-chip" id="tabBrasil" onclick="setMapMode('brasil')">🇧🇷 Brasil</button>
+      <button class="filter-chip" id="tabSudAmerica" onclick="setMapMode('sudamerica')">🌎 América do Sul</button>
     </div>
     <p id="mapModeDesc">Posição relativa (distância e direção) a partir do ponto de referência. Não é um mapa real de ruas.</p>
     <div class="btn-row" id="refBtnRow" style="margin-bottom:6px;">
@@ -704,18 +706,28 @@ function renderRaioRow(){
 }
 function setMapMode(mode){
   mapMode = mode;
-  document.getElementById('tabBussola').classList.toggle('active', mode==='bussola');
-  document.getElementById('tabRegiao').classList.toggle('active', mode==='regiao');
-  document.getElementById('mapModeDesc').textContent = mode==='bussola'
-    ? 'Posição relativa (distância e direção) a partir do ponto de referência. Não é um mapa real de ruas.'
-    : 'Visão geral fixa da Região Sul (RS, SC, PR) — contorno estilizado, não é uma carta precisa. Use as cidades e a grade de coordenadas como referência.';
+  ['tabBussola','tabSC','tabBrasil','tabSudAmerica'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.classList.remove('active');
+  });
+  var tabMap={bussola:'tabBussola',sc:'tabSC',brasil:'tabBrasil',sudamerica:'tabSudAmerica'};
+  var activeTab=document.getElementById(tabMap[mode]);
+  if(activeTab)activeTab.classList.add('active');
+  var descs={
+    bussola:'Posição relativa (distância e direção) a partir do ponto de referência.',
+    sc:'Santa Catarina — mesorregiões e principais municípios.',
+    brasil:'Brasil — estados e capitais.',
+    sudamerica:'América do Sul — países e capitais.'
+  };
+  document.getElementById('mapModeDesc').textContent = descs[mode]||'';
   document.getElementById('refBtnRow').style.display = mode==='bussola' ? 'flex' : 'none';
   document.getElementById('mapTapInfo').style.display = 'none';
   renderRaioRow();
   renderMap();
 }
 function renderMap(){
-  if(mapMode==='regiao') renderRegionMap();
+  if(mapMode==='sc') renderSCMap();
+  else if(mapMode==='brasil') renderBrasilMap();
+  else if(mapMode==='sudamerica') renderSudAmericaMap();
   else renderBussolaMap();
 }
 function renderBussolaMap(){
@@ -1239,6 +1251,194 @@ window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log('SW não registrado (ok em file://): ', e); });
   }
 });
+// ── DADOS DOS MAPAS ──────────────────────────────────
+
+// SANTA CATARINA — mesorregiões simplificadas
+var SC_BOUNDS = {latMin:-29.4, latMax:-25.9, lngMin:-54.0, lngMax:-48.3};
+var SC_ESTADOS = [
+  {nome:'SC', cor:'#C8D8A8', contorno:[ [-26.0,-53.8],[-26.0,-53.0],[-26.3,-52.0],[-26.2,-51.0],[-26.5,-50.0],[-26.9,-49.0],[-27.1,-48.6],[-27.8,-48.5],[-28.5,-49.0],[-29.0,-49.8],[-29.3,-50.5],[-29.4,-51.5],[-29.3,-52.5],[-28.8,-53.5],[-28.0,-54.0],[-27.0,-54.0],[-26.5,-53.8],[-26.0,-53.8] ]},
+];
+var SC_CIDADES = [
+  {nome:'Florianópolis',lat:-27.595,lng:-48.548,cap:true},
+  {nome:'Joinville',lat:-26.304,lng:-48.846},
+  {nome:'Blumenau',lat:-26.919,lng:-49.066},
+  {nome:'Chapecó',lat:-27.101,lng:-52.615},
+  {nome:'Lages',lat:-27.816,lng:-50.326},
+  {nome:'Criciúma',lat:-28.678,lng:-49.370},
+  {nome:'Itajaí',lat:-26.908,lng:-48.662},
+  {nome:'Jaraguá do Sul',lat:-26.486,lng:-49.071},
+  {nome:'Balneário Camboriú',lat:-26.990,lng:-48.634},
+  {nome:'São José',lat:-27.594,lng:-48.635},
+  {nome:'Caçador',lat:-26.775,lng:-51.016},
+  {nome:'Tubarão',lat:-28.467,lng:-49.010},
+];
+
+// BRASIL — estados simplificados (centroides para labels)
+var BR_BOUNDS = {latMin:-34.0, latMax:5.5, lngMin:-74.0, lngMax:-34.0};
+var BR_ESTADOS = [
+  {uf:'AC',nome:'Acre',lat:-9.0,lng:-70.5},
+  {uf:'AL',nome:'Alagoas',lat:-9.5,lng:-36.5},
+  {uf:'AM',nome:'Amazonas',lat:-3.5,lng:-65.0},
+  {uf:'AP',nome:'Amapá',lat:1.5,lng:-52.0},
+  {uf:'BA',nome:'Bahia',lat:-12.5,lng:-41.5},
+  {uf:'CE',nome:'Ceará',lat:-5.0,lng:-39.5},
+  {uf:'DF',nome:'Distrito Federal',lat:-15.78,lng:-47.93},
+  {uf:'ES',nome:'Espírito Santo',lat:-19.5,lng:-40.5},
+  {uf:'GO',nome:'Goiás',lat:-15.5,lng:-49.5},
+  {uf:'MA',nome:'Maranhão',lat:-5.0,lng:-45.5},
+  {uf:'MG',nome:'Minas Gerais',lat:-18.5,lng:-44.5},
+  {uf:'MS',nome:'Mato Grosso do Sul',lat:-20.5,lng:-54.5},
+  {uf:'MT',nome:'Mato Grosso',lat:-13.0,lng:-56.0},
+  {uf:'PA',nome:'Pará',lat:-3.5,lng:-52.0},
+  {uf:'PB',nome:'Paraíba',lat:-7.0,lng:-36.5},
+  {uf:'PE',nome:'Pernambuco',lat:-8.5,lng:-37.5},
+  {uf:'PI',nome:'Piauí',lat:-7.0,lng:-42.5},
+  {uf:'PR',nome:'Paraná',lat:-24.5,lng:-51.5},
+  {uf:'RJ',nome:'Rio de Janeiro',lat:-22.5,lng:-43.0},
+  {uf:'RN',nome:'Rio Grande do Norte',lat:-5.5,lng:-36.5},
+  {uf:'RO',nome:'Rondônia',lat:-11.0,lng:-63.0},
+  {uf:'RR',nome:'Roraima',lat:2.0,lng:-61.5},
+  {uf:'RS',nome:'Rio Grande do Sul',lat:-29.5,lng:-53.0},
+  {uf:'SC',nome:'Santa Catarina',lat:-27.3,lng:-50.5},
+  {uf:'SE',nome:'Sergipe',lat:-10.5,lng:-37.5},
+  {uf:'SP',nome:'São Paulo',lat:-22.0,lng:-48.5},
+  {uf:'TO',nome:'Tocantins',lat:-10.0,lng:-48.0},
+  {uf:'AM',nome:'Amazonas',lat:-3.5,lng:-65.0},
+];
+
+// AMÉRICAS DO SUL — países (centroides)
+var SA_BOUNDS = {latMin:-56.0, latMax:13.0, lngMin:-82.0, lngMax:-34.0};
+var SA_PAISES = [
+  {nome:'Brasil',lat:-10.0,lng:-55.0,cor:'#C8D8A8'},
+  {nome:'Argentina',lat:-35.0,lng:-65.0,cor:'#D4E8C8'},
+  {nome:'Chile',lat:-35.0,lng:-71.0,cor:'#E8D4C8'},
+  {nome:'Uruguai',lat:-33.0,lng:-56.0,cor:'#C8E8D4'},
+  {nome:'Paraguai',lat:-23.0,lng:-58.0,cor:'#E8E8C8'},
+  {nome:'Bolívia',lat:-17.0,lng:-65.0,cor:'#D4C8E8'},
+  {nome:'Peru',lat:-10.0,lng:-75.0,cor:'#E8C8D4'},
+  {nome:'Colômbia',lat:4.0,lng:-74.0,cor:'#C8E8E8'},
+  {nome:'Venezuela',lat:8.0,lng:-66.0,cor:'#E8D4E8'},
+  {nome:'Equador',lat:-2.0,lng:-78.0,cor:'#D4E8E8'},
+  {nome:'Guiana',lat:5.0,lng:-59.0,cor:'#E8E8D4'},
+  {nome:'Suriname',lat:4.0,lng:-56.0,cor:'#D4D4E8'},
+  {nome:'Guiana Francesa',lat:4.0,lng:-53.0,cor:'#E8D4D4'},
+];
+
+function coordToXY(lat, lng, bounds, W, H){
+  var x = (lng - bounds.lngMin) / (bounds.lngMax - bounds.lngMin) * W;
+  var y = (bounds.latMax - lat) / (bounds.latMax - bounds.latMin) * H;
+  return {x:x, y:y};
+}
+
+function renderSCMap(){
+  var canvas=document.getElementById('poiCanvas');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#AFC4C2'; ctx.fillRect(0,0,W,H);
+
+  // Desenhar contorno SC
+  SC_ESTADOS.forEach(function(e){
+    ctx.beginPath();
+    e.contorno.forEach(function(pt,i){
+      var p=coordToXY(pt[0],pt[1],SC_BOUNDS,W,H);
+      if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+    });
+    ctx.closePath();
+    ctx.fillStyle=e.cor;ctx.fill();
+    ctx.strokeStyle='#8A7A5C';ctx.lineWidth=2;ctx.stroke();
+  });
+
+  // Grade
+  ctx.strokeStyle='rgba(0,0,0,.1)';ctx.lineWidth=0.5;ctx.fillStyle='#555';ctx.font='9px sans-serif';
+  for(var lat=Math.ceil(SC_BOUNDS.latMin);lat<=SC_BOUNDS.latMax;lat++){
+    var p=coordToXY(lat,SC_BOUNDS.lngMin,SC_BOUNDS,W,H);
+    ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(W,p.y);ctx.stroke();
+    ctx.fillText(lat+'°',2,p.y-2);
+  }
+
+  // Cidades
+  SC_CIDADES.forEach(function(c){
+    var p=coordToXY(c.lat,c.lng,SC_BOUNDS,W,H);
+    ctx.beginPath();ctx.arc(p.x,p.y,c.cap?5:3,0,Math.PI*2);
+    ctx.fillStyle=c.cap?'#1e293b':'#5A4E40';ctx.fill();
+    ctx.font=(c.cap?'bold ':'')+' 10px sans-serif';ctx.fillStyle='#1e293b';
+    ctx.textAlign='left';ctx.fillText(c.nome,p.x+5,p.y+3);
+  });
+
+  // POIs
+  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,SC_BOUNDS,W,H);});
+  document.getElementById('mapRefLabel').textContent='Santa Catarina';
+  document.getElementById('mapScaleLabel').textContent='Contorno estilizado';
+}
+
+function renderBrasilMap(){
+  var canvas=document.getElementById('poiCanvas');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#AFC4C2';ctx.fillRect(0,0,W,H);
+
+  // Fundo Brasil
+  ctx.fillStyle='#DCCFA8';
+  ctx.fillRect(W*0.1,H*0.05,W*0.8,H*0.9);
+  ctx.strokeStyle='#8A7A5C';ctx.lineWidth=1.5;
+  ctx.strokeRect(W*0.1,H*0.05,W*0.8,H*0.9);
+
+  // Estados como pontos com label
+  BR_ESTADOS.forEach(function(e){
+    var p=coordToXY(e.lat,e.lng,BR_BOUNDS,W,H);
+    if(p.x<0||p.x>W||p.y<0||p.y>H)return;
+    ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
+    ctx.fillStyle='#334155';ctx.fill();
+    ctx.font='bold 8px sans-serif';ctx.fillStyle='#1e293b';
+    ctx.textAlign='center';ctx.fillText(e.uf,p.x,p.y-6);
+  });
+
+  // POIs
+  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,BR_BOUNDS,W,H);});
+  document.getElementById('mapRefLabel').textContent='Brasil — estados';
+  document.getElementById('mapScaleLabel').textContent='Contorno simplificado';
+}
+
+function renderSudAmericaMap(){
+  var canvas=document.getElementById('poiCanvas');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#AFC4C2';ctx.fillRect(0,0,W,H);
+
+  // Países como regiões coloridas com label
+  SA_PAISES.forEach(function(p){
+    var pos=coordToXY(p.lat,p.lng,SA_BOUNDS,W,H);
+    // Círculo colorido representando o país
+    ctx.beginPath();ctx.arc(pos.x,pos.y,18,0,Math.PI*2);
+    ctx.fillStyle=p.cor;ctx.fill();
+    ctx.strokeStyle='#8A7A5C';ctx.lineWidth=1;ctx.stroke();
+    ctx.font='bold 9px sans-serif';ctx.fillStyle='#1e293b';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.nome,pos.x,pos.y);
+  });
+
+  // POIs
+  renderPOIsOnMap(ctx,W,H,function(lat,lng){return coordToXY(lat,lng,SA_BOUNDS,W,H);});
+  document.getElementById('mapRefLabel').textContent='América do Sul';
+  document.getElementById('mapScaleLabel').textContent='Países — representação esquemática';
+}
+
+function renderPOIsOnMap(ctx,W,H,toXY){
+  window._mapHitTargets = window._mapHitTargets || [];
+  var pts = filterTrip ? db.points.filter(function(p){return p.tripId===filterTrip;}) : db.points;
+  pts.forEach(function(p){
+    var pos=toXY(p.lat,p.lng);
+    if(pos.x<0||pos.x>W||pos.y<0||pos.y>H)return;
+    var c=catById(p.catId);
+    ctx.font='18px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(c.icone,pos.x,pos.y);
+    window._mapHitTargets.push({x:pos.x,y:pos.y,p:p});
+  });
+}
+
 </script>
 </body>
 </html>
