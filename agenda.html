@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#1E293B"/>
+<title>Agenda</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Inter',system-ui,sans-serif;background:#F8FAFC;color:#1E293B;max-width:480px;margin:0 auto;min-height:100vh;}
+button{background:none;border:none;cursor:pointer;font-family:inherit;}
+input,textarea{font-family:inherit;}
+textarea{resize:none;}
+::-webkit-scrollbar{display:none;}
+
+#app{display:flex;flex-direction:column;height:100dvh;overflow:hidden;}
+#topbar{flex-shrink:0;background:#fff;border-bottom:1px solid #E2E8F0;z-index:40;}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px;}
+
+/* Tabs */
+.tabs{display:flex;}
+.tab{flex:1;padding:13px 0;font-size:11px;font-weight:700;color:#94A3B8;border-bottom:2px solid transparent;letter-spacing:.03em;}
+.tab.active{color:#1E293B;border-bottom-color:#1E293B;}
+
+/* Nav */
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 10px;}
+.nav-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:#64748B;font-size:22px;}
+.nav-btn:active{background:#F1F5F9;}
+.nav-title{font-size:15px;font-weight:800;color:#1E293B;}
+
+/* ── ABC BLOCK ── */
+.abc-block{margin:14px 16px 0;background:#fff;border-radius:20px;border:1.5px solid #FECACA;overflow:hidden;box-shadow:0 2px 12px rgba(239,68,68,.08);}
+.abc-header{display:flex;align-items:center;gap:8px;padding:12px 16px 10px;border-bottom:1px solid #FEF2F2;}
+.abc-header-dot{width:10px;height:10px;border-radius:50%;background:#EF4444;flex-shrink:0;}
+.abc-header-title{font-size:12px;font-weight:800;color:#EF4444;text-transform:uppercase;letter-spacing:.06em;flex:1;}
+.abc-header-count{font-size:11px;font-weight:600;color:#94A3B8;}
+.abc-slots{padding:10px 12px 12px;}
+.abc-slot{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:14px;margin-bottom:6px;border:1.5px dashed #E2E8F0;background:#F8FAFC;min-height:44px;transition:all .15s;}
+.abc-slot.filled{border-style:solid;border-color:#FECACA;background:#FEF2F2;}
+.abc-slot.done-slot{border-color:#D1FAE5;background:#ECFDF5;}
+.abc-slot-letter{width:22px;height:22px;border-radius:8px;background:#EF4444;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.abc-slot-letter.empty{background:#E2E8F0;color:#94A3B8;}
+.abc-slot-letter.done-letter{background:#10B981;}
+.abc-slot-content{flex:1;min-width:0;}
+.abc-slot-title{font-size:13px;font-weight:600;color:#1E293B;line-height:1.3;}
+.abc-slot-title.done-title{text-decoration:line-through;color:#94A3B8;}
+.abc-slot-meta{font-size:11px;color:#94A3B8;margin-top:2px;}
+.abc-slot-empty-label{font-size:12px;color:#CBD5E1;font-style:italic;}
+.abc-check{width:20px;height:20px;border-radius:50%;border:2px solid #FECACA;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;}
+.abc-check.done{background:#10B981;border-color:#10B981;}
+.abc-check.done::after{content:'✓';color:#fff;font-size:10px;}
+.abc-warn{margin:0 12px 10px;padding:8px 12px;background:#FFFBEB;border-radius:10px;border:1px solid #FDE68A;font-size:11px;color:#92400E;font-weight:600;}
+
+/* ── TIMELINE ── */
+.timeline{padding:0 16px;margin-top:18px;}
+.timeline-label{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.timeline-label::after{content:'';flex:1;height:1px;background:#E2E8F0;}
+.tl-item{display:flex;gap:12px;margin-bottom:10px;position:relative;}
+.tl-time{width:44px;flex-shrink:0;text-align:right;}
+.tl-time span{font-size:11px;font-weight:600;color:#94A3B8;line-height:1;}
+.tl-time .tl-no-time{font-size:10px;color:#CBD5E1;}
+.tl-line{width:2px;background:#E2E8F0;border-radius:2px;flex-shrink:0;margin:2px 0;position:relative;}
+.tl-dot{width:8px;height:8px;border-radius:50%;position:absolute;top:4px;left:-3px;border:2px solid #fff;}
+.tl-card{flex:1;min-width:0;border-radius:14px;padding:10px 12px;border:1.5px solid #E2E8F0;background:#fff;margin-bottom:0;}
+.tl-card.ui{border-color:#FECACA;background:#FEF2F2;}
+.tl-card.iu{border-color:#FDE68A;background:#FFFBEB;}
+.tl-card.uni{border-color:#A7F3D0;background:#ECFDF5;}
+.tl-card.nn{border-color:#E2E8F0;background:#F8FAFC;}
+.tl-card.done-card{opacity:.55;}
+.tl-card-top{display:flex;align-items:flex-start;gap:8px;}
+.tl-check{width:18px;height:18px;border-radius:50%;border:2px solid #CBD5E1;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.tl-check.done{background:#94A3B8;border-color:#94A3B8;}
+.tl-check.done::after{content:'✓';color:#fff;font-size:9px;}
+.tl-title{font-size:13px;font-weight:600;color:#1E293B;flex:1;line-height:1.3;}
+.tl-title.done{text-decoration:line-through;color:#94A3B8;}
+.tl-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;flex-shrink:0;}
+.tl-meta{font-size:11px;color:#94A3B8;margin-top:4px;display:flex;flex-wrap:wrap;gap:8px;}
+.tl-deadline{font-weight:600;}
+
+/* ── PRINCIPLE CARD ── */
+.principle-card{margin:14px 16px 0;border-radius:18px;overflow:hidden;border:1px solid #E2E8F0;background:#fff;}
+.principle-inner{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;}
+.principle-icon{font-size:26px;flex-shrink:0;}
+.principle-name{font-size:14px;font-weight:800;color:#1E293B;}
+.principle-summary{font-size:12px;color:#64748B;margin-top:3px;line-height:1.5;}
+
+/* ── GRATITUDE ── */
+.gratitude-block{margin:18px 16px 0;background:#fff;border-radius:20px;border:1px solid #E2E8F0;overflow:hidden;}
+.gratitude-header{padding:12px 16px 10px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:8px;}
+.gratitude-header span{font-size:18px;}
+.gratitude-header p{font-size:12px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.05em;}
+.gratitude-item{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid #F8FAFC;}
+.gratitude-item:last-child{border-bottom:none;}
+.gratitude-num{width:22px;height:22px;border-radius:8px;background:#FEF3C7;color:#D97706;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.gratitude-input{flex:1;border:none;outline:none;font-size:13px;color:#1E293B;background:transparent;line-height:1.5;min-height:36px;padding:2px 0;}
+.gratitude-input::placeholder{color:#CBD5E1;}
+
+/* ── OPPORTUNITIES ── */
+.opp-block{margin:14px 16px 0;background:#fff;border-radius:20px;border:1px solid #E2E8F0;overflow:hidden;}
+.opp-header{padding:12px 16px 10px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:8px;}
+.opp-header span{font-size:18px;}
+.opp-header p{font-size:12px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.05em;}
+.opp-input{width:100%;border:none;outline:none;font-size:13px;color:#1E293B;background:transparent;padding:12px 16px;min-height:80px;line-height:1.6;}
+.opp-input::placeholder{color:#CBD5E1;}
+
+/* ── MONTH / WEEK TASK LIST ── */
+.section-wrap{padding:0 16px;}
+.section-group{margin-bottom:20px;}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.section-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;}
+.section-count{font-size:11px;color:#CBD5E1;margin-left:auto;}
+
+/* ── TASK ROW (month/week) ── */
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border-radius:14px;margin-bottom:7px;border:1.5px solid #E2E8F0;background:#fff;}
+.task-check{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:2px solid #CBD5E1;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.task-check.done{background:#94A3B8;border-color:#94A3B8;}
+.task-check.done::after{content:'✓';color:#fff;font-size:10px;}
+.task-body{flex:1;min-width:0;}
+.task-title{font-size:13px;font-weight:600;color:#1E293B;line-height:1.35;}
+.task-title.done{text-decoration:line-through;color:#94A3B8;}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;}
+.task-meta span{font-size:11px;}
+.task-del{flex-shrink:0;color:#E2E8F0;font-size:13px;padding:2px 4px;}
+.task-del:active{color:#EF4444;}
+
+/* ── DELEGATED BADGE ── */
+.deleg-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#EDE9FE;color:#7C3AED;border:1px solid #DDD6FE;}
+.deleg-badge.due-today{background:#7C3AED;color:#fff;border-color:#7C3AED;}
+.tl-card.delegated{border-color:#DDD6FE;}
+.tl-card.delegated.due-today-card{border-color:#7C3AED;box-shadow:0 0 0 1px #7C3AED inset;}
+
+/* ── RECURRENCE ── */
+.recur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.recur-btn{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:10px 6px;font-size:12px;font-weight:600;border:2px solid #E2E8F0;background:#F8FAFC;color:#64748B;text-align:center;transition:all .15s;width:100%;}
+.recur-btn.active{background:#1E293B;color:#fff;border-color:#1E293B;}
+
+/* ── LEGEND ── */
+.legend{padding:10px 16px;border-top:1px solid #F1F5F9;border-bottom:1px solid #F1F5F9;display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#64748B;}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ── MONTH CALENDAR ── */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:0 14px 14px;background:#fff;}
+.dow-label{text-align:center;font-size:11px;font-weight:600;color:#94A3B8;padding:6px 0;}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;font-size:12px;font-weight:600;color:#334155;position:relative;transition:all .1s;}
+.day-cell:active{transform:scale(.85);}
+.day-cell.today{background:#1E293B;color:#fff;}
+.day-cell.has-urgent{color:#EF4444;}
+.day-dot{width:4px;height:4px;border-radius:50%;position:absolute;bottom:3px;}
+
+/* ── ANNUAL ── */
+.annual-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px;}
+.month-card{border-radius:16px;padding:12px;text-align:left;border:1px solid #E2E8F0;background:#fff;transition:all .1s;}
+.month-card:active{transform:scale(.95);}
+.month-card.urgent{background:#FEF2F2;border-color:#FECACA;}
+.month-name{font-size:12px;font-weight:700;color:#475569;}
+.progress-bar{height:5px;background:#E2E8F0;border-radius:99px;overflow:hidden;margin-top:8px;}
+.progress-fill{height:100%;border-radius:99px;}
+.progress-label{font-size:10px;color:#94A3B8;margin-top:4px;}
+
+/* ── WEEK STRIP ── */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 8px 12px;border-bottom:1px solid #E2E8F0;background:#fff;}
+.week-day-col{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.week-dow{font-size:10px;color:#94A3B8;font-weight:600;}
+.week-num{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;font-weight:700;color:#334155;}
+.week-num.today{background:#E2E8F0;}
+.week-num.selected{background:#1E293B;color:#fff;}
+
+/* ── SECTION TOOLBAR ── */
+.section-toolbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;}
+.toolbar-title{font-size:11px;font-weight:800;color:#64748B;text-transform:uppercase;letter-spacing:.06em;}
+.toolbar-actions{display:flex;gap:6px;}
+.btn-sm{font-size:11px;color:#64748B;border:1px solid #E2E8F0;border-radius:8px;padding:5px 10px;background:#fff;}
+.btn-sm.dark{background:#1E293B;color:#fff;border-color:#1E293B;font-weight:700;}
+
+/* ── FAB ── */
+.fab{position:fixed;right:20px;bottom:28px;width:56px;height:56px;border-radius:50%;background:#1E293B;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(30,41,59,.3);z-index:50;transition:transform .1s;}
+.fab:active{transform:scale(.9);}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:60;display:flex;align-items:flex-end;justify-content:center;}
+.modal-sheet{width:100%;max-width:480px;background:#fff;border-radius:24px 24px 0 0;max-height:92dvh;overflow-y:auto;}
+.modal-header{position:sticky;top:0;background:#fff;padding:18px 20px 14px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:15px;font-weight:800;color:#1E293B;}
+.modal-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#94A3B8;font-size:16px;}
+.modal-close:active{background:#F1F5F9;}
+.modal-body{padding:18px 20px 32px;}
+
+/* ── FORM ── */
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.field input,.field textarea{width:100%;border:1.5px solid #E2E8F0;border-radius:14px;padding:10px 14px;font-size:13px;color:#1E293B;background:#F8FAFC;outline:none;}
+.field input:focus,.field textarea:focus{border-color:#94A3B8;background:#fff;}
+.row2{display:flex;gap:8px;}
+.row2 input{flex:1;}
+.row2 .time{width:108px;flex:none;}
+
+/* Priority grid */
+.priority-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.prio-btn{display:flex;align-items:center;gap:8px;border-radius:14px;padding:10px 12px;font-size:12px;font-weight:600;border:2px solid #E2E8F0;background:#F8FAFC;color:#64748B;text-align:left;transition:all .15s;width:100%;}
+.prio-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* Done field */
+.done-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.done-btn{display:flex;align-items:center;gap:8px;border-radius:12px;padding:9px 14px;font-size:12px;font-weight:700;border:2px solid #E2E8F0;background:#F8FAFC;color:#64748B;transition:all .15s;}
+.done-btn.done{background:#10B981;border-color:#10B981;color:#fff;}
+
+/* Save */
+.save-btn{width:100%;padding:14px;border-radius:14px;background:#1E293B;color:#fff;font-size:14px;font-weight:800;margin-top:8px;}
+.save-btn:active{opacity:.8;}
+.save-btn:disabled{background:#CBD5E1;}
+
+/* Principle modal */
+.princ-item{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;border:1px solid #F1F5F9;background:#F8FAFC;margin-bottom:8px;width:100%;text-align:left;}
+.princ-item:active{background:#F1F5F9;}
+.princ-emoji{font-size:22px;}
+.princ-name{font-size:13px;font-weight:700;color:#1E293B;}
+.princ-summary{font-size:11px;color:#64748B;margin-top:2px;line-height:1.4;}
+.princ-arrow{margin-left:auto;color:#CBD5E1;font-size:16px;}
+.princ-text{font-size:14px;color:#334155;line-height:1.8;white-space:pre-line;margin-bottom:24px;}
+
+/* Notif banner */
+.notif-banner{margin:12px 16px 0;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;background:#FFFBEB;border:1px solid #FDE68A;}
+.notif-text{font-size:12px;color:#92400E;flex:1;line-height:1.4;}
+.notif-btn{font-size:11px;font-weight:700;color:#92400E;border:1px solid #FCD34D;border-radius:8px;padding:5px 10px;flex-shrink:0;}
+
+.empty{padding:32px 16px;text-align:center;}
+.empty p{font-size:13px;color:#CBD5E1;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div class="tabs">
+      <button class="tab active" data-view="day" onclick="setView('day')">Dia</button>
+      <button class="tab" data-view="week" onclick="setView('week')">Semana</button>
+      <button class="tab" data-view="month" onclick="setView('month')">Mês</button>
+      <button class="tab" data-view="annual" onclick="setView('annual')">Ano</button>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn" onclick="navPrev()">‹</button>
+      <span class="nav-title" id="nav-title"></span>
+      <div style="display:flex;align-items:center;gap:2px">
+        <button class="nav-btn" onclick="exportBackup()" title="Exportar backup" style="font-size:16px">⬇️</button>
+        <button class="nav-btn" onclick="document.getElementById('import-file').click()" title="Importar backup" style="font-size:16px">⬆️</button>
+        <input id="import-file" type="file" accept="application/json" style="display:none" onchange="importBackup(this)"/>
+      </div>
+      <button class="nav-btn" onclick="navNext()">›</button>
+    </div>
+  </div>
+  <div id="mem-banner" style="display:none;margin:10px 16px 0;border-radius:14px;padding:10px 14px;background:#FEF2F2;border:1px solid #FECACA;font-size:12px;color:#991B1B;font-weight:600;line-height:1.4">
+    ⚠️ Este navegador não permite salvar dados automaticamente neste arquivo. Use o botão ⬇️ para exportar um backup com frequência e o ⬆️ para restaurar.
+  </div>
+  <div id="content"></div>
+  <button class="fab" id="fab" onclick="openTaskModal()">+</button>
+</div>
+
+<!-- TASK MODAL -->
+<div id="task-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeTaskModal()">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title" id="task-modal-title">Nova tarefa</span>
+      <button class="modal-close" onclick="closeTaskModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>Título</label><input id="t-title" type="text" placeholder="Nome da tarefa…"/></div>
+      <div class="field"><label>Prioridade</label><div class="priority-grid" id="prio-grid"></div></div>
+      <div class="field"><label>📅 Pretendo fazer</label><div class="row2"><input id="t-planned-date" type="date"/><input id="t-planned-time" type="time" class="time"/></div></div>
+      <div class="field"><label>⏰ Prazo limite</label><div class="row2"><input id="t-deadline" type="date"/><input id="t-deadline-time" type="time" class="time"/></div></div>
+      <div class="field"><label>🔁 Repetir</label><div class="recur-grid" id="recur-grid"></div></div>
+      <div class="field"><label>👤 Delegar para</label><input id="t-delegate" type="text" placeholder="Nome da pessoa (opcional)…"/></div>
+      <div class="field" id="done-field" style="display:none">
+        <label>Conclusão</label>
+        <div class="done-row">
+          <button class="done-btn" id="done-btn" onclick="toggleDone()">Marcar como concluída</button>
+          <input id="t-done-date" type="date" style="flex:1;min-width:120px;border:1.5px solid #E2E8F0;border-radius:12px;padding:9px 12px;font-size:12px;background:#F8FAFC;outline:none;display:none"/>
+        </div>
+      </div>
+      <div class="field"><label>Observações</label><textarea id="t-notes" rows="2" placeholder="Detalhes adicionais…"></textarea></div>
+      <button class="save-btn" onclick="saveTask()">Salvar tarefa</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINCIPLE MODAL -->
+<div id="princ-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePrincModal()">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div><span class="modal-title">Princípio do Dia</span><br><span style="font-size:11px;color:#94A3B8">Escolha um para guiar seu dia</span></div>
+      <button class="modal-close" onclick="closePrincModal()">✕</button>
+    </div>
+    <div class="modal-body" id="princ-modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const PRIORITIES=[
+  {id:"ui",label:"Urgente · Importante",short:"U+I",color:"#EF4444",bg:"#FEF2F2",border:"#FECACA"},
+  {id:"iu",label:"Importante · Não Urgente",short:"I",color:"#F59E0B",bg:"#FFFBEB",border:"#FDE68A"},
+  {id:"uni",label:"Urgente · Não Importante",short:"U",color:"#10B981",bg:"#ECFDF5",border:"#A7F3D0"},
+  {id:"nn",label:"Não Urgente · Não Importante",short:"—",color:"#94A3B8",bg:"#F8FAFC",border:"#E2E8F0"},
+];
+const LETTERS=["A","B","C","D","E"];
+const RECUR_OPTS=[
+  {id:"",label:"Nunca"},
+  {id:"weekly",label:"Semanal"},
+  {id:"monthly",label:"Mensal"},
+  {id:"yearly",label:"Anual"},
+];
+const PRINCIPLES=[
+  {id:1,name:"Oração da Serenidade",icon:"🕊️",summary:"Aceitar o que não posso mudar, coragem para o que posso, sabedoria para distinguir.",text:"Concedei-me, Senhor,\nserenidade para aceitar as coisas que não posso mudar;\ncoragem para mudar aquelas que posso;\ne sabedoria para distinguir uma das outras.\n\nSó por hoje."},
+  {id:2,name:"O Bem em Si",icon:"✨",summary:"Ser virtuoso não por medo ou vaidade — mas porque o certo é belo em si mesmo.",text:"O verdadeiro bem não está nas coisas que possuímos, nem nos aplausos que recebemos, mas naquilo que somos quando ninguém nos vê.\n\nA virtude é o único tesouro que o tempo não corrói. A alma justa encontra paz porque não depende do mundo para ser boa.\n\nSer virtuoso é encontrar em si mesmo a fonte da serenidade — é ser inteiro, mesmo quando tudo ao redor se desfaz."},
+  {id:3,name:"Fogo Forte, Aço Bom",icon:"🔥",summary:"O fogo não destrói o aço — ele o forma. As provações revelam quem você é.",text:"O fogo não destrói o aço — ele o forma. Da mesma maneira, as provações não nos quebram: revelam o que somos.\n\nÉ no calor das dificuldades que o caráter ganha forma, que a alma aprende resistência e que o coração descobre sua própria força.\n\nQuem enfrenta as chamas com propósito, sai delas mais puro, mais forte, mais verdadeiro."},
+  {id:4,name:"A Força da Ação Intencional",icon:"⚡",summary:"A força não está em agir sempre — está em agir na hora certa, com clareza.",text:"A força não está em agir sempre — está em agir na hora certa. Sun Tzu ensinava que vencer sem lutar é a mais alta forma de sabedoria.\n\nQuem age por impulso se torna refém do instante. Quem age por intenção domina o tempo.\n\nCada gesto deve ter um porquê; cada silêncio, um propósito."},
+  {id:5,name:"Presença de Corpo e Alma",icon:"🌿",summary:"Habitar o momento com inteireza. Estar aqui — não por obrigação, mas por reverência à vida.",text:"Estar presente é mais do que ocupar um lugar — é habitar o momento com inteireza.\n\nA presença verdadeira é um gesto de amor: é dar-se inteiro ao que se vive, é ouvir com atenção, olhar com ternura, sentir com gratidão.\n\nQuem aprende a estar inteiro no agora descobre que o presente é o único lugar onde o amor, a paz e a verdade realmente existem."},
+  {id:6,name:"Menos, Porém Melhor",icon:"◻️",summary:"Quando tiramos o excesso, o essencial aparece. Não é ter pouco — é ter o que basta.",text:"Menos é espaço.\nMenos é calma.\n\nQuando tiramos o excesso, o essencial aparece.\nNão é ter pouco, é ter o que basta.\nNão é fazer menos, é fazer com sentido.\n\nO melhor nasce quando o supérfluo se cala.\nPorque o simples é o que fica."},
+  {id:7,name:"80/20",icon:"🎯",summary:"Grande parte dos resultados vem de uma pequena parte das ações. Foque nos 20% certos.",text:"Nem tudo o que você faz te leva para frente.\n\nGrande parte dos seus resultados vem de uma pequena parte das suas ações. O segredo é descobrir quais são esses 20% que realmente fazem a diferença.\n\nProdutividade não é fazer mais — é fazer o que importa, quando importa."},
+];
+const MONTHS=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const DAYS_S=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const DAYS_F=["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const now=new Date();
+let S={
+  view:"day",year:now.getFullYear(),month:now.getMonth(),day:now.getDate(),
+  weekOffset:0,tasks:[],journal:{},princDay:{},showDone:false,
+  editingTask:null,formDone:false,notifOk:false,
+};
+
+let _memStore={};
+let _usingMemFallback=false;
+function ls(k,d){
+  try{const r=localStorage.getItem(k);return r?JSON.parse(r):d;}
+  catch{return _memStore[k]!==undefined?_memStore[k]:d;}
+}
+function ss(k,v){
+  try{localStorage.setItem(k,JSON.stringify(v));}
+  catch{_usingMemFallback=true;_memStore[k]=v;}
+}
+function safeNotifOk(){
+  try{return(typeof Notification!=="undefined"&&Notification.permission==="granted");}
+  catch{return false;}
+}
+function loadState(){
+  S.tasks=ls("agd_t4",[]);
+  S.journal=ls("agd_j4",{});
+  S.princDay=ls("agd_p4",{});
+  S.notifOk=safeNotifOk();
+  try{
+    localStorage.setItem("__test__","1");localStorage.removeItem("__test__");
+  }catch{_usingMemFallback=true;}
+}
+function persist(){ss("agd_t4",S.tasks);ss("agd_j4",S.journal);ss("agd_p4",S.princDay);}
+
+// ─── BACKUP (export/import JSON) ───────────────────────────────────────────────
+function exportBackup(){
+  const data={tasks:S.tasks,journal:S.journal,princDay:S.princDay,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=`agenda-backup-${todayISO()}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importBackup(input){
+  const file=input.files&&input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(data.tasks)S.tasks=data.tasks;
+      if(data.journal)S.journal=data.journal;
+      if(data.princDay)S.princDay=data.princDay;
+      persist();render();
+      alert("Backup importado com sucesso!");
+    }catch{alert("Arquivo inválido.");}
+  };
+  reader.readAsText(file);
+  input.value="";
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+function p2(n){return String(n).padStart(2,"0");}
+function fmtDate(s){if(!s)return"";const[y,m,d]=s.split("-");return`${d}/${m}/${y}`;}
+function mKey(y,m){return`${y}-${p2(m+1)}`;}
+function selDS(){return`${S.year}-${p2(S.month+1)}-${p2(S.day)}`;}
+function selMK(){return mKey(S.year,S.month);}
+function esc(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function isOverdue(t){
+  if(t.done||!t.deadline)return false;
+  const td=todayISO();
+  if(t.deadline<td)return true;
+  if(t.deadline===td&&t.deadlineTime){const n=new Date();const cur=`${p2(n.getHours())}:${p2(n.getMinutes())}`;return t.deadlineTime<cur;}
+  return false;
+}
+function effPrio(t){if(isOverdue(t))return PRIORITIES[0];return PRIORITIES.find(p=>p.id===t.priority)||PRIORITIES[3];}
+function getPrinc(id){return PRINCIPLES.find(p=>p.id===id);}
+
+function getWeekDates(off=0){
+  const base=new Date(S.year,S.month,S.day);
+  const dow=base.getDay();
+  const mon=new Date(base);mon.setDate(base.getDate()-dow+(dow===0?-6:1)+off*7);
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
+}
+function dStr(d){return`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;}
+
+// Tasks for a given date
+function tasksForDate(ds){
+  return S.tasks.filter(t=>(t.plannedDate===ds||t.deadline===ds));
+}
+function uiTasksForDate(ds){
+  return tasksForDate(ds).filter(t=>effPrio(t).id==="ui"&&!t.done);
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render(){
+  updateTabs();updateNavTitle();
+  const c=document.getElementById("content");
+  if(S.view==="day") c.innerHTML=renderDay();
+  else if(S.view==="week") c.innerHTML=renderWeek();
+  else if(S.view==="month") c.innerHTML=renderMonth();
+  else c.innerHTML=renderAnnual();
+  bindLiveInputs();
+  document.getElementById("fab").style.display=S.view==="day"?"none":"flex";
+  const mb=document.getElementById("mem-banner");
+  if(mb)mb.style.display=_usingMemFallback?"block":"none";
+}
+function updateTabs(){document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===S.view));}
+function updateNavTitle(){
+  const t={day:`${S.day} de ${MONTHS[S.month]}`,month:`${MONTHS[S.month]} ${S.year}`,annual:String(S.year),week:()=>{const w=getWeekDates(S.weekOffset);return`${w[0].getDate()} – ${w[6].getDate()} ${MONTHS[w[6].getMonth()]}`;}};
+  const v=t[S.view];document.getElementById("nav-title").textContent=typeof v==="function"?v():v;
+}
+
+// ─── DAY VIEW ─────────────────────────────────────────────────────────────────
+function renderDay(){
+  const ds=selDS();
+  const jn=S.journal[ds]||{opportunities:"",g1:"",g2:"",g3:""};
+  const princ=getPrinc(S.princDay[ds]);
+  const allDay=tasksForDate(ds).filter(t=>S.showDone?true:!t.done);
+  const uiTasks=S.tasks.filter(t=>effPrio(t).id==="ui"&&(t.plannedDate===ds||t.deadline===ds)).sort((a,b)=>(a.plannedTime||"").localeCompare(b.plannedTime||""));
+  const uiCount=uiTasks.filter(t=>!t.done).length;
+
+  // ── ABC Block ──
+  let abcSlots="";
+  for(let i=0;i<Math.max(3,Math.min(5,uiTasks.length+(uiTasks.length<5?0:0)));i++){
+    const t=uiTasks[i];
+    const letter=LETTERS[i];
+    if(t){
+      const done=t.done;
+      abcSlots+=`<div class="abc-slot ${done?"done-slot":"filled"}" onclick="editTask(${t.id})">
+        <div class="abc-check ${done?"done":""}" onclick="event.stopPropagation();toggleTask(${t.id})"></div>
+        <div class="abc-slot-letter ${done?"done-letter":""}">${letter}</div>
+        <div class="abc-slot-content">
+          <div class="abc-slot-title ${done?"done-title":""}">${esc(t.title)}</div>
+          <div class="abc-slot-meta">${t.plannedTime?t.plannedTime+" · ":""}${t.deadline?"Prazo: "+fmtDate(t.deadline):""}</div>
+        </div>
+        <button onclick="event.stopPropagation();deleteTask(${t.id})" style="color:#E2E8F0;font-size:12px;flex-shrink:0;padding:2px">✕</button>
+      </div>`;
+    } else {
+      abcSlots+=`<div class="abc-slot" onclick="openTaskModalUI('${ds}')">
+        <div class="abc-slot-letter empty">${letter}</div>
+        <div class="abc-slot-content"><span class="abc-slot-empty-label">Toque para adicionar…</span></div>
+      </div>`;
+    }
+  }
+  const warnHtml=uiCount>=3?`<div class="abc-warn">⚠ Você já tem ${uiCount} tarefas U+I. O ideal são até 3 por dia.</div>`:"";
+
+  // ── Timeline ──
+  const tlTasks=allDay.sort((a,b)=>{
+    const at=a.plannedTime||a.deadlineTime||"";
+    const bt=b.plannedTime||b.deadlineTime||"";
+    if(!at&&!bt)return 0;if(!at)return 1;if(!bt)return -1;
+    return at.localeCompare(bt);
+  });
+
+  let tlHtml="";
+  if(tlTasks.length===0){
+    tlHtml=`<div class="empty"><p>Nenhuma tarefa programada.</p></div>`;
+  } else {
+    tlTasks.forEach(t=>{
+      const p=effPrio(t);
+      const time=t.plannedTime||t.deadlineTime||"";
+      const overdue=isOverdue(t);
+      const deadlineMeta=t.deadline&&t.deadline!==t.plannedDate?`⏰ ${fmtDate(t.deadline)}${t.deadlineTime?" "+t.deadlineTime:""}`:""
+      const isDeadlineToday=t.deadline===ds&&!t.done;
+      const delegBadge=t.delegate?`<span class="deleg-badge${isDeadlineToday?" due-today":""}">👤 ${esc(t.delegate)}${isDeadlineToday?" · hoje!":""}</span>`:"";
+      const cardCls=`${t.done?"done-card":p.id}${t.delegate?" delegated":""}${t.delegate&&isDeadlineToday?" due-today-card":""}`;
+      tlHtml+=`<div class="tl-item">
+        <div class="tl-time">${time?`<span>${time}</span>`:`<span class="tl-no-time">—</span>`}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;width:16px;flex-shrink:0">
+          <div class="tl-dot" style="background:${p.color};position:relative;top:6px;left:0;width:10px;height:10px;border-radius:50%;border:2px solid #fff;flex-shrink:0;z-index:1"></div>
+          <div style="width:2px;flex:1;background:#E2E8F0;margin-top:4px;border-radius:2px;min-height:20px"></div>
+        </div>
+        <div class="tl-card ${cardCls}" style="margin-bottom:0" onclick="editTask(${t.id})">
+          <div class="tl-card-top">
+            <div class="tl-check ${t.done?"done":""}" onclick="event.stopPropagation();toggleTask(${t.id})"></div>
+            <div class="tl-title ${t.done?"done":""}" style="flex:1">${esc(t.title)}</div>
+            <span class="tl-badge" style="background:${p.color}22;color:${p.color}">${p.short}</span>
+          </div>
+          ${deadlineMeta||t.notes||delegBadge?`<div class="tl-meta">
+            ${delegBadge}
+            ${deadlineMeta?`<span class="tl-deadline" style="color:${overdue?"#EF4444":"#94A3B8"}">${deadlineMeta}</span>`:""}
+            ${t.notes?`<span>${esc(t.notes)}</span>`:""}
+          </div>`:""}
+        </div>
+      </div>`;
+    });
+  }
+
+  // ── Notif banner ──
+  const notifBanner=!S.notifOk?`<div class="notif-banner"><span style="font-size:16px">🔔</span><p class="notif-text">Ative notificações para a revisão das 15h.</p><button class="notif-btn" onclick="enableNotif()">Ativar</button></div>`:"";
+
+  // ── Principle ──
+  const princCard=princ?`
+    <div class="principle-card" onclick="openPrincModal()">
+      <div class="principle-inner">
+        <span class="principle-icon">${princ.icon}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Princípio do Dia</div>
+          <div class="principle-name">${princ.name}</div>
+          <div class="principle-summary">${princ.summary}</div>
+        </div>
+        <span style="color:#CBD5E1;font-size:18px;flex-shrink:0">›</span>
+      </div>
+    </div>`:`
+    <div class="principle-card" style="border-color:#FDE68A;background:#FFFBEB" onclick="openPrincModal()">
+      <div class="principle-inner">
+        <span class="principle-icon">🌅</span>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:800;color:#92400E">Iniciar o dia</div>
+          <div style="font-size:12px;color:#B45309;margin-top:2px">Escolha o princípio de hoje</div>
+        </div>
+        <span style="color:#FCD34D;font-size:18px">›</span>
+      </div>
+    </div>`;
+
+  return `
+    <div style="background:#fff;border-bottom:1px solid #E2E8F0;padding:14px 16px 12px">
+      <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.07em">${DAYS_F[new Date(S.year,S.month,S.day).getDay()]}</div>
+      <div style="font-size:24px;font-weight:900;color:#1E293B;margin-top:1px">${S.day} de ${MONTHS[S.month]}</div>
+    </div>
+    ${notifBanner}
+    ${princCard}
+
+    <!-- ABC Block -->
+    <div class="abc-block">
+      <div class="abc-header">
+        <span class="abc-header-dot"></span>
+        <span class="abc-header-title">Urgente · Importante</span>
+        <span class="abc-header-count">${uiTasks.filter(t=>t.done).length}/${uiTasks.length} concluídas</span>
+      </div>
+      <div class="abc-slots">
+        ${warnHtml}
+        ${abcSlots}
+        ${uiTasks.length<5?`<button onclick="openTaskModalUI('${ds}')" style="width:100%;padding:8px;border-radius:12px;border:1.5px dashed #FECACA;color:#EF4444;font-size:12px;font-weight:700;background:transparent;margin-top:2px">+ Adicionar U+I</button>`:""}
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      <div class="timeline-label">Linha do Dia</div>
+      ${tlHtml}
+      <button onclick="openTaskModal()" style="width:100%;padding:10px;border-radius:12px;border:1.5px dashed #E2E8F0;color:#94A3B8;font-size:12px;font-weight:600;background:transparent;margin-top:6px">+ Adicionar tarefa</button>
+    </div>
+
+    <!-- Opportunities -->
+    <div class="opp-block">
+      <div class="opp-header"><span>💡</span><p>Oportunidades do Dia</p></div>
+      <textarea class="opp-input" placeholder="O que posso melhorar? Onde encontrei dificuldade?" data-jfield="opportunities" data-jdate="${ds}">${jn.opportunities||""}</textarea>
+    </div>
+
+    <!-- Gratitude -->
+    <div class="gratitude-block" style="margin-bottom:32px">
+      <div class="gratitude-header"><span>🙏</span><p>Agradecimentos do Dia</p></div>
+      <div class="gratitude-item">
+        <div class="gratitude-num">1</div>
+        <textarea class="gratitude-input" placeholder="Primeiro agradecimento…" data-jfield="g1" data-jdate="${ds}">${jn.g1||""}</textarea>
+      </div>
+      <div class="gratitude-item">
+        <div class="gratitude-num">2</div>
+        <textarea class="gratitude-input" placeholder="Segundo agradecimento…" data-jfield="g2" data-jdate="${ds}">${jn.g2||""}</textarea>
+      </div>
+      <div class="gratitude-item">
+        <div class="gratitude-num">3</div>
+        <textarea class="gratitude-input" placeholder="Terceiro agradecimento…" data-jfield="g3" data-jdate="${ds}">${jn.g3||""}</textarea>
+      </div>
+    </div>`;
+}
+
+// ─── WEEK VIEW ────────────────────────────────────────────────────────────────
+function renderWeek(){
+  const wDates=getWeekDates(S.weekOffset);
+  const ds=selDS();
+  const strip=wDates.map(d=>{
+    const dstr=dStr(d);const isT=dstr===todayISO();const isSel=dstr===ds;
+    return`<div class="week-day-col" onclick="selWeekDay('${dstr}')">
+      <span class="week-dow">${DAYS_S[d.getDay()]}</span>
+      <span class="week-num ${isSel?"selected":isT?"today":""}">${d.getDate()}</span>
+    </div>`;
+  }).join("");
+
+  const weekTasks=S.tasks.filter(t=>{
+    const d=t.plannedDate||t.deadline;if(!d)return false;
+    return wDates.some(wd=>dStr(wd)===d)&&(S.showDone?true:!t.done);
+  }).sort((a,b)=>(a.plannedDate||a.deadline||"").localeCompare(b.plannedDate||b.deadline||""));
+
+  const uiWeek=weekTasks.filter(t=>effPrio(t).id==="ui");
+  const rest=weekTasks.filter(t=>effPrio(t).id!=="ui");
+  const grouped=[{p:PRIORITIES[0],items:uiWeek},...PRIORITIES.slice(1).map(p=>({p,items:rest.filter(t=>effPrio(t).id===p.id)}))].filter(g=>g.items.length>0);
+
+  const tasksHtml=grouped.length===0?`<div class="empty"><p>Nenhuma tarefa para esta semana.</p></div>`:
+    grouped.map(({p,items})=>`<div class="section-group">
+      <div class="section-header">
+        <span class="section-dot" style="background:${p.color}"></span>
+        <span class="section-label" style="color:${p.color}">${p.label}</span>
+        <span class="section-count">${items.length}</span>
+      </div>
+      ${items.map(t=>taskRowHtml(t)).join("")}
+    </div>`).join("");
+
+  return`<div class="week-strip">${strip}</div>
+    <div class="section-toolbar">
+      <span class="toolbar-title">Tarefas da semana</span>
+      <div class="toolbar-actions">
+        <button class="btn-sm" onclick="S.showDone=!S.showDone;render()">${S.showDone?"Ocultar":"Concluídas"}</button>
+      </div>
+    </div>
+    <div style="padding:10px 16px 4px">${renderLegend()}</div>
+    <div class="section-wrap">${tasksHtml}</div>`;
+}
+
+// ─── MONTH VIEW ───────────────────────────────────────────────────────────────
+function renderMonth(){
+  const firstDay=new Date(S.year,S.month,1).getDay();
+  const dim=new Date(S.year,S.month+1,0).getDate();
+  const tod=new Date();
+  let cells=Array(firstDay).fill("<div></div>").join("");
+  for(let d=1;d<=dim;d++){
+    const dstr=`${S.year}-${p2(S.month+1)}-${p2(d)}`;
+    const dt=S.tasks.filter(t=>(t.plannedDate===dstr||t.deadline===dstr)&&!t.done);
+    const isT=tod.getFullYear()===S.year&&tod.getMonth()===S.month&&tod.getDate()===d;
+    const hasU=dt.some(t=>effPrio(t).id==="ui");
+    const hasDeleg=dt.some(t=>t.delegate&&t.deadline===dstr);
+    let cls="day-cell";if(isT)cls+=" today";else if(hasU)cls+=" has-urgent";
+    let dot="";
+    if(dt.length>0&&!isT){
+      const color=hasDeleg?"#7C3AED":hasU?"#EF4444":"#10B981";
+      dot=`<span class="day-dot" style="background:${color}"></span>`;
+    }
+    cells+=`<div class="${cls}" onclick="clickDay(${d})">${d}${dot}</div>`;
+  }
+
+  const mk=selMK();
+  const mt=S.tasks.filter(t=>t.month===mk);
+  const visible=mt.filter(t=>S.showDone?true:!t.done).sort((a,b)=>(a.plannedDate||a.deadline||"").localeCompare(b.plannedDate||b.deadline||""));
+  const grouped=PRIORITIES.map(p=>({p,items:visible.filter(t=>effPrio(t).id===p.id)})).filter(g=>g.items.length>0);
+  const tasksHtml=grouped.length===0?`<div class="empty"><p>Nenhuma tarefa para ${MONTHS[S.month]}.</p></div>`:
+    grouped.map(({p,items})=>`<div class="section-group">
+      <div class="section-header">
+        <span class="section-dot" style="background:${p.color}"></span>
+        <span class="section-label" style="color:${p.color}">${p.label}</span>
+        <span class="section-count">${items.length}</span>
+      </div>${items.map(t=>taskRowHtml(t)).join("")}
+    </div>`).join("");
+
+  return`<div style="background:#fff">${`<div class="month-grid">${DAYS_S.map(d=>`<div class="dow-label">${d}</div>`).join("")}${cells}</div>`}</div>
+    <div style="border-top:1px solid #E2E8F0;background:#F8FAFC">
+      <div class="section-toolbar">
+        <span class="toolbar-title">Tarefas de ${MONTHS[S.month]}</span>
+        <div class="toolbar-actions">
+          <button class="btn-sm" onclick="S.showDone=!S.showDone;render()">${S.showDone?"Ocultar":"Concluídas"}</button>
+          <button class="btn-sm dark" onclick="openTaskModal()">+</button>
+        </div>
+      </div>
+      <div style="padding:10px 16px 4px">${renderLegend()}</div>
+      <div class="section-wrap">${tasksHtml}</div>
+    </div>`;
+}
+
+// ─── ANNUAL VIEW ──────────────────────────────────────────────────────────────
+function renderAnnual(){
+  const cards=MONTHS.map((name,mi)=>{
+    const mk=mKey(S.year,mi);const mt=S.tasks.filter(t=>t.month===mk);
+    const done=mt.filter(t=>t.done).length;const total=mt.length;
+    const hasU=mt.some(t=>!t.done&&effPrio(t).id==="ui");
+    const pct=total?Math.round((done/total)*100):0;
+    return`<button class="month-card${hasU?" urgent":""}" onclick="S.month=${mi};S.view='month';render()">
+      <div class="month-name">${name}</div>
+      ${total>0?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${hasU?"#EF4444":"#10B981"}"></div></div><div class="progress-label">${done}/${total}</div>`:`<div class="progress-label" style="margin-top:6px">Vazio</div>`}
+    </button>`;
+  }).join("");
+  return`<p style="text-align:center;font-size:12px;color:#CBD5E1;padding:16px 0 4px">Toque em um mês</p><div class="annual-grid">${cards}</div>`;
+}
+
+// ─── TASK ROW (month/week) ────────────────────────────────────────────────────
+function taskRowHtml(t){
+  const p=effPrio(t);const overdue=isOverdue(t);
+  const isDeadlineToday=t.deadline===todayISO()&&!t.done;
+  return`<div class="task-row" style="background:${t.done?"#F8FAFC":p.bg};border-color:${t.delegate&&isDeadlineToday?"#7C3AED":t.done?"#E2E8F0":p.border}" onclick="editTask(${t.id})">
+    <div class="task-check ${t.done?"done":""}" onclick="event.stopPropagation();toggleTask(${t.id})" style="border-color:${t.done?"#94A3B8":p.color};${t.done?"background:#94A3B8":""}"></div>
+    <div class="task-body">
+      <div class="task-title ${t.done?"done":""}">${esc(t.title)}</div>
+      <div class="task-meta">
+        <span style="color:${p.color};font-weight:700">${p.short}</span>
+        ${t.delegate?`<span class="deleg-badge${isDeadlineToday?" due-today":""}">👤 ${esc(t.delegate)}${isDeadlineToday?" · hoje!":""}</span>`:""}
+        ${overdue?`<span style="color:#EF4444;font-weight:700">⚠ Vencida</span>`:""}
+        ${t.plannedDate?`<span style="color:#94A3B8">📅 ${fmtDate(t.plannedDate)}${t.plannedTime?" "+t.plannedTime:""}</span>`:""}
+        ${t.deadline?`<span style="color:${overdue?"#EF4444":"#64748B"};font-weight:${overdue?"700":"400"}">⏰ ${fmtDate(t.deadline)}</span>`:""}
+        ${t.recurrence?`<span style="color:#7C3AED">🔁 ${RECUR_OPTS.find(r=>r.id===t.recurrence)?.label||""}</span>`:""}
+        ${t.done&&t.doneDate?`<span style="color:#10B981">✓ ${fmtDate(t.doneDate)}</span>`:""}
+      </div>
+    </div>
+    <button class="task-del" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+  </div>`;
+}
+
+function renderLegend(){
+  return`<div class="legend">${PRIORITIES.map(p=>`<div class="legend-item"><span class="legend-dot" style="background:${p.color}"></span>${p.label}</div>`).join("")}</div>`;
+}
+
+// ─── LIVE INPUTS (journal) ────────────────────────────────────────────────────
+function bindLiveInputs(){
+  document.querySelectorAll("[data-jfield]").forEach(el=>{
+    el.addEventListener("input",()=>{
+      const ds=el.dataset.jdate,f=el.dataset.jfield;
+      if(!S.journal[ds])S.journal[ds]={opportunities:"",g1:"",g2:"",g3:""};
+      S.journal[ds][f]=el.value;persist();
+    });
+  });
+}
+
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
+function setView(v){S.view=v;S.weekOffset=0;render();}
+function navPrev(){
+  if(S.view==="annual")S.year--;
+  else if(S.view==="month"){if(S.month===0){S.month=11;S.year--;}else S.month--;}
+  else if(S.view==="week")S.weekOffset--;
+  else{const d=new Date(S.year,S.month,S.day-1);S.year=d.getFullYear();S.month=d.getMonth();S.day=d.getDate();}
+  render();
+}
+function navNext(){
+  if(S.view==="annual")S.year++;
+  else if(S.view==="month"){if(S.month===11){S.month=0;S.year++;}else S.month++;}
+  else if(S.view==="week")S.weekOffset++;
+  else{const d=new Date(S.year,S.month,S.day+1);S.year=d.getFullYear();S.month=d.getMonth();S.day=d.getDate();}
+  render();
+}
+function clickDay(d){S.day=d;S.view="day";render();}
+function selWeekDay(dstr){const[y,m,d]=dstr.split("-").map(Number);S.year=y;S.month=m-1;S.day=d;S.view="day";render();}
+
+// ─── TASK MODAL ───────────────────────────────────────────────────────────────
+let _selPrio="ui";
+
+function buildPrioGrid(sel){
+  _selPrio=sel;
+  return PRIORITIES.map((p,i)=>{
+    const act=p.id===sel;
+    return`<button class="prio-btn" onclick="selPrio('${p.id}')" id="pbtn-${p.id}" style="background:${act?p.color:"#F8FAFC"};color:${act?"#fff":"#64748B"};border-color:${act?p.color:"#E2E8F0"}">
+      <span class="prio-dot-sm" style="background:${act?"rgba(255,255,255,.6)":p.color}"></span>${p.label}
+    </button>`;
+  }).join("");
+}
+function selPrio(id){
+  _selPrio=id;
+  document.getElementById("prio-grid").innerHTML=buildPrioGrid(id);
+}
+
+let _selRecur="";
+function buildRecurGrid(sel){
+  _selRecur=sel;
+  return RECUR_OPTS.map(r=>{
+    const act=r.id===sel;
+    return`<button class="recur-btn${act?" active":""}" onclick="selRecur('${r.id}')">${r.label}</button>`;
+  }).join("");
+}
+function selRecur(id){
+  _selRecur=id;
+  document.getElementById("recur-grid").innerHTML=buildRecurGrid(id);
+}
+
+function openTaskModal(task=null){
+  S.editingTask=task;S.formDone=task?task.done:false;_selPrio=task?task.priority:"ui";
+  document.getElementById("task-modal-title").textContent=task?"Editar tarefa":"Nova tarefa";
+  document.getElementById("t-title").value=task?task.title:"";
+  document.getElementById("t-planned-date").value=task?task.plannedDate||"":S.view==="day"?selDS():"";
+  document.getElementById("t-planned-time").value=task?task.plannedTime||"":"";
+  document.getElementById("t-deadline").value=task?task.deadline||"":"";
+  document.getElementById("t-deadline-time").value=task?task.deadlineTime||"":"";
+  document.getElementById("t-notes").value=task?task.notes||"":"";
+  document.getElementById("t-done-date").value=task?task.doneDate||"":"";
+  document.getElementById("t-delegate").value=task?task.delegate||"":"";
+  document.getElementById("recur-grid").innerHTML=buildRecurGrid(task?task.recurrence||"":"");
+  document.getElementById("prio-grid").innerHTML=buildPrioGrid(_selPrio);
+  document.getElementById("done-field").style.display=task?"block":"none";
+  const db=document.getElementById("done-btn");const dd=document.getElementById("t-done-date");
+  db.className="done-btn"+(S.formDone?" done":"");
+  db.textContent=S.formDone?"✓ Concluída":"Marcar como concluída";
+  dd.style.display=S.formDone?"block":"none";
+  document.getElementById("task-modal").style.display="flex";
+}
+
+function openTaskModalUI(ds){
+  openTaskModal(null);
+  _selPrio="ui";
+  document.getElementById("prio-grid").innerHTML=buildPrioGrid("ui");
+  document.getElementById("t-planned-date").value=ds;
+}
+
+function closeTaskModal(){document.getElementById("task-modal").style.display="none";S.editingTask=null;}
+
+function toggleDone(){
+  S.formDone=!S.formDone;
+  const db=document.getElementById("done-btn");const dd=document.getElementById("t-done-date");
+  db.className="done-btn"+(S.formDone?" done":"");
+  db.textContent=S.formDone?"✓ Concluída":"Marcar como concluída";
+  dd.style.display=S.formDone?"block":"none";
+  if(S.formDone&&!dd.value)dd.value=todayISO();
+}
+
+function saveTask(){
+  const title=document.getElementById("t-title").value.trim();
+  if(!title)return;
+  const task={
+    id:S.editingTask?S.editingTask.id:Date.now(),title,priority:_selPrio,
+    plannedDate:document.getElementById("t-planned-date").value,
+    plannedTime:document.getElementById("t-planned-time").value,
+    deadline:document.getElementById("t-deadline").value,
+    deadlineTime:document.getElementById("t-deadline-time").value,
+    month:selMK(),done:S.formDone,
+    doneDate:document.getElementById("t-done-date").value,
+    notes:document.getElementById("t-notes").value.trim(),
+    delegate:document.getElementById("t-delegate").value.trim(),
+    recurrence:_selRecur,
+  };
+  if(S.editingTask){
+    S.tasks=S.tasks.map(t=>t.id===task.id?task:t);
+  } else {
+    S.tasks=[...S.tasks,task];
+    if(task.recurrence)generateRecurrences(task);
+  }
+  persist();closeTaskModal();render();
+}
+
+// ─── RECURRENCE ───────────────────────────────────────────────────────────────
+function addInterval(dateStr,recurrence,n){
+  if(!dateStr)return"";
+  const[y,m,d]=dateStr.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  if(recurrence==="weekly")dt.setDate(dt.getDate()+7*n);
+  else if(recurrence==="monthly")dt.setMonth(dt.getMonth()+n);
+  else if(recurrence==="yearly")dt.setFullYear(dt.getFullYear()+n);
+  return dStr(dt);
+}
+// Generates future occurrences of a recurring task (next 12 occurrences)
+function generateRecurrences(baseTask){
+  const COUNT=12;
+  const newTasks=[];
+  for(let n=1;n<=COUNT;n++){
+    const plannedDate=addInterval(baseTask.plannedDate,baseTask.recurrence,n);
+    const deadline=addInterval(baseTask.deadline,baseTask.recurrence,n);
+    const refDate=plannedDate||deadline;
+    if(!refDate)break;
+    const[ry,rm]=refDate.split("-");
+    newTasks.push({
+      ...baseTask,
+      id:baseTask.id+n,
+      plannedDate,deadline,
+      month:mKey(Number(ry),Number(rm)-1),
+      done:false,doneDate:"",
+      recurrence:baseTask.recurrence,
+      parentId:baseTask.id,
+    });
+  }
+  S.tasks=[...S.tasks,...newTasks];
+}
+
+function editTask(id){const t=S.tasks.find(x=>x.id===id);if(t)openTaskModal(t);}
+function toggleTask(id){S.tasks=S.tasks.map(t=>t.id===id?{...t,done:!t.done,doneDate:!t.done?todayISO():""}:t);persist();render();}
+function deleteTask(id){
+  const t=S.tasks.find(x=>x.id===id);
+  if(!t)return;
+  const isSeries=t.recurrence||t.parentId||S.tasks.some(x=>x.parentId===id);
+  if(isSeries){
+    if(!confirm("Esta tarefa faz parte de uma série recorrente. Excluir apenas esta ocorrência ou toda a série?\n\nOK = toda a série\nCancelar = só esta"))
+      {S.tasks=S.tasks.filter(x=>x.id!==id);persist();render();return;}
+    const rootId=t.parentId||t.id;
+    S.tasks=S.tasks.filter(x=>x.id!==rootId&&x.parentId!==rootId);
+  } else {
+    if(!confirm("Excluir esta tarefa?"))return;
+    S.tasks=S.tasks.filter(x=>x.id!==id);
+  }
+  persist();render();
+}
+
+// ─── PRINCIPLE MODAL ──────────────────────────────────────────────────────────
+let pStep="list",pSelId=null;
+function openPrincModal(){pStep="list";renderPrincModal();document.getElementById("princ-modal").style.display="flex";}
+function closePrincModal(){document.getElementById("princ-modal").style.display="none";}
+function renderPrincModal(){
+  const body=document.getElementById("princ-modal-body");
+  if(pStep==="list"){
+    body.innerHTML=PRINCIPLES.map(p=>`<button class="princ-item" onclick="showPrincDetail(${p.id})">
+      <span class="princ-emoji">${p.icon}</span>
+      <div style="flex:1;min-width:0"><div class="princ-name">${p.name}</div><div class="princ-summary">${p.summary}</div></div>
+      <span class="princ-arrow">›</span>
+    </button>`).join("");
+  } else {
+    const p=getPrinc(pSelId);
+    body.innerHTML=`<button onclick="pStep='list';renderPrincModal()" style="font-size:13px;color:#64748B;margin-bottom:16px;display:flex;align-items:center;gap:4px;font-weight:600">‹ Voltar</button>
+      <div style="font-size:26px;margin-bottom:6px">${p.icon}</div>
+      <div style="font-size:17px;font-weight:800;color:#1E293B;margin-bottom:14px">${p.name}</div>
+      <div class="princ-text">${p.text.replace(/\n/g,"<br>")}</div>
+      <button class="save-btn" onclick="choosePrinc(${p.id})">Escolher para hoje</button>`;
+  }
+}
+function showPrincDetail(id){pSelId=id;pStep="detail";renderPrincModal();}
+function choosePrinc(id){S.princDay[selDS()]=id;persist();closePrincModal();render();}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
+async function enableNotif(){
+  try{
+    if(!("Notification"in window))return alert("Notificações não suportadas neste navegador.");
+    const r=await Notification.requestPermission();
+    if(r==="granted"){S.notifOk=true;scheduleReview();render();}
+  }catch{alert("Notificações não disponíveis (modo offline/arquivo local).");}
+}
+function scheduleReview(){
+  if(!S.notifOk)return;
+  try{
+    setInterval(()=>{
+      try{
+        const n=new Date();
+        if(n.getHours()===15&&n.getMinutes()===0)new Notification("📋 Revisão do Dia",{body:"Hora de revisar suas tarefas e reflexões.",tag:"revisao"});
+      }catch{}
+    },60000);
+  }catch{}
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+try{
+  loadState();
+  if(S.notifOk)scheduleReview();
+  render();
+}catch(err){
+  try{render();}catch{}
+  console.error("Erro ao iniciar a agenda:",err);
+}
+</script>
+</body>
+</html>

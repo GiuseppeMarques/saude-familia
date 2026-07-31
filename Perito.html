@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="App do Perito">
+<meta name="theme-color" content="#1e3a5f">
+<title>App do Perito</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+body{margin:0;padding:0;font-family:Arial,sans-serif;background:#f5f5f0;color:#1a1a1a;font-size:15px;}
+.page{display:none;max-width:600px;margin:0 auto;padding:16px 16px 100px;}
+.page.ativo{display:block;}
+h1{font-size:22px;color:#1e3a5f;margin:0 0 4px;}
+h2{font-size:14px;color:#555;margin:0 0 16px;font-weight:normal;}
+h3{font-size:15px;color:#1e3a5f;margin:12px 0 8px;}
+.card{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+label{display:block;font-size:12px;font-weight:600;color:#666;margin-bottom:4px;}
+input,select,textarea{width:100%;border:1px solid #ccc;border-radius:8px;padding:10px 12px;font-size:14px;background:#fff;margin-bottom:12px;font-family:Arial,sans-serif;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#1e3a5f;box-shadow:0 0 0 2px rgba(30,58,95,.15);}
+textarea{resize:vertical;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-primary{background:#1e3a5f;color:#fff;}
+.btn-red{background:#9b1c1c;color:#fff;}
+.btn-dark{background:#222;color:#fff;}
+.btn-outline{background:#fff;color:#555;border:1px solid #ccc;}
+.btn-green{background:#16a34a;color:#fff;}
+.btn-amber{background:#b45309;color:#fff;}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:6px;}
+.btn-full{width:100%;}
+.btn-danger{background:#dc2626;color:#fff;}
+.fixed-bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e0e0d8;padding:12px 16px;display:flex;gap:8px;z-index:100;}
+.fixed-bottom .btn{flex:1;}
+.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+.laudo-item{background:#fff;border:1px solid #e0e0d8;border-radius:12px;padding:14px;margin-bottom:10px;}
+.laudo-item .nome{font-weight:700;font-size:15px;}
+.laudo-item .sub{font-size:12px;color:#777;margin-top:2px;}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;}
+.badge-ok{background:#dcfce7;color:#15803d;}
+.badge-indet{background:#fef3c7;color:#b45309;}
+.badge-and{background:#f1f5f9;color:#475569;}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;}
+.tab{white-space:nowrap;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#e5e5e0;color:#555;}
+.tab.ativo{background:#1e3a5f;color:#fff;}
+.tab-content{display:none;}
+.tab-content.ativo{display:block;}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.chip.ativo{background:#1e3a5f;color:#fff;border-color:#1e3a5f;}
+.foto-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid #ccc;border-radius:8px;margin-bottom:8px;cursor:pointer;background:#fff;}
+.foto-item.feita{background:#f0fdf4;border-color:#16a34a;color:#15803d;}
+.section-title{font-size:13px;font-weight:700;color:#1e3a5f;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #e0e8f0;}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 12px;font-size:12px;color:#1e40af;margin-bottom:10px;}
+.info-box.amber{background:#fffbeb;border-color:#fcd34d;color:#92400e;}
+.judgment-btns{display:flex;gap:8px;margin-bottom:10px;}
+.judgment-btns .btn{flex:1;font-size:12px;padding:9px 6px;}
+.jbox-a{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-bottom:8px;}
+.jbox-b{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px;margin-bottom:8px;}
+.jbox-a textarea,.jbox-b textarea{border:none;background:transparent;padding:0;margin:0;}
+.sistema-row{border:1px solid #e0e0d8;border-radius:8px;margin-bottom:6px;overflow:hidden;}
+.sistema-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;background:#fff;}
+.sistema-header:active{background:#f5f5f0;}
+.sistema-body{padding:12px;border-top:1px solid #e0e0d8;background:#fafaf8;}
+.sim-nao{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0ec;}
+.sim-nao:last-child{border-bottom:none;}
+.sim-nao span{font-size:13px;color:#444;}
+.sim-nao .btns{display:flex;gap:6px;}
+.sn-btn{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid #ccc;background:#fff;color:#555;cursor:pointer;}
+.sn-sim.ativo{background:#16a34a;color:#fff;border-color:#16a34a;}
+.sn-nao.ativo{background:#dc2626;color:#fff;border-color:#dc2626;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.dot-green{background:#16a34a;}
+.dot-red{background:#dc2626;}
+.dot-gray{background:#ccc;}
+.vitima-card{border:1px solid #e0e0d8;border-radius:8px;padding:12px;margin-bottom:10px;}
+.vitima-card h4{font-size:13px;font-weight:700;color:#666;margin:0 0 8px;}
+.lesao-tag{display:inline-flex;align-items:center;gap:4px;background:#fee2e2;color:#9b1c1c;border:1px solid #fca5a5;border-radius:20px;padding:3px 10px;font-size:12px;margin:2px;}
+.lesao-tag button{background:none;border:none;cursor:pointer;font-weight:700;color:#9b1c1c;padding:0;font-size:14px;line-height:1;}
+.confirm-del{background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:12px;margin-top:8px;}
+.txt-preview{background:#fff;border:1px solid #e0e0d8;border-radius:8px;padding:14px;white-space:pre-wrap;font-size:13px;line-height:1.6;color:#333;}
+.empty-state{text-align:center;padding:48px 16px;color:#999;font-size:14px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:16px;}
+.modal-overlay.ativo{display:flex;}
+.modal{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px;}
+.modal h3{margin:0 0 16px;}
+.gps-info{font-size:12px;color:#555;margin-top:4px;margin-bottom:10px;}
+.agente-group{margin-bottom:4px;}
+.agente-group summary{font-size:12px;font-weight:700;color:#555;padding:4px 0;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- LISTA -->
+<div id="pg-lista" class="page ativo">
+  <div class="header">
+    <div><h1>App do Perito</h1><h2>Laudo Pericial de Incêndio</h2></div>
+    <button class="btn btn-primary" onclick="abrirModalNovo()">+ Novo</button>
+  </div>
+  <div style="margin-bottom:12px;">
+    <input type="file" id="file-importar" accept=".json" style="display:none" onchange="importarArquivo(this)">
+    <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-importar').click()">⬇ Importar do Chefe de Socorro</button>
+  </div>
+  <div id="lista-laudos"></div>
+</div>
+
+<!-- EDITOR -->
+<div id="pg-editor" class="page">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <button class="btn btn-outline btn-sm" onclick="voltarLista()">← Voltar</button>
+    <div style="flex:1;min-width:0;">
+      <div id="ed-titulo" style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      <div id="ed-subtitulo" style="font-size:12px;color:#777;"></div>
+    </div>
+    <div id="ed-badge"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab ativo" onclick="mudarTab('p1')">1. Identificação</button>
+    <button class="tab" onclick="mudarTab('p2')">2. F. Passiva</button>
+    <button class="tab" onclick="mudarTab('p3')">3. F. Ativa</button>
+    <button class="tab" onclick="mudarTab('p4')">4. Investigativa</button>
+    <button class="tab" onclick="mudarTab('p5')">5. Conclusão</button>
+  </div>
+  <div id="tab-p1" class="tab-content ativo"></div>
+  <div id="tab-p2" class="tab-content"></div>
+  <div id="tab-p3" class="tab-content"></div>
+  <div id="tab-p4" class="tab-content"></div>
+  <div id="tab-p5" class="tab-content"></div>
+  <div class="fixed-bottom">
+    <button class="btn btn-dark" onclick="verLaudo()">Ver laudo completo →</button>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div id="pg-preview" class="page">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <button class="btn btn-outline btn-sm" onclick="irEditor()">← Voltar</button>
+    <span style="font-weight:700;">Laudo (texto)</span>
+  </div>
+  <div class="txt-preview" id="txt-laudo"></div>
+  <div class="fixed-bottom">
+    <button class="btn btn-outline" onclick="copiarLaudo()">📋 Copiar</button>
+    <button class="btn btn-red" onclick="baixarLaudo()">⬇ Baixar .txt</button>
+  </div>
+</div>
+
+<!-- MODAL NOVO -->
+<div class="modal-overlay" id="modal-novo">
+  <div class="modal">
+    <h3>Novo laudo</h3>
+    <div id="modal-importado" style="display:none" class="info-box" style="margin-bottom:12px;"></div>
+    <label>Nº do Laudo Pericial *</label>
+    <input id="novo-numero" type="text" placeholder="Ex: 1260/7ºBBM/2019">
+    <label>Nº da Certidão de Ocorrência *</label>
+    <input id="novo-certidao" type="text" placeholder="Ex: 70005926">
+    <label>Apelido (opcional)</label>
+    <input id="novo-apelido" type="text" placeholder="Ex: Confecções Gabriely">
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" style="flex:1;" onclick="criarLaudo()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// DADOS BASE
+// =====================================================================
+var CIDADES_BAIRROS = {
+  "Alfredo Wagner":["Centro","Alto Capivari","Baixo Capivari","Correntes","Tigrinhos","Trombudo","Braço do Tigre","Pontão"],
+  "Angelina":["Centro","Alto Boa Vista","Baixo Bonsucesso","Braço Direito","Braço Esquerdo","Palmeira","Rio dos Frios","Vargem Grande"],
+  "Anitápolis":["Centro","Alto Capivari","Bela Vista","Braço do Norte","Campestre","Morro Pelado","Pinheiros","São Mateus"],
+  "Leoberto Leal":["Centro","Alto Bonito","Arroio Grande","Baixo Bonito","Bonito","Figueiredo","Poço Grande","São Luís"],
+  "Rancho Queimado":["Centro","Bom Retiro","Estreito","Paiol Grande","Pinheiros","Serra do Tabuleiro","Vale do Rio Bonito"]
+};
+var CAUSAS = ["Humana","Humana Direta","Humana Indireta","Natural","Acidental","Indeterminada"];
+var SUBCAUSAS = ["Descarga atmosférica","Raios solares","Choques mecânicos","Falha/mau uso de equipamentos","Chama direta ou fonte de calor","Fenômeno biológico","Fenômeno químico","Outros","Indefinida"];
+var EVENTOS = ["Reações biológicas","Processos fermentativos","Reação química exotérmica","Combustão espontânea","Raio solar direto","Raio solar ampliado","Fenômeno termoelétrico","Operação de equipamentos","Avarias/falhas mecânicas","Superfície aquecida","Brasa","Chama","Fagulha","Centelha","Outros","Indefinido"];
+var AGENTES_GRUPOS = [
+  {g:"Cozinha",i:["Fogão a gás","Fogão elétrico","Forno a gás","Forno elétrico","Microondas","Geladeira","Depurador/Coifa"]},
+  {g:"Climatização",i:["Ventilador","Ar-condicionado","Aquecedor elétrico","Aquecedor a gás","Lareira","Aquecedor de água"]},
+  {g:"Elétrica",i:["Lâmpada","Fiação","Caixa de distribuição","Tomada","Interruptor","Mau dimensionamento"]},
+  {g:"Eletroeletrônicos",i:["Computador","Celular","Televisão","Carregador/Fonte","Roteador"]},
+  {g:"Outros equip.",i:["Ferro de passar roupa","Secador de cabelo","Chuveiro","Motor elétrico","Gerador"]},
+  {g:"Outros",i:["Cigarro","Vela","Fósforo/Isqueiro","Álcool/Gasolina","Crianças","Lixo","Outros","Indeterminado"]}
+];
+var SISTEMAS = ["Preventivo por extintores","Hidrantes e mangotinhos","Saídas de emergência","Iluminação de emergência","Sinalização para abandono","Alarme e detecção","Pára-raio","GLP/GN","Sprinkler","Plano de emergência","Materiais de acabamento","Controle de fumaça","Compartimentação vertical","Compartimentação horizontal","Brigada de incêndio"];
+var ESTRU = ["Concreto armado","Alvenaria estrutural","Madeira","Metálica","Misto"];
+var TETO  = ["Concreto armado","Gesso","Madeira","PVC","Fibrocimento","Telha cerâmica","Misto"];
+var PAREDE= ["Alvenaria","Concreto armado","Madeira","Vidro","PVC","Gesso","Misto"];
+var PISO  = ["Cerâmico/Porcelanato","Cimento queimado","Resina epóxi","Carpete","Madeira","Vinílico/PVC","Outro"];
+var SITUACOES = ["Ileso","Ferido leve","Ferido grave","Óbito"];
+var REGIOES   = ["Cabeça","Tronco","M.S. Direito","M.S. Esquerdo","M.I. Direito","M.I. Esquerdo"];
+var LESOES    = ["Fratura fechada","Fratura exposta","Corte/Laceração","Hematoma","Edema","Queimadura","Escoriação","Outra"];
+var ENTRADA_OPTS = ["Porta principal","Porta dos fundos","Janela","Portão/Cancela","Telhado","Outro"];
+var ESTRATEGIAS = ["Ofensiva","Defensiva","Marginal","Mista"];
+var TEC_CB = ["Ataque direto","Ataque indireto","Ataque combinado","Ataque tridimensional"];
+var FOTOS_OBR = ["Fachada","Quadro de disjuntores / medidor de energia","Medidor ou botijão de gás","Zona de origem","Foco inicial","Sentido de propagação das chamas"];
+
+var TPL = {
+  funcSim:"Os sistemas de segurança contra incêndio instalados encontravam-se em condições de uso e atenderam à finalidade prevista na NSCI, [restringindo a propagação / permitindo o abandono seguro]. Conclui-se que os sistemas funcionaram de maneira adequada.",
+  funcNao:"Os sistemas de segurança exigidos não se encontravam em condições adequadas por [ausência/inoperância/falha de manutenção], evidenciado por [evidência]. Tal condição [contribuiu para o agravamento dos danos].",
+  combateSim:"A atuação da guarnição no combate mostrou-se compatível com as técnicas e táticas previstas. Os procedimentos de rescaldo foram conduzidos com o cuidado necessário à preservação de vestígios na zona de origem.",
+  combateNao:"A atuação no combate apresentou as seguintes falhas: [descrever]. Verificou-se que [conduta] pode ter comprometido vestígios relevantes para a determinação da causa.",
+  zonaOrigSim:"Para determinação da zona de origem foram avaliadas as marcas de combustão, identificando-se que a zona de origem foi [local], pois: (1) [evidência 1]; (2) [evidência 2]. Os elementos colhidos sustentam com segurança esta indicação.",
+  zonaOrigNao:"A análise das marcas de combustão não confirmou [local] como zona de origem, pois [razão]. Os vestígios apontam para [local alternativo] com base em [evidência].",
+  focoSim:"Para delimitação do foco inicial: (1) a análise das marcas de combustão indicou o foco em [objeto/local]; (2) os demais materiais foram descartados por apresentarem queima de fora para dentro, permanecendo [objeto] como responsável pelo início.",
+  focoNao:"A hipótese do foco em [objeto/local] não foi confirmada, pois não evidenciou queima mais intensa em relação aos demais materiais. O objeto foi descartado como foco inicial.",
+  propSim:"O incêndio propagou-se por [condução/convecção/irradiação] a partir de [foco inicial], atingindo [demais objetos/cômodos], favorecido por [fator construtivo]. O padrão observado é compatível com o foco e a zona de origem definidos.",
+  propNao:"O padrão de propagação apresenta características atípicas em relação ao foco inicial considerado, notadamente [inconsistência]. Esta constatação exige reanálise ou exames complementares.",
+  hdAfastado:"A hipótese de ação humana direta foi afastada, pois não foram encontrados indícios de acelerantes, múltiplos focos sem ligação aparente, ou outros sinais típicos de ação incendiária.",
+  hdMantido:"Não foi possível excluir a hipótese de ação humana direta, tendo em vista [indícios de acelerante/múltiplos focos/motivação identificada].",
+  hiAfastado:"A hipótese de ação humana indireta foi afastada, pois não se identificou conduta culposa relacionada ao uso, instalação ou manutenção dos equipamentos na zona de origem.",
+  hiMantido:"Não foi possível excluir a hipótese de ação humana indireta, considerando [conduta culposa identificada], compatível com [negligência/imprudência/imperícia].",
+  natAfastado:"A hipótese de causa natural foi afastada, pois não foram encontrados indícios de fenômenos da natureza (descargas atmosféricas, etc.), conforme [dados meteorológicos/elemento].",
+  natMantido:"Não foi possível excluir a hipótese de causa natural, tendo em vista [registro de descarga atmosférica/condições climáticas compatíveis].",
+  acAfastado:"A hipótese de causa acidental foi afastada, pois foram identificados elementos de conduta humana, descaracterizando a imprevisibilidade exigida para essa classificação.",
+  acMantido:"Não foi possível excluir a hipótese de causa acidental, pois o equipamento apresentava funcionamento normal e não foi possível relacionar o evento a conduta humana ou fenômeno natural."
+};
+
+// =====================================================================
+// ESTADO GLOBAL
+// =====================================================================
+var L = null;
+var tabAtual = 'p1';
+var sistemaAberto = null;
+var confirmandoDel = null;
+var importPacote = null;
+var saveTimer = null;
+
+// =====================================================================
+// ARMAZENAMENTO
+// =====================================================================
+function uid(){ return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
+function salvarIdx(l){ localStorage.setItem('perito-idx',JSON.stringify(l)); }
+function carregarIdx(){ try{ return JSON.parse(localStorage.getItem('perito-idx')||'[]'); }catch(e){ return []; } }
+function salvarL(l){ localStorage.setItem('pl-'+l.id,JSON.stringify(l)); }
+function carregarL(id){ try{ return JSON.parse(localStorage.getItem('pl-'+id)||'null'); }catch(e){ return null; } }
+function excluirL(id){ localStorage.removeItem('pl-'+id); }
+
+function criarLaudoObj(numero,certidao,apelido){
+  var fotos={};
+  FOTOS_OBR.forEach(function(f){ fotos[f]=false; });
+  var sist={};
+  SISTEMAS.forEach(function(s){ sist[s]={exigido:null,existente:null,atende:null,falha:null,falhaDetalhe:'',obs:''}; });
+  return {
+    id:uid(), numero:numero, certidao:certidao, apelido:apelido||'', status:'andamento',
+    numOcorrencia:'',data:'',hora:'',obm:'',
+    peritoNome:'',peritoPosto:'',peritoMat:'',peritoObm:'',
+    inspNome:'',inspPosto:'',inspMat:'',inspObm:'',
+    re:'',protocolo:'',
+    endereco:'',bairro:'',cidade:'',cep:'',
+    gps:{lat:'',lng:'',precisao:''},
+    nomeEdif:'',nomeEmpresa:'',cnpj:'',
+    areaConstruida:'',pavimentos:'',blocos:'',altura:'',ocupacao:'',
+    estrutura:[],teto:[],parede:[],piso:[],
+    propNome:'',propCpf:'',propTel:'',propEmail:'',propEndereco:'',
+    ppci:'',habitese:'',funcionamento:'',pre:'',
+    sistemas:sist, sistObs:'', produtosPerigosos:'',
+    funcAnalise:{op:null,txt:''},
+    sugestoesNorm:'',
+    estrategiaCombate:'',tecnicaCombate:'',dificuldades:'',
+    localEntrada:'',localEntradaOutro:'',forcada:'',forcadaDetalhe:'',
+    analiseCombate:{op:null,txt:''},
+    sugestoesCombate:'',
+    areaTotal:'',areaAtingida:'',percSalvados:'',percPerdas:'',valorSalvados:'',valorPerdas:'',
+    exameInicio:'',exameFim:'',
+    vitimas:{quantidade:'',lista:[]},
+    seguro:'',seguradora:'',segVigencia:'',segBeneficiario:'',
+    zonaOrigem:{op:null,txt:''},
+    focoInicial:{op:null,txt:''},
+    propagacao:{op:null,txt:''},
+    exclusaoHD:{op:null,txt:''},
+    exclusaoHI:{op:null,txt:''},
+    exclusaoNat:{op:null,txt:''},
+    exclusaoAc:{op:null,txt:''},
+    examesComp:'',
+    causa:'',subcausa:'',evento:'',agente:'',
+    fundamentacao:'',
+    sugestoesPreventivas:'',conclusao:'',anexos:'',
+    fotosObr:fotos
+  };
+}
+
+function aplicarImportacao(l,p){
+  if(p.numero) l.numOcorrencia=p.numero;
+  if(p.data) l.data=p.data;
+  if(p.hora) l.hora=p.hora;
+  if(p.municipio) l.cidade=p.municipio;
+  if(p.local) l.endereco=p.local;
+  if(p.bairro) l.bairro=p.bairro;
+  if(p.cep) l.cep=p.cep;
+  if(p.gps&&p.gps.lat) l.gps=p.gps;
+  if(p.construtivas){
+    if(p.construtivas.estrutura) l.estrutura=p.construtivas.estrutura;
+    if(p.construtivas.teto) l.teto=p.construtivas.teto;
+    if(p.construtivas.parede) l.parede=p.construtivas.parede;
+    if(p.construtivas.piso) l.piso=p.construtivas.piso;
+  }
+  if(p.areaAtingidaM2) l.areaAtingida=p.areaAtingidaM2;
+  if(p.estrategiaCombate) l.estrategiaCombate=p.estrategiaCombate;
+  if(p.tecnicaCombate) l.tecnicaCombate=p.tecnicaCombate;
+  if(p.localEntrada) l.localEntrada=p.localEntrada;
+  if(p.aberturaForcada) l.forcada=p.aberturaForcada;
+  if(p.aberturaForcadaDetalhe) l.forcadaDetalhe=p.aberturaForcadaDetalhe;
+  var notas=[];
+  if(p.obs) notas.push('Obs. chefe de socorro: '+p.obs);
+  if(p.dificuldades&&p.dificuldades.length) notas.push('Dificuldades: '+p.dificuldades.join(', '));
+  if(p.apoios&&p.apoios.length) notas.push('Apoios: '+p.apoios.join(', '));
+  if(p.perigos&&p.perigos.length) notas.push('Perigos: '+p.perigos.join(', '));
+  if(notas.length) l.dificuldades=notas.join(' | ');
+  if(p.vitimas&&(p.vitimas.lista||[]).length) l.vitimas=p.vitimas;
+  if(p.fotos){ Object.keys(p.fotos).forEach(function(k){ if(l.fotosObr.hasOwnProperty(k)) l.fotosObr[k]=p.fotos[k]; }); }
+  return l;
+}
+
+// =====================================================================
+// LISTA
+// =====================================================================
+function renderLista(){
+  var lista=carregarIdx();
+  var el=document.getElementById('lista-laudos');
+  if(!lista.length){ el.innerHTML='<div class="empty-state">Nenhum laudo.<br>Crie um novo ou importe do Chefe de Socorro.</div>'; return; }
+  lista.sort(function(a,b){ return b.ts-a.ts; });
+  el.innerHTML=lista.map(function(item){
+    var st=item.status==='determinada'?'<span class="badge badge-ok">✓ Causa determinada</span>':
+           item.status==='indeterminada'?'<span class="badge badge-indet">⚠ Causa indeterminada</span>':
+           '<span class="badge badge-and">Em andamento</span>';
+    var del=confirmandoDel===item.id?
+      '<div class="confirm-del"><p style="font-size:13px;margin:0 0 8px;">Excluir permanentemente?</p>'+
+      '<div style="display:flex;gap:8px;"><button class="btn btn-danger btn-sm" onclick="confirmarDel(\''+item.id+'\')">Excluir</button>'+
+      '<button class="btn btn-outline btn-sm" onclick="cancelarDel()">Cancelar</button></div></div>':'';
+    return '<div class="laudo-item">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+      '<div onclick="abrirLaudo(\''+item.id+'\')" style="flex:1;cursor:pointer;">'+
+      '<div class="nome">Laudo nº '+(item.numero||'—')+'</div>'+
+      '<div class="sub">Certidão nº '+(item.certidao||'—')+'</div>'+
+      (item.apelido?'<div class="sub">'+item.apelido+'</div>':'')+
+      st+
+      '</div>'+
+      '<button class="btn btn-outline btn-sm" onclick="pedirDel(\''+item.id+'\')">🗑</button>'+
+      '</div>'+del+'</div>';
+  }).join('');
+}
+function pedirDel(id){ confirmandoDel=id; renderLista(); }
+function cancelarDel(){ confirmandoDel=null; renderLista(); }
+function confirmarDel(id){ excluirL(id); var l=carregarIdx().filter(function(i){ return i.id!==id; }); salvarIdx(l); confirmandoDel=null; renderLista(); }
+
+function importarArquivo(inp){
+  var f=inp.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var p=JSON.parse(ev.target.result);
+      if(p.__tipo!=='socorro-incendio-v2'){ alert('Arquivo não reconhecido. Use o arquivo gerado pelo App do Chefe de Socorro para ocorrências de incêndio.'); return; }
+      importPacote=p;
+      var box=document.getElementById('modal-importado');
+      box.style.display='block';
+      box.textContent='Dados do Chefe de Socorro prontos: Ocorrência nº '+(p.numero||'—')+', '+( p.municipio||'município não informado');
+      abrirModalNovo();
+    }catch(e){ alert('Erro ao ler o arquivo.'); }
+  };
+  r.readAsText(f); inp.value='';
+}
+
+// =====================================================================
+// MODAL NOVO
+// =====================================================================
+function abrirModalNovo(){
+  document.getElementById('novo-numero').value='';
+  document.getElementById('novo-certidao').value='';
+  document.getElementById('novo-apelido').value='';
+  if(!importPacote){ document.getElementById('modal-importado').style.display='none'; }
+  document.getElementById('modal-novo').classList.add('ativo');
+}
+function fecharModal(){ document.getElementById('modal-novo').classList.remove('ativo'); importPacote=null; document.getElementById('modal-importado').style.display='none'; }
+function criarLaudo(){
+  var n=document.getElementById('novo-numero').value.trim();
+  var c=document.getElementById('novo-certidao').value.trim();
+  if(!n||!c){ alert('Preencha o nº do laudo e o nº da certidão.'); return; }
+  var a=document.getElementById('novo-apelido').value.trim();
+  L=criarLaudoObj(n,c,a);
+  if(importPacote){ L=aplicarImportacao(L,importPacote); importPacote=null; }
+  salvarL(L);
+  var lista=carregarIdx();
+  lista.push({id:L.id,numero:L.numero,certidao:L.certidao,apelido:L.apelido,status:L.status,ts:Date.now()});
+  salvarIdx(lista); fecharModal(); abrirEditor();
+}
+
+// =====================================================================
+// EDITOR
+// =====================================================================
+function abrirLaudo(id){ L=carregarL(id); if(!L) return; abrirEditor(); }
+function abrirEditor(){
+  document.getElementById('ed-titulo').textContent='Laudo nº '+(L.numero||'—');
+  document.getElementById('ed-subtitulo').textContent='Certidão nº '+(L.certidao||'—');
+  atualizarBadge();
+  mudarPagina('editor'); mudarTab('p1');
+}
+function atualizarBadge(){
+  var b=document.getElementById('ed-badge');
+  if(L.status==='determinada') b.innerHTML='<span class="badge badge-ok">✓</span>';
+  else if(L.status==='indeterminada') b.innerHTML='<span class="badge badge-indet">⚠</span>';
+  else b.innerHTML='';
+}
+function voltarLista(){ salvarAtual(); renderLista(); mudarPagina('lista'); }
+function mudarPagina(pg){ document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('ativo'); }); document.getElementById('pg-'+pg).classList.add('ativo'); }
+function mudarTab(tab){
+  tabAtual=tab; sistemaAberto=null;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('ativo'); });
+  event&&event.target&&event.target.classList.add('ativo');
+  document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('ativo'); });
+  document.getElementById('tab-'+tab).classList.add('ativo');
+  renderTab(tab);
+}
+function renderTab(tab){ var el=document.getElementById('tab-'+tab); el.innerHTML=htmlTab(tab); }
+
+// =====================================================================
+// HELPERS
+// =====================================================================
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function nz(v){ return String(v||'').trim()||'[não informado]'; }
+function fi(label,field,type,ph){ type=type||'text'; ph=ph||''; var v=L[field]||''; return '<label>'+label+'</label><input type="'+type+'" value="'+esc(v)+'" placeholder="'+ph+'" oninput="L[\''+field+'\']=this.value" onchange="autoSalvar()">'; }
+function fta(label,field,rows){ return '<label>'+label+'</label><textarea rows="'+(rows||2)+'" oninput="L[\''+field+'\']=this.value" onchange="autoSalvar()">'+esc(L[field]||'')+'</textarea>'; }
+function fs(label,field,opts){ var v=L[field]||''; return '<label>'+label+'</label><select onchange="L[\''+field+'\']=this.value;autoSalvar()"><option value=""></option>'+opts.map(function(o){ return '<option'+(v===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'; }
+function fsGrupos(label,field,grupos){ var v=L[field]||''; return '<label>'+label+'</label><select onchange="L[\''+field+'\']=this.value;autoSalvar()"><option value=""></option>'+grupos.map(function(g){ return '<optgroup label="'+esc(g.g)+'">'+g.i.map(function(o){ return '<option'+(v===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</optgroup>'; }).join('')+'</select>'; }
+function multiCheck(label,field,opts){ var sel=L[field]||[]; return '<label>'+label+'</label><div class="chip-group">'+opts.map(function(o){ return '<button type="button" class="chip'+(sel.indexOf(o)>=0?' ativo':'')+'" onclick="toggleArr(\''+field+'\',\''+esc(o)+'\')">'+o+'</button>'; }).join('')+'</div>'; }
+function toggleArr(field,val){ var a=L[field]||[]; if(!Array.isArray(a)) a=[]; var i=a.indexOf(val); if(i>=0) a.splice(i,1); else a.push(val); L[field]=a; autoSalvar(); renderTab(tabAtual); }
+
+var saveTimer2=null;
+function autoSalvar(){ clearTimeout(saveTimer2); saveTimer2=setTimeout(function(){ salvarAtual(); },700); }
+function salvarAtual(){
+  if(!L) return;
+  salvarL(L);
+  var lista=carregarIdx();
+  for(var i=0;i<lista.length;i++){
+    if(lista[i].id===L.id){ lista[i].status=L.status; lista[i].ts=Date.now(); break; }
+  }
+  salvarIdx(lista);
+}
+
+// =====================================================================
+// TABS HTML
+// =====================================================================
+function htmlTab(tab){
+  switch(tab){
+    case 'p1': return htmlP1();
+    case 'p2': return htmlP2();
+    case 'p3': return htmlP3();
+    case 'p4': return htmlP4();
+    case 'p5': return htmlP5();
+    default: return '';
+  }
+}
+
+function htmlP1(){
+  var bairros=CIDADES_BAIRROS[L.cidade||'']||[];
+  var bairroHtml=bairros.length?
+    '<label>Bairro</label><select onchange="L.bairro=this.value;autoSalvar()"><option value=""></option>'+bairros.map(function(b){ return '<option'+(L.bairro===b?' selected':'')+'>'+b+'</option>'; }).join('')+'</select>':
+    '<label>Bairro</label><input value="'+esc(L.bairro||'')+'" oninput="L.bairro=this.value" onchange="autoSalvar()">';
+  var gpsInfo='';
+  return '<div class="card"><div class="section-title">Dados gerais</div>'+
+    '<div class="row2">'+fi('Nº do Laudo','numero')+fi('Nº da Certidão','certidao')+'</div>'+
+    '<div class="row2">'+fi('Nº Ocorrência','numOcorrencia')+fi('OBM','obm')+'</div>'+
+    '<div class="row2">'+fi('Data','data','date')+fi('Hora','hora','time')+'</div>'+
+    '</div>'+
+    '<div class="card"><div class="section-title">Responsáveis</div>'+
+    '<p style="font-size:12px;font-weight:700;color:#888;margin:0 0 6px;">Perito</p>'+
+    '<div class="row2">'+fi('Nome','peritoNome')+fi('Posto','peritoPosto')+'</div>'+
+    '<div class="row2">'+fi('Matrícula','peritoMat')+fi('OBM','peritoObm')+'</div>'+
+    '<p style="font-size:12px;font-weight:700;color:#888;margin:8px 0 6px;">Inspetor</p>'+
+    '<div class="row2">'+fi('Nome','inspNome')+fi('Posto','inspPosto')+'</div>'+
+    '<div class="row2">'+fi('Matrícula','inspMat')+fi('OBM','inspObm')+'</div>'+
+    '</div>'+
+    '<div class="card"><div class="section-title">Imóvel</div>'+
+    '<div class="row2">'+fi('RE','re')+fi('Protocolo','protocolo')+'</div>'+
+    fi('Endereço','endereco')+
+    '<label>Cidade</label><input value="'+esc(L.cidade||'')+'" oninput="L.cidade=this.value;autoSalvar();renderTab(\'p1\')" onchange="autoSalvar()">'+
+    bairroHtml+
+    fi('CEP','cep')+
+    '<label>GPS</label><button id="btn-gps" class="btn btn-outline btn-sm" onclick="capGps()" style="margin-bottom:6px;">📍 Capturar localização</button>'+
+    '<div id="gps-status" style="font-size:12px;color:#555;margin-bottom:10px;">'+(L.gps&&L.gps.lat?'✅ '+L.gps.lat+', '+L.gps.lng+' (precisão: '+L.gps.precisao+')':(L.gpsErro||''))+'</div>'+
+    fi('Nome da edificação','nomeEdif')+fi('Empresa/Estabelecimento','nomeEmpresa')+fi('CNPJ','cnpj')+
+    '</div>'+
+    '<div class="card"><div class="section-title">Características construtivas</div>'+
+    '<div class="info-box">Selecione todos os materiais que se aplicam.</div>'+
+    '<div class="row2">'+fi('Área construída','areaConstruida')+fi('Altura','altura')+'</div>'+
+    '<div class="row2">'+fi('Pavimentos','pavimentos')+fi('Blocos','blocos')+'</div>'+
+    fi('Ocupação','ocupacao')+
+    multiCheck('Estrutura','estrutura',ESTRU)+
+    multiCheck('Teto','teto',TETO)+
+    multiCheck('Parede','parede',PAREDE)+
+    multiCheck('Piso','piso',PISO)+
+    '</div>'+
+    '<div class="card"><div class="section-title">Proprietário</div>'+
+    fi('Nome','propNome')+'<div class="row2">'+fi('CPF/RG','propCpf')+fi('Telefone','propTel')+'</div>'+
+    fi('E-mail','propEmail')+fi('Endereço','propEndereco')+
+    '</div>';
+}
+
+function capGps(){
+  var btn = document.getElementById('btn-gps');
+  var status = document.getElementById('gps-status');
+  if(!navigator.geolocation){
+    if(status) status.innerHTML = '❌ GPS não disponível neste dispositivo ou navegador.';
+    return;
+  }
+  if(btn){ btn.textContent = '⏳ Obtendo localização...'; btn.disabled = true; }
+  if(status) status.innerHTML = '<span style="color:#888;">Aguarde, capturando GPS...</span>';
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      L.gps = {
+        lat: pos.coords.latitude.toFixed(6),
+        lng: pos.coords.longitude.toFixed(6),
+        precisao: Math.round(pos.coords.accuracy)+'m'
+      };
+      L.gpsErro = '';
+      autoSalvar();
+      if(btn){ btn.textContent = '✅ Localização capturada'; btn.disabled = false; }
+      if(status) status.innerHTML = '✅ Lat: '+L.gps.lat+' | Lng: '+L.gps.lng+' | Precisão: '+L.gps.precisao;
+    },
+    function(e){
+      var msg = e.code === 1 ? 'Permissão negada. Habilite o GPS nas configurações do navegador.' :
+                e.code === 2 ? 'Posição indisponível. Verifique se o GPS está ativo.' :
+                e.code === 3 ? 'Tempo esgotado. Tente em local aberto.' : 'Erro: '+e.message;
+      L.gpsErro = '❌ '+msg;
+      autoSalvar();
+      if(btn){ btn.textContent = '📍 Tentar novamente'; btn.disabled = false; }
+      if(status) status.innerHTML = '<span style="color:#dc2626;">❌ '+msg+'</span>';
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function htmlP2(){
+  var sistHtml = SISTEMAS.map(function(nm){
+    var v=L.sistemas[nm]||{exigido:null,existente:null,atende:null,falha:null,falhaDetalhe:'',obs:''};
+    var aberto=sistemaAberto===nm;
+    var cor=v.exigido===false?'dot-gray':v.exigido===true&&v.falha===true?'dot-red':v.exigido===true&&v.falha===false?'dot-green':'';
+    var dotHtml=v.exigido!==null&&cor?'<span class="dot '+cor+'"></span>':'';
+    var bodyHtml='';
+    if(aberto){
+      bodyHtml='<div class="sistema-body">'+
+        simNaoHtml(nm,'exigido','Exigido pela NSCI/PPCI')+
+        (v.exigido===true?
+          simNaoHtml(nm,'existente','Existente')+
+          simNaoHtml(nm,'atende','Atende à NSCI')+
+          simNaoHtml(nm,'falha','Falha na operação/manutenção')+
+          (v.falha===true?'<label>Detalhar a falha</label><input value="'+esc(v.falhaDetalhe||'')+'" oninput="L.sistemas[\''+esc(nm)+'\'].falhaDetalhe=this.value" onchange="autoSalvar()">':'')
+          :'')+
+        (v.exigido===false?'<p style="font-size:12px;color:#999;font-style:italic;">Não exigido — sem avaliação necessária.</p>':'')+
+        '<label>Observações</label><textarea rows="1" oninput="L.sistemas[\''+esc(nm)+'\'].obs=this.value" onchange="autoSalvar()">'+esc(v.obs||'')+'</textarea>'+
+        '</div>';
+    }
+    return '<div class="sistema-row">'+
+      '<div class="sistema-header" onclick="toggleSistema(\''+esc(nm)+'\')">'+
+      '<span>'+dotHtml+nm+'</span><span>'+(aberto?'▲':'▼')+'</span>'+
+      '</div>'+bodyHtml+'</div>';
+  }).join('');
+
+  return '<div class="card"><div class="section-title">6.1 Situação da edificação</div>'+
+    '<div class="row2">'+fi('PPCI','ppci','text','Deferido/Indeferido')+fi('Habite-se','habitese')+'</div>'+
+    '<div class="row2">'+fi('Funcionamento','funcionamento')+fi('PRE','pre')+'</div>'+
+    '</div>'+
+    '<div class="card"><div class="section-title">6.2 Sistemas preventivos</div>'+
+    '<div class="info-box">Toque no sistema para avaliar.</div>'+
+    sistHtml+
+    fta('Obs. gerais dos sistemas','sistObs',2)+
+    '</div>'+
+    '<div class="card">'+fta('6.3/6.4 Produtos perigosos e GLP','produtosPerigosos',2)+'</div>'+
+    judgmentHtml('Considerações – Funcionamento dos sistemas','funcAnalise','Funcionaram bem','Apresentaram falhas','funcSim','funcNao')+
+    '<div class="card">'+fta('Sugestões normativas','sugestoesNorm',2)+'</div>';
+}
+
+function toggleSistema(nm){ sistemaAberto=sistemaAberto===nm?null:nm; renderTab('p2'); }
+
+function simNaoHtml(sist,campo,label){
+  var v=L.sistemas[sist]||{};
+  var val=v[campo];
+  return '<div class="sim-nao"><span>'+label+'</span><div class="btns">'+
+    '<button class="sn-btn sn-sim'+(val===true?' ativo':'')+'" onclick="setSistCampo(\''+esc(sist)+'\',\''+campo+'\',true)">Sim</button>'+
+    '<button class="sn-btn sn-nao'+(val===false?' ativo':'')+'" onclick="setSistCampo(\''+esc(sist)+'\',\''+campo+'\',false)">Não</button>'+
+    '</div></div>';
+}
+function setSistCampo(sist,campo,val){
+  if(!L.sistemas[sist]) L.sistemas[sist]={exigido:null,existente:null,atende:null,falha:null,falhaDetalhe:'',obs:''};
+  var cur=L.sistemas[sist][campo];
+  L.sistemas[sist][campo]=(cur===val?null:val);
+  autoSalvar(); renderTab('p2');
+}
+
+function htmlP3(){
+  var le=L.localEntrada||''; var lf=L.forcada||'';
+  return '<div class="card"><div class="section-title">Dados do combate</div>'+
+    '<label>Estratégia</label><select onchange="L.estrategiaCombate=this.value;autoSalvar()"><option></option>'+
+    ['Ofensiva','Defensiva','Marginal','Mista'].map(function(o){ return '<option'+(L.estrategiaCombate===o?' selected':'')+'>'+o+'</option>'; }).join('')+
+    '</select>'+
+    '<label>Técnica</label><select onchange="L.tecnicaCombate=this.value;autoSalvar()"><option></option>'+
+    ['Ataque direto','Ataque indireto','Ataque combinado','Ataque tridimensional'].map(function(o){ return '<option'+(L.tecnicaCombate===o?' selected':'')+'>'+o+'</option>'; }).join('')+
+    '</select>'+
+    fta('Dificuldades encontradas','dificuldades',2)+
+    '</div>'+
+    '<div class="card"><div class="section-title">Entrada da guarnição</div>'+
+    '<div class="info-box amber">A doutrina orienta documentar as marcas de entrada forçada como vestígio relevante.</div>'+
+    '<label>Local de entrada</label><select onchange="L.localEntrada=this.value;autoSalvar();renderTab(\'p3\')"><option></option>'+
+    ENTRADA_OPTS.map(function(o){ return '<option'+(le===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+
+    (le==='Outro'?fi('Especificar','localEntradaOutro'):'')+
+    '<label>Abertura forçada?</label><select onchange="L.forcada=this.value;autoSalvar();renderTab(\'p3\')"><option></option><option'+(lf==='Sim'?' selected':'')+'>Sim</option><option'+(lf==='Não'?' selected':'')+'>Não</option></select>'+
+    (lf==='Sim'?fi('Detalhar','forcadaDetalhe','text','Ex: fechadura forçada, vidro quebrado...'):'')+
+    '</div>'+
+    judgmentHtml('Considerações – Análise do combate','analiseCombate','Combate eficiente','Apresentou falhas','combateSim','combateNao')+
+    '<div class="card">'+fta('Sugestões','sugestoesCombate',2)+'</div>';
+}
+
+function htmlP4(){
+  var vits=L.vitimas.lista||[];
+  var vHtml=vits.map(function(v,i){ return htmlVitimaCard(i,v); }).join('');
+  var hdv=L.exclusaoHD||{op:null,txt:''};
+  var hiv=L.exclusaoHI||{op:null,txt:''};
+  var natv=L.exclusaoNat||{op:null,txt:''};
+  var acv=L.exclusaoAc||{op:null,txt:''};
+  function excl(titulo,campo,tplA,tplB,lA,lB){
+    var v=L[campo]||{op:null,txt:''};
+    return '<div style="border:1px solid #e0e0d8;border-radius:8px;padding:12px;margin-bottom:10px;">'+
+      '<p style="font-size:14px;font-weight:600;margin:0 0 8px;">'+titulo+'</p>'+
+      '<div class="judgment-btns">'+
+      '<button class="btn btn-sm '+(v.op==='A'?'btn-green':'btn-outline')+'" onclick="pickJ(\''+campo+'\',\'A\',\''+tplA+'\')">'+lA+'</button>'+
+      '<button class="btn btn-sm '+(v.op==='B'?'btn-amber':'btn-outline')+'" onclick="pickJ(\''+campo+'\',\'B\',\''+tplB+'\')">'+lB+'</button>'+
+      '</div>'+
+      (v.op?'<div class="'+(v.op==='A'?'jbox-a':'jbox-b')+'"><textarea rows="3" oninput="L[\''+campo+'\'].txt=this.value" onchange="autoSalvar()">'+esc(v.txt||'')+'</textarea></div>':'')+
+      '</div>';
+  }
+
+  return '<div class="card"><div class="section-title">7. Extensão dos danos</div>'+
+    '<div class="row2">'+fi('Área total','areaTotal')+fi('Área atingida','areaAtingida')+'</div>'+
+    '<div class="row2">'+fi('% Salvados','percSalvados')+fi('% Perdas','percPerdas')+'</div>'+
+    '<div class="row2">'+fi('Valor salvados','valorSalvados')+fi('Valor perdas','valorPerdas')+'</div>'+
+    '<div class="row2">'+fi('Início exames','exameInicio','date')+fi('Término','exameFim','date')+'</div>'+
+    '<label>Nº de vítimas</label>'+
+    '<input type="number" value="'+esc(L.vitimas.quantidade||'')+'" placeholder="0" oninput="setQtVit(this.value)" onchange="autoSalvar()">'+
+    vHtml+
+    '</div>'+
+    '<div class="card"><div class="section-title">Seguro incêndio</div>'+
+    '<div class="row2">'+fi('Possui seguro?','seguro')+fi('Seguradora','seguradora')+'</div>'+
+    '<div class="row2">'+fi('Vigência','segVigencia')+fi('Beneficiário','segBeneficiario')+'</div>'+
+    '</div>'+
+    judgmentHtml('9.1 Zona de origem','zonaOrigem','Confirmo a zona','Não confirmo / indico outra','zonaOrigSim','zonaOrigNao')+
+    judgmentHtml('9.2 Foco inicial','focoInicial','Confirmo o foco','Não confirmo / descarto','focoSim','focoNao')+
+    judgmentHtml('9.3 Surgimento e propagação','propagacao','Padrão compatível','Padrão atípico','propSim','propNao')+
+    '<div class="card"><div class="section-title">9.4 Exclusão de possibilidades</div>'+
+    '<div class="info-box amber">Cada hipótese deve ser afastada com base em vestígios concretos antes de fixar a causa.</div>'+
+    excl('Ação humana direta (incendiária)','exclusaoHD','hdAfastado','hdMantido','Excluída','Não excluída')+
+    excl('Ação humana indireta (culposa)','exclusaoHI','hiAfastado','hiMantido','Excluída','Não excluída')+
+    excl('Causa natural','exclusaoNat','natAfastado','natMantido','Excluída','Não excluída')+
+    excl('Causa acidental','exclusaoAc','acAfastado','acMantido','Excluída','Não excluída')+
+    '</div>'+
+    '<div class="card">'+fta('9.5 Exames complementares','examesComp',2)+'</div>'+
+    '<div class="card"><div class="section-title">9.6 Causa, subcausa, evento e agente causal</div>'+
+    '<div class="info-box">A fundamentação e conclusão são geradas ao selecionar a causa.</div>'+
+    '<label>Causa</label><select onchange="setCausa(this.value)"><option value=""></option>'+
+    CAUSAS.map(function(c){ return '<option'+(L.causa===c?' selected':'')+'>'+c+'</option>'; }).join('')+'</select>'+
+    (L.causa&&L.causa!=='Indeterminada'?
+      '<label>Subcausa</label><select onchange="L.subcausa=this.value;regenerarTextos();autoSalvar()"><option></option>'+SUBCAUSAS.map(function(o){ return '<option'+(L.subcausa===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+
+      '<label>Evento causal</label><select onchange="L.evento=this.value;regenerarTextos();autoSalvar()"><option></option>'+EVENTOS.map(function(o){ return '<option'+(L.evento===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+
+      '<label>Agente causal</label><select onchange="L.agente=this.value;regenerarTextos();autoSalvar()"><option></option>'+AGENTES_GRUPOS.map(function(g){ return '<optgroup label="'+esc(g.g)+'">'+g.i.map(function(o){ return '<option'+(L.agente===o?' selected':'')+'>'+o+'</option>'; }).join('')+'</optgroup>'; }).join('')+'</select>'
+      :'')+
+    (L.causa?
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;margin-bottom:4px;">'+
+      '<label style="margin:0;">Fundamentação (item 9.6) — editável</label>'+
+      '<button class="btn btn-outline btn-sm" onclick="regenerarTextos();renderTab(\'p4\')" style="font-size:11px;padding:4px 10px;">↻ Regenerar</button>'+
+      '</div>'+
+      '<div class="info-box" style="margin-bottom:8px;">Edite os trechos entre [colchetes]. Ao mudar causa/subcausa/evento/agente, o texto é atualizado automaticamente.</div>'+
+      '<textarea rows="6" oninput="L.fundamentacao=this.value" onchange="autoSalvar()">'+esc(L.fundamentacao||'')+'</textarea>':'')+
+    '</div>';
+}
+
+function setQtVit(v){
+  var n=parseInt(v,10)||0;
+  var arr=L.vitimas.lista||[];
+  while(arr.length<n) arr.push({nome:'',idade:'',situacao:'',lesoes:[],conduzida:'',destino:'',obs:''});
+  arr.length=Math.max(0,n);
+  L.vitimas={quantidade:v,lista:arr};
+  autoSalvar(); renderTab('p4');
+}
+
+function htmlVitimaCard(i,v){
+  var lesTags=(v.lesoes||[]).map(function(l,li){
+    return '<span class="lesao-tag">'+l.regiao+' – '+l.tipo+'<button onclick="delLesao('+i+','+li+')">×</button></span>';
+  }).join('');
+  return '<div class="vitima-card"><h4>Vítima '+(i+1)+'</h4>'+
+    '<div class="row2">'+
+    '<div><label>Nome</label><input value="'+esc(v.nome||'')+'" oninput="L.vitimas.lista['+i+'].nome=this.value" onchange="autoSalvar()"></div>'+
+    '<div><label>Idade</label><input type="number" value="'+esc(v.idade||'')+'" oninput="L.vitimas.lista['+i+'].idade=this.value" onchange="autoSalvar()"></div>'+
+    '</div>'+
+    '<label>Situação</label><select onchange="L.vitimas.lista['+i+'].situacao=this.value;autoSalvar()"><option></option>'+
+    SITUACOES.map(function(s){ return '<option'+(v.situacao===s?' selected':'')+'>'+s+'</option>'; }).join('')+'</select>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">'+
+    '<select id="pr'+i+'" style="flex:1;margin-bottom:0;"><option value="">Região...</option>'+REGIOES.map(function(r){ return '<option>'+r+'</option>'; }).join('')+'</select>'+
+    '<select id="pl'+i+'" style="flex:1;margin-bottom:0;"><option value="">Tipo...</option>'+LESOES.map(function(l){ return '<option>'+l+'</option>'; }).join('')+'</select>'+
+    '<button class="btn btn-red btn-sm" onclick="addLesaoP('+i+')">+</button>'+
+    '</div>'+
+    (lesTags?'<div style="margin-bottom:8px;">'+lesTags+'</div>':'')+
+    '<div class="row2">'+
+    '<div><label>Conduzida?</label><select onchange="L.vitimas.lista['+i+'].conduzida=this.value;autoSalvar();renderTab(\'p4\')"><option></option><option'+(v.conduzida==='Sim'?' selected':'')+'>Sim</option><option'+(v.conduzida==='Não'?' selected':'')+'>Não</option></select></div>'+
+    (v.conduzida==='Sim'?'<div><label>Destino</label><input value="'+esc(v.destino||'')+'" oninput="L.vitimas.lista['+i+'].destino=this.value" onchange="autoSalvar()"></div>':'<div></div>')+
+    '</div>'+
+    '</div>';
+}
+function addLesaoP(i){ var r=document.getElementById('pr'+i); var pl=document.getElementById('pl'+i); if(!r||!pl||!r.value||!pl.value){alert('Selecione região e tipo.');return;} L.vitimas.lista[i].lesoes=L.vitimas.lista[i].lesoes||[]; L.vitimas.lista[i].lesoes.push({regiao:r.value,tipo:pl.value}); autoSalvar(); renderTab('p4'); }
+function delLesao(i,li){ L.vitimas.lista[i].lesoes.splice(li,1); autoSalvar(); renderTab('p4'); }
+
+function setCausa(v){
+  L.causa=v;
+  L.fundamentacao=gerarFund();
+  L.conclusao=gerarConcl();
+  L.status=v==='Indeterminada'?'indeterminada':(v?'determinada':'andamento');
+  autoSalvar(); atualizarBadge(); renderTab('p4');
+}
+
+function regenerarTextos(){
+  L.fundamentacao=gerarFund();
+  L.conclusao=gerarConcl();
+  // Atualiza os campos de texto na tela sem re-renderizar tudo
+  var elFund = document.querySelector('#tab-p4 textarea[onchange*="fundamentacao"]');
+  var elConcl = document.querySelector('#tab-p5 textarea[onchange*="conclusao"]');
+  if(elFund) elFund.value = L.fundamentacao||'';
+  if(elConcl) elConcl.value = L.conclusao||'';
+  // Atualiza também o campo de fundamentação da aba 4 se estiver visível
+  var textareas = document.querySelectorAll('#tab-p4 textarea');
+  textareas.forEach(function(ta){
+    if(ta.getAttribute('oninput') && ta.getAttribute('oninput').indexOf('fundamentacao')>=0){
+      ta.value = L.fundamentacao||'';
+    }
+  });
+}
+function gerarFund(){
+  if(L.causa==='Indeterminada') return 'Descartadas as hipóteses analisadas e não havendo elementos suficientes e conclusivos para sustentar nenhuma das classificações, conclui-se que o incêndio teve causa indeterminada, subcausa indefinida, evento causal indefinido e agente causal indefinido, pelos seguintes motivos: [explicar].';
+  return 'Correlacionando os fatos com os exames realizados e com a análise das hipóteses de exclusão, conclui-se, com segurança, que o incêndio teve causa '+nz(L.causa)+', subcausa '+nz(L.subcausa)+', evento causal '+nz(L.evento)+' e agente causal '+nz(L.agente)+', pelos seguintes motivos: [síntese das evidências].';
+}
+function gerarConcl(){
+  if(L.causa==='Indeterminada') return 'De acordo com a investigação realizada, não foi possível reunir elementos suficientes e conclusivos para determinar, com a segurança técnica exigida, a causa do incêndio, concluindo-se que o sinistro teve causa indeterminada, subcausa indefinida, evento causal indefinido e agente causal indefinido.';
+  return 'De acordo com a investigação realizada, conclui-se que o incêndio teve causa '+nz(L.causa)+', subcausa '+nz(L.subcausa)+', evento causal '+nz(L.evento)+' e agente causal '+nz(L.agente)+'.';
+}
+
+function htmlP5(){
+  var fotos=L.fotosObr||{};
+  var total=FOTOS_OBR.length;
+  var feitas=FOTOS_OBR.filter(function(f){ return fotos[f]; }).length;
+  return '<div class="card">'+fta('10. Sugestões para a fase preventiva','sugestoesPreventivas',3)+'</div>'+
+    '<div class="card"><div class="section-title">11. Conclusão</div>'+
+    (L.causa?'<textarea rows="4" oninput="L.conclusao=this.value" onchange="autoSalvar()">'+esc(L.conclusao||'')+'</textarea>':'<div class="info-box amber">Defina a causa na aba "4. Investigativa" para gerar a conclusão.</div>')+
+    '</div>'+
+    '<div class="card"><div class="section-title">12. Anexos / Fotos ('+feitas+'/'+total+' confirmadas)</div>'+
+    '<div class="info-box">Toque para confirmar que a foto foi tirada.</div>'+
+    FOTOS_OBR.map(function(f){ var ok=fotos[f]; return '<div class="foto-item'+(ok?' feita':'')+'" onclick="toggleFoto(\''+esc(f)+'\')"><span>'+f+'</span><span>'+(ok?'✅':'○')+'</span></div>'; }).join('')+
+    fta('Outros anexos','anexos',2)+
+    '</div>';
+}
+function toggleFoto(f){ L.fotosObr[f]=!L.fotosObr[f]; autoSalvar(); renderTab('p5'); }
+
+// =====================================================================
+// JUDGMENT HELPER
+// =====================================================================
+function judgmentHtml(titulo,campo,lA,lB,tplA,tplB){
+  var v=L[campo]||{op:null,txt:''};
+  return '<div class="card"><div class="section-title">'+titulo+'</div>'+
+    '<div class="judgment-btns">'+
+    '<button class="btn btn-sm '+(v.op==='A'?'btn-green':'btn-outline')+'" onclick="pickJ(\''+campo+'\',\'A\',\''+tplA+'\')">'+lA+'</button>'+
+    '<button class="btn btn-sm '+(v.op==='B'?'btn-amber':'btn-outline')+'" onclick="pickJ(\''+campo+'\',\'B\',\''+tplB+'\')">'+lB+'</button>'+
+    '</div>'+
+    (v.op?'<p style="font-size:11px;color:#888;margin:0 0 4px;">Edite os trechos entre [colchetes].</p><div class="'+(v.op==='A'?'jbox-a':'jbox-b')+'"><textarea rows="5" oninput="L[\''+campo+'\'].txt=this.value" onchange="autoSalvar()">'+esc(v.txt||'')+'</textarea></div>':'')+
+    '</div>';
+}
+function pickJ(campo,op,tplKey){
+  if(!L[campo]) L[campo]={op:null,txt:''};
+  if(L[campo].op===op) return;
+  L[campo]={op:op,txt:TPL[tplKey]||''};
+  autoSalvar(); renderTab(tabAtual);
+}
+
+// =====================================================================
+// PREVIEW
+// =====================================================================
+function verLaudo(){ salvarAtual(); document.getElementById('txt-laudo').textContent=buildLaudo(); mudarPagina('preview'); }
+function irEditor(){ mudarPagina('editor'); renderTab(tabAtual); }
+
+function buildLaudo(){
+  var l=L; var linhas=[];
+  function h1(t){ linhas.push('','===== '+t+' =====',''); }
+  function h2(t){ linhas.push('--- '+t+' ---',''); }
+  function p(t){ linhas.push(t); }
+  function br(){ linhas.push(''); }
+  p('LAUDO PERICIAL Nº '+nz(l.numero));
+  p('Certidão de Ocorrência nº '+nz(l.certidao));
+  br();
+  h1('PARTE 1 – IDENTIFICAÇÃO');
+  h2('1. Dados gerais');
+  p('Nº ocorrência: '+nz(l.numOcorrencia)+' | Data: '+nz(l.data)+' | Hora: '+nz(l.hora)+' | OBM: '+nz(l.obm));
+  h2('2. Responsáveis');
+  p('Perito: '+nz(l.peritoNome)+', '+nz(l.peritoPosto)+', mat. '+nz(l.peritoMat)+', '+nz(l.peritoObm));
+  p('Inspetor: '+nz(l.inspNome)+', '+nz(l.inspPosto)+', mat. '+nz(l.inspMat)+', '+nz(l.inspObm));
+  h2('3. Imóvel');
+  p('RE: '+nz(l.re)+' | Protocolo: '+nz(l.protocolo));
+  p('Endereço: '+nz(l.endereco)+(l.bairro?', '+l.bairro:'')+', '+nz(l.cidade)+' - CEP '+nz(l.cep));
+  if(l.gps&&l.gps.lat) p('GPS: '+l.gps.lat+', '+l.gps.lng+' ('+l.gps.precisao+')');
+  p('Edificação: '+nz(l.nomeEdif)+' | Empresa: '+nz(l.nomeEmpresa)+' | CNPJ: '+nz(l.cnpj));
+  h2('4. Características construtivas');
+  p('Área: '+nz(l.areaConstruida)+' | Pavimentos: '+nz(l.pavimentos)+' | Blocos: '+nz(l.blocos)+' | Altura: '+nz(l.altura)+' | Ocupação: '+nz(l.ocupacao));
+  p('Estrutura: '+(l.estrutura&&l.estrutura.length?l.estrutura.join(', '):'[não informado]'));
+  p('Teto: '+(l.teto&&l.teto.length?l.teto.join(', '):'[não informado]'));
+  p('Parede: '+(l.parede&&l.parede.length?l.parede.join(', '):'[não informado]'));
+  p('Piso: '+(l.piso&&l.piso.length?l.piso.join(', '):'[não informado]'));
+  h2('5. Proprietário');
+  p(nz(l.propNome)+' | CPF/RG: '+nz(l.propCpf)+' | Tel: '+nz(l.propTel));
+  h1('PARTE 2 – FASE PASSIVA (ESTRUTURAL)');
+  h2('6.1 Situação da edificação');
+  p('PPCI: '+nz(l.ppci)+' | Habite-se: '+nz(l.habitese)+' | Funcionamento: '+nz(l.funcionamento)+' | PRE: '+nz(l.pre));
+  h2('6.2 Sistemas preventivos');
+  SISTEMAS.forEach(function(s){ var v=l.sistemas[s]||{}; if(v.exigido!==null){ var yn=function(x){ return x===true?'Sim':x===false?'Não':'—'; }; var li=s+': Exigido:'+yn(v.exigido); if(v.exigido){ li+=' | Existente:'+yn(v.existente)+' | Atende:'+yn(v.atende)+' | Falha:'+yn(v.falha); } if(v.obs) li+=' | Obs: '+v.obs; p(li); } });
+  if(l.sistObs) p('Obs gerais: '+l.sistObs);
+  h2('Considerações – funcionamento');
+  p((l.funcAnalise&&l.funcAnalise.txt)||'[não preenchido]');
+  h1('PARTE 3 – FASE ATIVA (COMBATE)');
+  h2('Dados do combate');
+  p('Estratégia: '+nz(l.estrategiaCombate)+' | Técnica: '+nz(l.tecnicaCombate));
+  p('Dificuldades: '+nz(l.dificuldades));
+  h2('Entrada da guarnição');
+  var le=l.localEntrada==='Outro'&&l.localEntradaOutro?'Outro ('+l.localEntradaOutro+')':l.localEntrada;
+  p('Local: '+nz(le)+' | Abertura forçada: '+nz(l.forcada)+(l.forcada==='Sim'&&l.forcadaDetalhe?' ('+l.forcadaDetalhe+')':''));
+  h2('Análise do combate');
+  p((l.analiseCombate&&l.analiseCombate.txt)||'[não preenchido]');
+  h1('PARTE 4 – FASE INVESTIGATIVA');
+  h2('7. Extensão dos danos');
+  p('Área total: '+nz(l.areaTotal)+' | Atingida: '+nz(l.areaAtingida)+' | Salvados: '+nz(l.percSalvados)+' | Perdas: '+nz(l.percPerdas));
+  p('Valor salvados: '+nz(l.valorSalvados)+' | Valor perdas: '+nz(l.valorPerdas));
+  p('Exames: '+nz(l.exameInicio)+' a '+nz(l.exameFim));
+  h2('Vítimas');
+  var vits=l.vitimas&&l.vitimas.lista||[];
+  if(!vits.length){ p('Sem vítimas registradas.'); }
+  else{
+    p('Número: '+nz(l.vitimas.quantidade));
+    vits.forEach(function(v,i){ var s='Vítima '+(i+1)+': '+nz(v.nome)+', '+nz(v.idade)+' anos, '+nz(v.situacao)+'.'; if(v.lesoes&&v.lesoes.length) s+=' Lesões: '+v.lesoes.map(function(x){ return x.regiao+'–'+x.tipo; }).join('; ')+'.'; if(v.conduzida) s+=' Conduzida: '+v.conduzida+(v.destino?' ('+v.destino+')':'')+'.'; p(s); });
+  }
+  h2('Seguro incêndio');
+  p('Possui: '+nz(l.seguro)+' | Seguradora: '+nz(l.seguradora)+' | Vigência: '+nz(l.segVigencia));
+  h2('9.1 Zona de origem'); p((l.zonaOrigem&&l.zonaOrigem.txt)||'[não preenchido]');
+  h2('9.2 Foco inicial'); p((l.focoInicial&&l.focoInicial.txt)||'[não preenchido]');
+  h2('9.3 Surgimento e propagação'); p((l.propagacao&&l.propagacao.txt)||'[não preenchido]');
+  h2('9.4 Exclusão de possibilidades');
+  p('HD: '+((l.exclusaoHD&&l.exclusaoHD.txt)||'[não preenchido]')); br();
+  p('HI: '+((l.exclusaoHI&&l.exclusaoHI.txt)||'[não preenchido]')); br();
+  p('Natural: '+((l.exclusaoNat&&l.exclusaoNat.txt)||'[não preenchido]')); br();
+  p('Acidental: '+((l.exclusaoAc&&l.exclusaoAc.txt)||'[não preenchido]'));
+  h2('9.5 Exames complementares'); p(l.examesComp||'Não foram necessários.');
+  h2('9.6 Causa'); p(l.fundamentacao||'[não preenchido]');
+  h1('PARTE 5 – CONCLUSÃO E ANEXOS');
+  h2('10. Sugestões'); p(l.sugestoesPreventivas||'Sem sugestões.');
+  h2('11. Conclusão'); p(l.conclusao||'[não preenchido]');
+  h2('12. Anexos');
+  var ff=Object.keys(l.fotosObr||{}).filter(function(k){ return l.fotosObr[k]; });
+  if(ff.length) p('Fotos confirmadas: '+ff.join(', '));
+  p(l.anexos||'Não informado.');
+  return linhas.join('\n');
+}
+
+async function copiarLaudo(){
+  var txt=buildLaudo();
+  try{ await navigator.clipboard.writeText(txt); alert('Copiado!'); }
+  catch(e){ var ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Copiado!'); }
+}
+function baixarLaudo(){
+  var txt=buildLaudo(); var n=(L.numero||'laudo').replace(/[^\w\-]+/g,'_');
+  var b=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Laudo_'+n+'.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+renderLista();
+</script>
+</body>
+</html>

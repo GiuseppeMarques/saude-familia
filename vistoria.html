@@ -1,0 +1,2848 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIFNvbWJyYSBkbyBlc2N1ZG8gLS0+CiAgPHBhdGggZD0iTTI2MCAzMiBMNDgwIDExMiBMNDgwIDI5MiBRNDgwIDQyMCAyNjAgNTAwIFE0MCA0MjAgNDAgMjkyIEw0MCAxMTIgWiIgZmlsbD0iIzhCMUExRSIgb3BhY2l0eT0iMC40Ii8+CiAgPCEtLSBFc2N1ZG8gcHJpbmNpcGFsIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMjggTDQ3NiAxMDggTDQ3NiAyODggUTQ3NiA0MTYgMjU2IDQ5NiBRMzYgNDE2IDM2IDI4OCBMMzYgMTA4IFoiIGZpbGw9IiNDMDI3MkQiLz4KICA8IS0tIEJvcmRhIGludGVybmEgLS0+CiAgPHBhdGggZD0iTTI1NiA1MiBMNDUyIDEyMiBMNDUyIDI4OCBRNDUyIDM5NiAyNTYgNDY4IFE2MCAzOTYgNjAgMjg4IEw2MCAxMjIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIENoYW1hIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMTMwCiAgICBRMjY4IDE1OCAyNjIgMTgwCiAgICBRMjc4IDE2MiAyNzYgMTM4CiAgICBRMjk4IDE2OCAyOTAgMjAwCiAgICBRMzA4IDE3NiAzMDQgMTQ4CiAgICBRMzMwIDE4MiAzMjAgMjE4CiAgICBRMzE0IDI0OCAyOTIgMjY0CiAgICBRMzAwIDI0MiAyODYgMjI2CiAgICBRMjgyIDI1NCAyNjQgMjY4CiAgICBRMjY2IDI0NCAyNTQgMjMyCiAgICBRMjQyIDI0NCAyNDQgMjY4CiAgICBRMjI2IDI1NCAyMjIgMjI2CiAgICBRMjA4IDI0MiAyMTYgMjY0CiAgICBRMTk0IDI0OCAxODggMjE4CiAgICBRMTc4IDE4MiAyMDQgMTQ4CiAgICBRMjAwIDE3NiAyMTggMjAwCiAgICBRMjEwIDE2OCAyMzIgMTM4CiAgICBRMjMwIDE2MiAyNDYgMTgwCiAgICBRMjQwIDE1OCAyNTYgMTMwWiIKICAgIGZpbGw9IndoaXRlIi8+CiAgPCEtLSBMaW5oYSBkaXZpc8OzcmlhIC0tPgogIDxyZWN0IHg9Ijc2IiB5PSIyODYiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBTQyAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM4MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iODgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNiI+U0M8L3RleHQ+Cjwvc3ZnPg==">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIFNvbWJyYSBkbyBlc2N1ZG8gLS0+CiAgPHBhdGggZD0iTTI2MCAzMiBMNDgwIDExMiBMNDgwIDI5MiBRNDgwIDQyMCAyNjAgNTAwIFE0MCA0MjAgNDAgMjkyIEw0MCAxMTIgWiIgZmlsbD0iIzhCMUExRSIgb3BhY2l0eT0iMC40Ii8+CiAgPCEtLSBFc2N1ZG8gcHJpbmNpcGFsIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMjggTDQ3NiAxMDggTDQ3NiAyODggUTQ3NiA0MTYgMjU2IDQ5NiBRMzYgNDE2IDM2IDI4OCBMMzYgMTA4IFoiIGZpbGw9IiNDMDI3MkQiLz4KICA8IS0tIEJvcmRhIGludGVybmEgLS0+CiAgPHBhdGggZD0iTTI1NiA1MiBMNDUyIDEyMiBMNDUyIDI4OCBRNDUyIDM5NiAyNTYgNDY4IFE2MCAzOTYgNjAgMjg4IEw2MCAxMjIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIENoYW1hIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMTMwCiAgICBRMjY4IDE1OCAyNjIgMTgwCiAgICBRMjc4IDE2MiAyNzYgMTM4CiAgICBRMjk4IDE2OCAyOTAgMjAwCiAgICBRMzA4IDE3NiAzMDQgMTQ4CiAgICBRMzMwIDE4MiAzMjAgMjE4CiAgICBRMzE0IDI0OCAyOTIgMjY0CiAgICBRMzAwIDI0MiAyODYgMjI2CiAgICBRMjgyIDI1NCAyNjQgMjY4CiAgICBRMjY2IDI0NCAyNTQgMjMyCiAgICBRMjQyIDI0NCAyNDQgMjY4CiAgICBRMjI2IDI1NCAyMjIgMjI2CiAgICBRMjA4IDI0MiAyMTYgMjY0CiAgICBRMTk0IDI0OCAxODggMjE4CiAgICBRMTc4IDE4MiAyMDQgMTQ4CiAgICBRMjAwIDE3NiAyMTggMjAwCiAgICBRMjEwIDE2OCAyMzIgMTM4CiAgICBRMjMwIDE2MiAyNDYgMTgwCiAgICBRMjQwIDE1OCAyNTYgMTMwWiIKICAgIGZpbGw9IndoaXRlIi8+CiAgPCEtLSBMaW5oYSBkaXZpc8OzcmlhIC0tPgogIDxyZWN0IHg9Ijc2IiB5PSIyODYiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBTQyAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM4MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iODgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNiI+U0M8L3RleHQ+Cjwvc3ZnPg==">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vistoria CBMSC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#C0272D">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vistoria CBMSC</title>
+<style>
+:root{--verm:#C0272D;--fundo:#F2F2F7;--card:#FFFFFF;--borda:#E5E5EA;--texto:#1C1C1E;--sub:#6C6C70;--cinza:#8E8E93;--verde:#34C759;--azul:#007AFF;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--fundo);color:var(--texto);min-height:100vh}
+.hdr{background:var(--verm);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(192,39,45,.3)}
+.hdr-inner{display:flex;align-items:center;gap:10px;padding:13px 16px}
+.hdr-back{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer;display:none}
+.hdr-back.on{display:block}
+.hdr-logo{width:34px;height:34px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.hdr-title{font-size:17px;font-weight:700;flex:1}
+.hdr-sub{font-size:11px;opacity:.85}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--borda);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px 7px;cursor:pointer;border:none;background:none;color:var(--cinza);font-size:10px;gap:3px}
+.ni.on{color:var(--verm)}
+.ni svg{width:21px;height:21px}
+.scr{display:none;padding:14px 14px 88px}
+.scr.on{display:block}
+.card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.card-t{font-size:15px;font-weight:600}
+.card-s{font-size:12px;color:var(--sub);margin-top:2px}
+.card-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.bdg{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.b-hs{background:#E8F5E9;color:#2E7D32}.b-fn{background:#E3F2FD;color:#1565C0}.b-of{background:#FFF3E0;color:#E65100}
+.b-pend{background:#FFF8E1;color:#F57F17}.b-ok{background:#E8F5E9;color:#2E7D32}.b-and{background:#E3F2FD;color:#1565C0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.btn:active{opacity:.8}
+.btn-p{background:var(--verm);color:#fff;width:100%}
+.btn-s{background:var(--fundo);color:var(--verm);width:100%;border:1px solid var(--borda)}
+.btn-sm{padding:7px 12px;font-size:12px;width:auto}
+.btn-maps{background:#E3F2FD;color:#1565C0;font-size:12px;padding:6px 12px;width:auto}
+.btn-danger{background:#FFF0F0;color:var(--verm)}
+.fg{margin-bottom:12px}
+.fl{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.fi,.fs,.ft{width:100%;padding:11px 13px;border:1.5px solid var(--borda);border-radius:10px;font-size:15px;color:var(--texto);background:#fff;outline:none;font-family:inherit}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--verm)}
+.ft{resize:vertical;min-height:72px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec{font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.7px;margin:18px 0 9px}
+.sep{height:1px;background:var(--borda);margin:10px 0}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end}
+.mo.on{display:flex}
+.m{background:#fff;border-radius:20px 20px 0 0;padding:18px 14px 38px;width:100%;max-height:92vh;overflow-y:auto}
+.m-t{font-size:17px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.m-x{background:var(--fundo);border:none;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cb{display:flex;gap:8px;margin-bottom:14px}
+.ct{flex:1;text-align:center;padding:10px;border-radius:10px;background:#fff}
+.ct-n{font-size:20px;font-weight:700}.ct-l{font-size:10px;color:var(--sub)}
+.cv .ct-n{color:var(--verde)}.cr .ct-n{color:var(--verm)}.cc .ct-n{color:var(--cinza)}
+.ci{background:#fff;border-radius:10px;padding:12px;margin-bottom:7px;border:1.5px solid var(--borda)}
+.ci.ok{border-color:var(--verde);background:#F0FBF3}.ci.nao{border-color:var(--verm);background:#FFF5F5}
+.ci-obj{font-size:11px;color:var(--sub);font-weight:600;margin-bottom:2px}
+.ci-crit{font-size:13px;font-weight:600}
+.ci-causa{font-size:11px;color:var(--verm);margin-top:6px;font-style:italic}
+.ci-btns{display:flex;gap:6px;margin-top:9px}
+.cb2{flex:1;padding:7px;border-radius:7px;border:1.5px solid var(--borda);font-size:12px;font-weight:600;cursor:pointer;background:var(--fundo);color:var(--sub);font-family:inherit}
+.cb2.ok{border-color:var(--verde);background:var(--verde);color:#fff}
+.cb2.nao{border-color:var(--verm);background:var(--verm);color:#fff}
+.cb2.na{border-color:var(--cinza);background:var(--cinza);color:#fff}
+.obs-in{width:100%;margin-top:7px;padding:7px 10px;border:1.5px solid var(--borda);border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px;display:none}
+.obs-in.on{display:block}
+.pi{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--borda)}
+.pi:last-child{border-bottom:none}
+.pc{width:21px;height:21px;border-radius:5px;border:2px solid var(--borda);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+.pc.on{background:var(--verm);border-color:var(--verm);color:#fff}
+.pi-n{font-size:13px;font-weight:600}.pi-in{font-size:11px;color:var(--sub)}
+.pq{display:none;align-items:center;gap:5px}
+.pq.on{display:flex}
+.qb{width:24px;height:24px;border-radius:50%;border:1px solid var(--borda);background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.qn{font-size:13px;font-weight:700;min-width:22px;text-align:center}
+.ir{background:var(--fundo);border-radius:8px;padding:9px;margin-bottom:7px;position:relative}
+.ir-x{position:absolute;top:7px;right:7px;background:none;border:none;color:var(--verm);cursor:pointer;font-size:15px}
+.inr{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--borda)}
+.inr:last-child{border-bottom:none}
+.ink{font-size:13px;color:var(--sub)}.inv{font-size:13px;font-weight:600;text-align:right;max-width:58%}
+.emp{text-align:center;padding:36px 20px;color:var(--sub)}
+.emp-i{font-size:44px;margin-bottom:10px}.emp-t{font-size:14px;font-weight:500}.emp-s{font-size:12px;margin-top:4px}
+.tabs{display:flex;background:var(--fundo);border-radius:10px;padding:3px;margin-bottom:14px;gap:2px}
+.tab{flex:1;text-align:center;padding:7px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--sub)}
+.tab.on{background:#fff;color:var(--texto);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.ri{background:#fff;border-radius:11px;padding:12px;margin-bottom:9px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.rn{width:30px;height:30px;background:var(--verm);border-radius:7px;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.es{background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1.5px solid var(--borda);cursor:pointer}
+.es.on{border-color:var(--verm);background:#FFF5F5}
+.es-num{font-size:11px;font-weight:700;color:var(--sub);background:var(--fundo);padding:3px 7px;border-radius:5px;flex-shrink:0;white-space:nowrap}
+.es-nome{font-size:14px;font-weight:600}.es-end{font-size:11px;color:var(--sub)}
+.ord-item{background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:9px;border:1px solid var(--borda)}
+.ord-num{width:26px;height:26px;background:var(--verm);border-radius:6px;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ord-info{flex:1;min-width:0}.ord-n{font-size:13px;font-weight:600}.ord-s{font-size:11px;color:var(--sub)}
+.ord-btns{display:flex;flex-direction:column;gap:3px}
+.ord-btn{background:var(--fundo);border:1px solid var(--borda);border-radius:5px;padding:2px 8px;cursor:pointer;font-size:11px}
+.vi-item{background:#fff;border-radius:11px;padding:12px;margin-bottom:9px;display:flex;align-items:center;gap:10px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.vi-num{width:30px;height:30px;background:var(--verm);border-radius:7px;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vi-info{flex:1;min-width:0}.vi-nome{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vi-sub{font-size:11px;color:var(--sub)}
+.vi-st{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.st-pend{background:#FFF3E0;color:#E65100}.st-ok{background:#E8F5E9;color:#2E7D32}
+.relbox{background:#fff;border-radius:10px;padding:14px;font-family:monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;border:1px solid var(--borda);max-height:380px;overflow-y:auto}
+.tag{display:inline-flex;align-items:center;background:var(--fundo);border-radius:5px;padding:3px 7px;font-size:11px;color:var(--sub);margin:2px}
+.srch{width:100%;padding:10px 13px;border:1.5px solid var(--borda);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:10px;outline:none}
+.srch:focus{border-color:var(--verm)}
+
+.card-vis{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.vis-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+.vis-num{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;}
+.vis-nome{font-size:17px;font-weight:700;color:var(--texto);margin-bottom:2px;}
+.vis-end{font-size:12px;color:var(--sub);margin-bottom:6px;}
+.vis-coord{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sep-vis{height:1px;background:var(--borda);margin:10px 0;}
+.sec2{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin:10px 0 6px;}
+.inr2{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid #F2F2F7;}
+.inr2:last-child{border-bottom:none;}
+.ink2{font-size:12px;color:var(--sub);}
+.inv2{font-size:12px;font-weight:600;text-align:right;max-width:60%;}
+.sit-btn{flex:1;padding:9px 6px;border-radius:8px;border:1.5px solid var(--borda);font-size:12px;font-weight:600;cursor:pointer;background:var(--fundo);color:var(--sub);font-family:inherit;}
+.sit-ok{border-color:var(--verde)!important;background:#E8F5E9!important;color:#2E7D32!important;}
+.sit-nao{border-color:var(--verm)!important;background:#FFF0F0!important;color:var(--verm)!important;}
+.sit-pend{border-color:#FF9500!important;background:#FFF8E1!important;color:#E65100!important;}
+.alerta-hs{background:#FFF0F0;border-left:3px solid var(--verm);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--verm);margin-top:8px;line-height:1.5;}
+.alerta-pend{background:#FFF8E1;border-left:3px solid #FF9500;border-radius:6px;padding:10px 12px;font-size:12px;color:#E65100;margin-top:8px;line-height:1.5;}
+
+.mun-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.mun-pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--borda);background:var(--fundo);color:var(--sub);font-family:inherit;transition:all .15s;}
+.mun-pill.on{border-color:var(--verm);background:#FFF0F0;color:var(--verm);}
+.mun-pill-all{border-color:var(--cinza);}
+.mun-pill-all.on{border-color:var(--texto);background:var(--texto);color:#fff;}
+.mun-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#fff;border-radius:8px;margin-bottom:6px;border:1px solid var(--borda);}
+.mun-name{font-size:14px;font-weight:600;}
+.mun-del{background:none;border:none;color:var(--verm);cursor:pointer;font-size:16px;padding:2px 6px;}
+
+.pi-obs{width:100%;margin-top:6px;padding:7px 10px;border:1.5px solid var(--borda);border-radius:7px;font-size:12px;font-family:inherit;resize:none;height:52px;display:none;color:var(--texto);background:#fff;}
+.pi-obs.on{display:block;}
+.pi-obs-btn{background:none;border:none;color:var(--azul);font-size:11px;cursor:pointer;padding:4px 0;font-family:inherit;}
+
+.pav-block{background:#F8F8FB;border:1.5px solid var(--borda);border-radius:10px;padding:12px;margin-bottom:10px;}
+.pav-title{font-size:13px;font-weight:700;color:var(--texto);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pav-num{width:28px;height:28px;background:var(--verm);border-radius:7px;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pav-sist{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--borda);}
+.pav-sist:last-child{border-bottom:none;}
+.pav-pc{width:19px;height:19px;border-radius:4px;border:2px solid var(--borda);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
+.pav-pc.on{background:var(--verm);border-color:var(--verm);color:#fff;}
+.pav-sist-label{flex:1;font-size:12px;}
+.pav-qty{display:none;align-items:center;gap:4px;}
+.pav-qty.on{display:flex;}
+.pav-qb{width:22px;height:22px;border-radius:50%;border:1px solid var(--borda);background:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.pav-qn{font-size:12px;font-weight:700;min-width:20px;text-align:center;}
+
+/* Vistoria — bloco de pavimento */
+.vpav-block{background:#fff;border-radius:10px;border:1.5px solid var(--borda);margin-bottom:10px;overflow:hidden;}
+.vpav-header{display:flex;align-items:center;gap:10px;padding:12px;cursor:pointer;background:#F8F8FB;}
+.vpav-num{width:30px;height:30px;background:var(--verm);border-radius:7px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.vpav-info{flex:1;}
+.vpav-title{font-size:14px;font-weight:700;}
+.vpav-sub{font-size:11px;color:var(--sub);}
+.vpav-body{padding:12px;display:none;}
+.vpav-body.on{display:block;}
+.vpav-sist{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F2F2F7;}
+.vpav-sist:last-child{border-bottom:none;}
+.vpav-sist-nome{font-size:13px;font-weight:600;}
+.vpav-sist-qtd{font-size:12px;color:var(--sub);background:#F2F2F7;border-radius:5px;padding:2px 8px;}
+.vpav-obs{width:100%;margin-top:10px;padding:8px 10px;border:1.5px solid var(--borda);border-radius:7px;font-size:13px;font-family:inherit;resize:none;min-height:56px;}
+
+.tag-prev{display:inline-flex;align-items:center;gap:0;border-radius:6px;overflow:hidden;font-size:11px;border:1px solid var(--borda);}
+.tag-prev-in{background:var(--verm);color:#fff;font-weight:700;padding:3px 5px;font-size:10px;white-space:nowrap;}
+.tag-prev-nome{background:#fff;color:var(--texto);padding:3px 5px;white-space:nowrap;}
+.tag-prev-qty{background:#F2F2F7;color:var(--sub);padding:3px 5px;font-weight:600;border-left:1px solid var(--borda);}
+
+.estimativa-card{background:linear-gradient(135deg,#C0272D,#8B1A1E);border-radius:12px;padding:14px;margin-bottom:12px;color:#fff;}
+.est-titulo{font-size:11px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.est-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.est-item{background:rgba(255,255,255,.15);border-radius:8px;padding:8px 10px;text-align:center;}
+.est-num{font-size:20px;font-weight:700;}
+.est-label{font-size:10px;opacity:.8;margin-top:2px;}
+.est-detalhe{font-size:11px;opacity:.75;line-height:1.6;border-top:1px solid rgba(255,255,255,.2);padding-top:8px;}
+.est-aviso{font-size:10px;opacity:.65;margin-top:6px;font-style:italic;}
+.trecho-dist{font-size:10px;color:var(--sub);margin-top:2px;}
+
+/* EXPORTAÇÃO */
+.exp-section{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid var(--borda);}
+.exp-section-t{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--texto);}
+.exp-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F2F2F7;cursor:pointer;}
+.exp-item:last-child{border-bottom:none;}
+.exp-chk{width:20px;height:20px;border-radius:5px;border:2px solid var(--borda);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
+.exp-chk.on{background:var(--verm);border-color:var(--verm);color:#fff;}
+.exp-info{flex:1;}
+.exp-nome{font-size:13px;font-weight:600;}
+.exp-sub{font-size:11px;color:var(--sub);}
+.exp-filter-pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--borda);background:var(--fundo);color:var(--sub);margin:3px;}
+.exp-filter-pill.on{border-color:var(--verm);background:#FFF0F0;color:var(--verm);}
+
+/* PLANEJAMENTO */
+.plan-param{background:#fff;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--borda);}
+.plan-rota-card{background:#fff;border-radius:10px;border:1.5px solid var(--borda);margin-bottom:10px;overflow:hidden;}
+.plan-rota-header{background:#F8F8FB;padding:12px;border-bottom:1px solid var(--borda);}
+.plan-rota-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.plan-rota-info{font-size:12px;color:var(--sub);}
+.plan-rota-body{padding:10px 12px;}
+.plan-edif-row{font-size:12px;padding:4px 0;border-bottom:1px solid #F2F2F7;color:var(--sub);}
+.plan-edif-row:last-child{border-bottom:none;}
+.plan-badge{display:inline-block;background:var(--verm);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-right:4px;}
+
+.qtv-block{background:#fff;border-radius:10px;border:1.5px solid var(--borda);padding:14px;margin-bottom:10px;}
+.qtv-titulo{font-size:13px;font-weight:700;margin-bottom:4px;}
+.qtv-sub{font-size:11px;color:var(--sub);margin-bottom:12px;line-height:1.5;}
+.qtv-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.qtv-label{flex:1;font-size:13px;font-weight:600;}
+.qtv-prev{font-size:12px;color:var(--sub);white-space:nowrap;}
+.qtv-input{width:70px;padding:8px;border:1.5px solid var(--borda);border-radius:7px;font-size:14px;font-weight:700;text-align:center;font-family:inherit;}
+.qtv-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.qtv-ok{background:#E8F5E9;color:#2E7D32;}
+.qtv-nao{background:#FFF0F0;color:var(--verm);}
+.qtv-warn{background:#FFF8E1;color:#E65100;}
+.ano-block{background:#F8F8FB;border-radius:8px;padding:10px 12px;margin-top:8px;display:none;}
+.ano-block.on{display:block;}
+.wpp-block{background:#E8F5E9;border-radius:10px;padding:12px;margin-top:10px;}
+.wpp-titulo{font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:8px;}
+.wpp-texto{width:100%;padding:9px 10px;border:1.5px solid #A5D6A7;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;min-height:100px;background:#fff;}
+
+.nc-pav-sel{width:100%;margin-top:6px;padding:8px 10px;border:1.5px solid var(--verm);border-radius:7px;font-size:13px;font-family:inherit;background:#fff;display:none;color:var(--texto);}
+.nc-pav-sel.on{display:block;}
+
+.venc-alerta{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;margin-top:4px;}
+.venc-ok{background:#E8F5E9;color:#2E7D32;}
+.venc-prox{background:#FFF8E1;color:#E65100;}
+.venc-vencido{background:#FDEDEC;color:#C0392B;}
+.prox-edif-item{background:#fff;border-radius:10px;padding:11px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.07);cursor:pointer;}
+.prox-edif-dist{font-size:11px;font-weight:700;color:var(--verm);background:#FFF0F0;padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <button class="hdr-back" id="btnBack" onclick="goBack()">← Voltar</button>
+    <div class="hdr-logo">🚒</div>
+    <div style="flex:1">
+      <div class="hdr-title" id="hdrT">Vistoria CBMSC</div>
+      <div class="hdr-sub" id="hdrS">CBMSC — SC</div>
+    </div>
+  </div>
+</div>
+
+<div class="scr on" id="s-home">
+  <div class="sec" style="margin-top:4px">Resumo</div>
+  <div class="cb">
+    <div class="ct cc"><div class="ct-n" id="cnt-e">0</div><div class="ct-l">Edificações</div></div>
+    <div class="ct cc"><div class="ct-n" id="cnt-v">0</div><div class="ct-l">Vistorias</div></div>
+    <div class="ct cv"><div class="ct-n" id="cnt-c">0</div><div class="ct-l">Concluídas</div></div>
+  </div>
+  <div class="sec">Rotas de Hoje</div>
+  <div id="home-rotas"></div>
+  <div id="home-venc-func"></div>
+  <div class="sec">Menu</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <button class="btn btn-p" onclick="navTo('edificacoes')">🏢 Edificações</button>
+    <button class="btn btn-s" onclick="navTo('vistorias')">📋 Vistorias</button>
+    <button class="btn btn-s" onclick="navTo('rotas')">🗺️ Rotas</button>
+    <button class="btn btn-s" onclick="navTo('relatorio')">📄 Relatórios</button>
+  </div>
+  <div class="sec">Dados</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+    <button class="btn btn-s" onclick="openM('mo-mun');renderMunicipios()">🏘️ Municípios</button>
+    <button class="btn btn-s" onclick="exportarDados()">📤 Exportar</button>
+    <button class="btn btn-s" onclick="document.getElementById('inp-import-geral').click()">📥 Importar</button>
+  </div>
+  <input type="file" id="inp-import-geral" accept=".json" style="display:none" onchange="importarGeral(this)">
+</div>
+
+<div class="scr" id="s-edificacoes">
+  <button class="btn btn-p" id="btnNovaEdif" style="margin-bottom:14px">+ Nova Edificação</button>
+  <div id="lista-edif"></div>
+</div>
+
+<div class="scr" id="s-vistorias">
+  <button class="btn btn-p" id="btnNovaVist" style="margin-bottom:14px">+ Adicionar Vistoria</button>
+  <div class="tabs" id="tabs-vist">
+    <button class="tab on" onclick="filtVist('todas',this)">Todas</button>
+    <button class="tab" onclick="filtVist('pendente',this)">Pendentes</button>
+    <button class="tab" onclick="filtVist('concluida',this)">Concluídas</button>
+  </div>
+  <div id="lista-vist"></div>
+</div>
+
+<div class="scr" id="s-rotas">
+  <div style="display:flex;gap:9px;margin-bottom:14px">
+  <button class="btn btn-p" id="btnNovaRota" style="flex:2">+ Nova Rota</button>
+  <button class="btn btn-s btn-sm" onclick="document.getElementById('inp-import-rota').click()" style="flex:1">📥 Importar</button>
+  <input type="file" id="inp-import-rota" accept=".json" style="display:none" onchange="importarRota(this)">
+</div>
+  <div class="tabs" id="tabs-rota">
+    <button class="tab on" onclick="filtRota('todas',this)">Todas</button>
+    <button class="tab" onclick="filtRota('hoje',this)">Hoje</button>
+    <button class="tab" onclick="filtRota('pend',this)">Pendentes</button>
+  </div>
+  <div id="lista-rotas"></div>
+</div>
+
+<div class="scr" id="s-exec">
+  <div id="exec-content"></div>
+</div>
+
+<div class="scr" id="s-relatorio">
+  <div class="tabs" id="tabs-rel" style="margin-top:4px">
+    <button class="tab on" onclick="setTipoRel('completo',this)">📄 Completo</button>
+    <button class="tab" onclick="setTipoRel('nc',this)">⚠️ Não conformidades</button>
+  </div>
+  <div id="lista-rel"></div>
+  <div id="rel-box" style="display:none">
+    <div class="sec" id="rel-titulo-sec">Relatório</div>
+    <div class="relbox" id="rel-texto"></div>
+    <button class="btn btn-p" style="margin-top:10px" onclick="copiar()">📋 Copiar</button>
+  </div>
+</div>
+
+<div class="scr" id="s-dados">
+  <!-- TABS internas -->
+  <div class="tabs" id="tabs-dados" style="margin-top:4px">
+    <button class="tab on" onclick="setTabDados('exportar',this)">📤 Exportar</button>
+    <button class="tab" onclick="setTabDados('planejar',this)">🗓️ Planejar Rotas</button>
+    <button class="tab" onclick="setTabDados('excluir',this)">🗑️ Excluir</button>
+  </div>
+
+  <!-- EXPORTAR -->
+  <div id="tab-exportar">
+    <div class="sec" style="margin-top:4px">Filtrar por</div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">Município</div>
+      <div id="exp-pills-mun" style="flex-wrap:wrap;display:flex"></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">Rota</div>
+      <div id="exp-pills-rota" style="flex-wrap:wrap;display:flex"></div>
+    </div>
+
+    <div class="sec">Selecionar itens</div>
+    <div class="exp-section">
+      <div class="exp-section-t">🏢 Edificações</div>
+      <div id="exp-lista-edif"></div>
+    </div>
+    <div class="exp-section">
+      <div class="exp-section-t">📋 Vistorias / Relatórios</div>
+      <div id="exp-lista-vist"></div>
+    </div>
+    <div class="exp-section">
+      <div class="exp-section-t">🗺️ Rotas</div>
+      <div id="exp-lista-rotas"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-s btn-sm" onclick="expSelecionarTudo()" style="flex:1">Selecionar tudo</button>
+      <button class="btn btn-s btn-sm" onclick="expDeselecionarTudo()" style="flex:1">Limpar seleção</button>
+    </div>
+    <button class="btn btn-p" onclick="executarExportacao()" style="margin-top:10px">📥 Baixar arquivo</button>
+  </div>
+
+  <!-- PLANEJAR ROTAS -->
+  <div id="tab-planejar" style="display:none">
+    <div class="plan-param">
+      <div class="sec" style="margin-top:0">Parâmetros</div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">Tempo por dia (horas)</label>
+          <input class="fi" type="number" id="plan-horas" value="6" min="1" max="12" step="0.5">
+        </div>
+        <div class="fg">
+          <label class="fl">Min. por vistoria</label>
+          <input class="fi" type="number" id="plan-min-vist" value="15" min="5" max="120">
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">Data inicial</label>
+          <input class="fi" type="date" id="plan-data-ini">
+        </div>
+        <div class="fg">
+          <label class="fl">Dias disponíveis</label>
+          <input class="fi" type="number" id="plan-dias" value="5" min="1" max="30">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Horário de início</label>
+        <input class="fi" type="time" id="plan-hora-ini" value="08:00">
+      </div>
+      <div class="fg">
+        <label class="fl">Filtrar município (opcional)</label>
+        <select class="fs" id="plan-mun">
+          <option value="">Todos os municípios</option>
+        </select>
+      </div>
+      <button class="btn btn-p" onclick="gerarPlanejamento()" style="margin-top:4px">⚡ Gerar Sugestão de Rotas</button>
+    </div>
+    <div id="plan-resultado"></div>
+  </div>
+
+  <!-- EXCLUIR -->
+  <div id="tab-excluir" style="display:none">
+    <div class="sec" style="margin-top:4px">Edificações</div>
+    <div id="excl-lista-edif"></div>
+    <div class="sec">Rotas</div>
+    <div id="excl-lista-rotas"></div>
+    <div class="sec">Vistorias</div>
+    <div id="excl-lista-vist"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="ni on" id="ni-home" onclick="navTo('home')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Início
+  </button>
+  <button class="ni" id="ni-edificacoes" onclick="navTo('edificacoes')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 11V3H7v4H3v14h8v-4h2v4h8V11h-4zM7 19H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5v-2h2v2zm4 4H9v-2h2v2zm0-4H9v-2h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V5h2v2zm4 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>
+    Edificações
+  </button>
+  <button class="ni" id="ni-vistorias" onclick="navTo('vistorias')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    Vistorias
+  </button>
+  <button class="ni" id="ni-rotas" onclick="navTo('rotas')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+    Rotas
+  </button>
+  <button class="ni" id="ni-dados" onclick="navTo('dados')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
+    Dados
+  </button>
+  <button class="ni" id="ni-relatorio" onclick="navTo('relatorio')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+    Relatório
+  </button>
+</nav>
+
+<!-- MODAL EDIFICAÇÃO -->
+<div class="mo" id="mo-edif">
+  <div class="m">
+    <div class="m-t">
+      <span id="mo-edif-titulo">Nova Edificação</span>
+      <button class="m-x" onclick="closeM('mo-edif')">✕</button>
+    </div>
+    <input type="hidden" id="e-id">
+    <div class="fr">
+      <div class="fg"><label class="fl">Número / RE *</label><input class="fi" id="e-num" placeholder="Ex: 2024/001"></div>
+      <div class="fg"><label class="fl">Município *</label><select class="fs" id="e-mun"><option value="">Selecione...</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Nome / Razão Social *</label><input class="fi" id="e-nome" placeholder="Nome da edificação"></div>
+    <div class="fg"><label class="fl">Endereço</label><input class="fi" id="e-end" placeholder="Rua, número, bairro"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Área Total (m²)</label><input class="fi" type="number" id="e-area" placeholder="Ex: 1250"></div>
+      <div class="fg"><label class="fl">Área Vistoriada (m²)</label><input class="fi" type="number" id="e-area-vist" placeholder="Opcional"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nº de Pavimentos</label>
+        <input class="fi" type="number" id="e-npav" placeholder="Ex: 3" min="1" max="50" oninput="renderPavimentosForm()">
+      </div>
+      <div class="fg"><label class="fl">Térreo incluso?</label>
+        <select class="fs" id="e-terreo" onchange="renderPavimentosForm()">
+          <option value="sim">Sim (Térreo + andares)</option>
+          <option value="nao">Não (apenas andares)</option>
+        </select>
+      </div>
+    </div>
+    <div id="pavimentos-form"></div>
+    <div class="fg">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <label class="fl" style="margin:0">Coordenadas GPS</label>
+        <button class="btn btn-s btn-sm" type="button" onclick="capturarGPS('e-lat','e-lng','gps-status-edif')" style="font-size:11px;padding:5px 10px">📍 Capturar GPS</button>
+      </div>
+      <div class="fr" style="gap:8px">
+        <input class="fi" id="e-lat" placeholder="Latitude (-27.5954)">
+        <input class="fi" id="e-lng" placeholder="Longitude (-48.5480)">
+      </div>
+      <div id="gps-status-edif" style="font-size:11px;color:var(--sub);margin-top:4px;min-height:16px"></div>
+    </div>
+    <div class="sep"></div>
+    <div class="sec" style="margin-top:4px">Proprietário</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Nome</label><input class="fi" id="e-pn" placeholder="Nome completo"></div>
+      <div class="fg"><label class="fl">Telefone</label><input class="fi" id="e-pt" placeholder="(48) 9 9999-0000"></div>
+    </div>
+    <div class="sec">Inquilinos</div>
+    <div id="inq-list"></div>
+    <button class="btn btn-s btn-sm" id="btnAddInq" style="margin-bottom:12px">+ Inquilino</button>
+    <div class="sep"></div>
+    <div class="sec">Projetos / Habite-se</div>
+    <div id="proj-list"></div>
+    <button class="btn btn-s btn-sm" id="btnAddProj" style="margin-bottom:12px">+ Projeto</button>
+    <div class="sep"></div>
+    <div class="sec">Sistemas Preventivos</div>
+    <div id="prev-lista" class="card" style="padding:10px;margin-bottom:12px"></div>
+    <div class="sec">Laudos de Manutenção</div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Laudo Alarme</label><input type="date" class="fi" id="e-lal"></div>
+      <div class="fg"><label class="fl">Laudo Hidrante</label><input type="date" class="fi" id="e-lhi"></div>
+    </div>
+    <div class="fg"><label class="fl">Vencimento do Funcionamento (Certificado/Alvará)</label><input type="date" class="fi" id="e-venc-func" onchange="atualizarStatusFunc()"><div style="font-size:11px;color:var(--sub);margin-top:4px" id="e-venc-func-status"></div></div>
+    <div class="sep"></div>
+    <div class="sec" style="margin-top:4px">Observações da Edificação</div>
+    <textarea class="ft" id="e-obs" placeholder="Observações gerais, histórico, situações especiais, exceções normativas..." style="min-height:80px"></textarea>
+    <button class="btn btn-p" id="btnSalvarEdif" style="margin-top:12px">💾 Salvar Edificação</button>
+  </div>
+</div>
+
+<!-- MODAL ADICIONAR VISTORIA -->
+<div class="mo" id="mo-vist">
+  <div class="m">
+    <div class="m-t">
+      <span>Adicionar Vistoria</span>
+      <button class="m-x" onclick="closeM('mo-vist')">✕</button>
+    </div>
+    <div class="fg"><label class="fl">Tipo de Vistoria</label>
+      <select class="fs" id="v-tipo">
+        <option value="habite-se">Habite-se</option>
+        <option value="funcionamento">Funcionamento</option>
+        <option value="oficio">Existente / Ofício</option>
+      </select>
+    </div>
+    <div class="sec">Selecionar Edificação</div>
+    <div class="mun-pills" id="pills-mun-vist"></div>
+    <input type="text" class="srch" id="srch-edif-vist" placeholder="🔍 Filtrar por nome ou número...">
+    <div id="vist-edif-select"></div>
+    <button class="btn btn-p" id="btnSalvarVist" style="margin-top:12px">✅ Adicionar à Lista</button>
+  </div>
+</div>
+
+<!-- MODAL NOVA ROTA -->
+<div class="mo" id="mo-rota">
+  <div class="m">
+    <div class="m-t">
+      <span>Nova Rota</span>
+      <button class="m-x" onclick="closeM('mo-rota')">✕</button>
+    </div>
+    <div class="fg"><label class="fl">Nome da Rota *</label><input class="fi" id="r-nome" placeholder="Ex: Rota Centro — Quinta"></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Data *</label><input type="date" class="fi" id="r-data"></div>
+      <div class="fg"><label class="fl">Horário de início</label><input type="time" class="fi" id="r-inicio" placeholder="08:00" onchange="renderEstimativa(rotaVistSel)"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Vistoriador</label><input class="fi" id="r-vist" placeholder="Nome"></div>
+    </div>
+    <div class="sec">Vistorias Pendentes</div>
+    <div class="mun-pills" id="pills-mun-rota"></div>
+    <input type="text" class="srch" id="srch-vist-rota" placeholder="🔍 Filtrar por nome ou número...">
+    <div id="rota-vist-select"></div>
+    <div id="rota-ordem-wrap" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px;margin-bottom:9px">
+        <div class="sec" style="margin:0">Ordem da Rota</div>
+        <button class="btn btn-s btn-sm" id="btnOtimizar" onclick="otimizarRota()" style="font-size:12px">⚡ Otimizar</button>
+      </div>
+      <div id="rota-otimizar-aviso" style="display:none"></div>
+      <div id="rota-estimativa"></div>
+      <div id="rota-ordem"></div>
+    </div>
+    <button class="btn btn-p" id="btnSalvarRota" style="margin-top:12px">💾 Salvar Rota</button>
+  </div>
+</div>
+
+
+<!-- MODAL MUNICÍPIOS -->
+<div class="mo" id="mo-mun">
+  <div class="m">
+    <div class="m-t">
+      <span>Municípios</span>
+      <button class="m-x" onclick="closeM('mo-mun')">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input class="fi" id="mun-novo" placeholder="Nome do município" style="flex:1">
+      <button class="btn btn-p btn-sm" id="btnAddMun" style="width:auto;padding:11px 16px">+ Adicionar</button>
+    </div>
+    <div id="lista-mun"></div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE EDIF -->
+<div class="mo" id="mo-detalhe">
+  <div class="m">
+    <div class="m-t">
+      <span id="det-titulo">Edificação</span>
+      <button class="m-x" onclick="closeM('mo-detalhe')">✕</button>
+    </div>
+    <div id="det-content"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-s" id="btnEditarEdif" style="flex:1">✏️ Editar</button>
+      <button class="btn btn-danger btn-sm" id="btnExcluirEdif" style="flex:1">🗑️ Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════
+var S = { edificacoes:[], vistorias:[], rotas:[], municipios:[] };
+var backFn = null;
+var edifDetId = null;
+var edifVistSel = null;
+var rotaVistSel = [];
+var rotaAtiva = null;
+var vistAtiva = null;
+var clState = {};
+var vstFilt = 'todas';
+var tipoRel = 'completo';
+var filtMunVist = '';
+var filtMunRota = '';
+var rotaFilt = 'todas';
+
+function load() {
+  try { var s = localStorage.getItem('cbmsc3'); if(s) S = JSON.parse(s); } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem('cbmsc3', JSON.stringify(S)); } catch(e) {}
+}
+
+// ════════════════════════════════════════
+// SISTEMAS
+// ════════════════════════════════════════
+var SIST = [
+  {id:'ext',l:'Extintores',n:'IN 6'},
+  {id:'shp',l:'Hidrante (SHP)',n:'IN 7'},
+  {id:'gas',l:'Instalação de Gás',n:'IN 8'},
+  {id:'sai',l:'Saídas de Emergência',n:'IN 9'},
+  {id:'fum',l:'Controle de Fumaça',n:'IN 10'},
+  {id:'ilu',l:'Iluminação de Emergência',n:'IN 11'},
+  {id:'ala',l:'Alarme de Incêndio (SDAI)',n:'IN 12'},
+  {id:'sal',l:'Sinalização de Abandono',n:'IN 13'},
+  {id:'com',l:'Compartimentação/TRF',n:'IN 14'},
+  {id:'spr',l:'Sprinklers',n:'IN 15'},
+  {id:'cmar',l:'Materiais de Acabamento',n:'IN 18'},
+  {id:'ele',l:'Instalações Elétricas',n:'IN 19'},
+  {id:'liq',l:'Líquidos Inflamáveis',n:'IN 20'},
+  {id:'bri',l:'Brigada de Incêndio',n:'IN 28'},
+  {id:'plano',l:'Plano de Emergência',n:'IN 31'},
+  {id:'pis',l:'Piscinas',n:'IN 33'},
+  {id:'aces',l:'Acesso de Viaturas',n:'IN 35'},
+  {id:'hidr',l:'Rede Pública Hidrantes',n:'IN 25'},
+  {id:'glp',l:'GLP Comercial',n:'IN 29'}
+];
+
+// ════════════════════════════════════════
+// CHECKLISTS
+// ════════════════════════════════════════
+var CL_HS = {
+  'Documentação': [
+    {id:'h1',obj:'DRT',c:'Taxa paga — comprovante de recolhimento apresentado',ca:'Comprovante de recolhimento da taxa referente ao Habite-se não apresentado.'},
+    {id:'h2',obj:'DRT',c:'DRT de execução de todos os SMSCI conforme PPCI aprovado',ca:'É necessário DRT de execução de todos os SMSCI executados na edificação, conforme o PPCI aprovado.'},
+    {id:'h3',obj:'DRT',c:'Relatório de conformidade dos SMSCI (Anexo I — IN 1 Parte 1)',ca:'Relatório de conformidade dos SMSCI não apresentado.'},
+    {id:'h4',obj:'DRT',c:'Autenticidade e validade dos DRTs',ca:'DRT sem comprovação de autenticidade/validade.'},
+    {id:'h5',obj:'PPCI',c:'PPCI aprovado e em condições para vistoria',ca:'O PPCI não está aprovado. Para Habite-se o PPCI deve estar aprovado.'}
+  ],
+  'Características Gerais do Bloco': [
+    {id:'h6',obj:'Bloco',c:'Imóvel construído e todos os SMSCI instalados e operantes',ca:'O imóvel não está construído ou SMSCI não foram executados.'},
+    {id:'h7',obj:'Bloco',c:'Endereço conforme PPCI',ca:'Endereço da edificação incorreto. Necessário corrigir no PPCI.'},
+    {id:'h8',obj:'Bloco',c:'Altura informada no PPCI corresponde ao constatado',ca:'A altura informada no PPCI não corresponde ao constatado em vistoria.'},
+    {id:'h9',obj:'Bloco',c:'Área informada no PPCI corresponde ao constatado',ca:'A área informada no PPCI não corresponde ao constatado em vistoria.'},
+    {id:'h10',obj:'Bloco',c:'Número de pavimentos conforme PPCI',ca:'O número de pavimentos informado no PPCI não corresponde ao constatado em vistoria.'},
+    {id:'h11',obj:'Planta',c:'Blocos na Planta de Locação condizem com os construídos',ca:'Os blocos indicados na Planta de Locação não condizem com os blocos construídos.'}
+  ],
+  'Extintores — IN 6': [
+    {id:'h12',obj:'IN 6',c:'Quantidade de extintores conforme PPCI (amostragem)',ca:'A quantidade de extintores instalados está em desacordo com o PPCI aprovado.'},
+    {id:'h13',obj:'IN 6',c:'Extintores em área de circulação/comum, fora de escadas e antecâmaras',ca:'Todos os extintores devem estar em área de circulação ou comum, fora das escadas, rampas, antecâmaras e patamares.'},
+    {id:'h14',obj:'IN 6',c:'Extintores pressurizados, lacre intacto e hidrostático válido (5 anos)',ca:'Todos os extintores devem estar com lacre intacto, pressurizados e teste hidrostático válido (5 anos).'}
+  ],
+  'Sistema Hidráulico Preventivo — IN 7': [
+    {id:'h15',obj:'IN 7',c:'Relatório de comissionamento do SHP com DRT (Art. 106)',ca:'Necessário apresentar o relatório de comissionamento do sistema, conforme Art. 106 da IN 7, com DRT.'},
+    {id:'h16',obj:'IN 7',c:'Tubulação metálica com diâmetro mínimo 65 mm',ca:'A canalização do SHP deve ser metálica.'},
+    {id:'h17',obj:'IN 7',c:'Válvula de retenção instalada corretamente',ca:'Necessário instalar válvula de retenção na saída do reservatório ou bombas, com sentido correto.'},
+    {id:'h18',obj:'IN 7',c:'Bombas de incêndio instaladas conforme PPCI',ca:'Necessário instalar as bombas de incêndio conforme PPCI.'},
+    {id:'h19',obj:'IN 7',c:'Quantidade de hidrantes/mangotinhos conforme PPCI (amostragem)',ca:'Quantidade de hidrantes ou mangotinhos em desacordo com o PPCI aprovado.'},
+    {id:'h20',obj:'IN 7',c:'Abrigos com mangueira, esguicho e conexão tipo storz',ca:'Todos os abrigos devem possuir mangueira(s), esguicho e conexão tipo storz.'},
+    {id:'h21',obj:'IN 7',c:'Hidrantes em área de circulação/comum; ao menos um por pavimento/setor',ca:'Os abrigos do SHP devem estar em área de circulação ou comum, fora de escadas e antecâmaras.'},
+    {id:'h22',obj:'IN 7',c:'Hidrante de recalque conforme PPCI (válvula storz, engate 45°)',ca:'Executar hidrante de recalque conforme o PPCI aprovado.'},
+    {id:'h23',obj:'IN 7',c:'Funcionamento: retirada de água pelo hidrante de recalque',ca:'Impossibilidade de retirada de água pelo hidrante de recalque. Verificar válvula de retenção ou obstruções.'}
+  ],
+  'Instalações de Gás — IN 8': [
+    {id:'h24',obj:'IN 8',c:'Laudo de estanqueidade com DRT (validade 5 anos — Art. 95)',ca:'Apresentar laudo ou ensaio de estanqueidade da rede de gás com DRT, conforme Art. 95 da IN 8.'},
+    {id:'h25',obj:'IN 8',c:'Manual do proprietário com instruções para aparelhos a gás (Art. 80)',ca:'Apresentar manual do proprietário com instruções para instalação dos aparelhos a gás, conforme Art. 80 da IN 8.'},
+    {id:'h26',obj:'IN 8',c:'Tipo de gás (GLP/GN) conforme PPCI',ca:'O tipo de gás combustível deve estar de acordo com o PPCI aprovado.'},
+    {id:'h27',obj:'IN 8',c:'Válvula de corte geral por bloco conforme PPCI',ca:'Executar Válvula de Corte Geral conforme o PPCI aprovado.'},
+    {id:'h28',obj:'IN 8',c:'Ventilação permanente nos locais com aparelhos de queima',ca:'Executar ventilação permanente nos ambientes com equipamentos de queima a gás.'},
+    {id:'h29',obj:'IN 8',c:'Central de GLP / Abrigo de Gás / CRM-ERPM conforme PPCI',ca:'Executar Central de GLP / Abrigo de Gás conforme o PPCI aprovado.'}
+  ],
+  'Saídas de Emergência — IN 9': [
+    {id:'h30',obj:'IN 9',c:'Quantidade e tipo das escadas conforme PPCI',ca:'A quantidade e tipo das escadas estão em desacordo com o PPCI aprovado.'},
+    {id:'h31',obj:'IN 9',c:'Largura das escadas conforme PPCI',ca:'A largura da escada está em desacordo com o PPCI aprovado.'},
+    {id:'h32',obj:'IN 9',c:'Corrimão instalado conforme PPCI',ca:'As escadas devem possuir corrimão conforme o PPCI aprovado.'},
+    {id:'h33',obj:'IN 9',c:'Guarda-corpo instalado onde necessário (desnível > 60 cm, alt. mín. 1,10 m)',ca:'Instalar guarda-corpo com no mínimo 1,10 m de altura em todos os locais com desnível superior a 60 cm.'},
+    {id:'h34',obj:'IN 9',c:'Escada termina no pavimento de descarga sem continuidade com subsolos',ca:'As escadas de emergência devem terminar no piso de descarga, sem comunicação com os pavimentos de subsolo.'},
+    {id:'h35',obj:'IN 9',c:'Portas corta-fogo instaladas conforme PPCI (amostragem)',ca:'Instalar portas corta-fogo conforme o PPCI aprovado.'},
+    {id:'h36',obj:'IN 9',c:'Rotas de fuga desobstruídas e sem dispositivos de bloqueio',ca:'As rotas de fuga devem permanecer destrancadas e desobstruídas.'},
+    {id:'h37',obj:'IN 9',c:'Largura das descargas: mín. 1,20 m (geral); 1,65 m (H-2); 2,20 m (H-3)',ca:'A largura das descargas não pode ser inferior ao disposto no Art. 131 da IN 09.'},
+    {id:'h38',obj:'IN 9',c:'Largura das portas de saída conforme PPCI',ca:'A largura das portas das saídas de emergência está em desacordo com o PPCI aprovado.'},
+    {id:'h39',obj:'IN 9',c:'Abertura das portas no sentido do fluxo de saída (escadas, antecâmaras)',ca:'As portas devem abrir no sentido do fluxo de saída nas escadas de emergência e antecâmaras.'},
+    {id:'h40',obj:'IN 9',c:'Quantidade de saídas de emergência conforme PPCI',ca:'A quantidade de saídas de emergência está em desacordo com o PPCI aprovado.'}
+  ],
+  'Controle de Fumaça — IN 10': [
+    {id:'h41',obj:'IN 10',c:'Relatório de comissionamento (profissional independente) + DRT',ca:'Apresentar relatório de comissionamento do controle de fumaça (sistema mecânico) por profissional independente com DRT, conforme Art. 41 da IN 10.'},
+    {id:'h42',obj:'IN 10',c:'Aberturas de ventilação e exaustão conforme PPCI',ca:'Providenciar as aberturas de introdução de ar e extração de fumaça conforme o PPCI.'},
+    {id:'h43',obj:'IN 10',c:'Funcionamento testado (acionamento via detecção/botoeira)',ca:'O controle de fumaça não funcionou adequadamente no teste de acionamento.'}
+  ],
+  'Iluminação de Emergência — IN 11': [
+    {id:'h44',obj:'IN 11',c:'Sistema de iluminação de emergência funcionando (teste amostragem)',ca:'As luminárias de emergência (todas ou algumas) não estão funcionando.'},
+    {id:'h45',obj:'IN 11',c:'Quantidade de pontos conforme PPCI (edificações horizontais)',ca:'Quantidade de pontos de iluminação de emergência em desacordo com o PPCI aprovado.'},
+    {id:'h46',obj:'IN 11',c:'Iluminação nos corredores e mínimo 1 ponto por lance de escada (verticalizadas)',ca:'Instalar iluminação de emergência nos corredores e ao menos uma luminária por lance de escada.'}
+  ],
+  'Detecção e Alarme — IN 12': [
+    {id:'h47',obj:'IN 12',c:'Relatório de comissionamento do SDAI (NBR 17240) com DRT (Art. 47)',ca:'Apresentar relatório de comissionamento do SDAI atendendo ao item 8 da NBR 17240, com DRT.'},
+    {id:'h48',obj:'IN 12',c:'Tipo de SDAI instalado conforme PPCI',ca:'O tipo de SDAI está divergente do projeto aprovado.'},
+    {id:'h49',obj:'IN 12',c:'ECI instalada em local de fácil acesso e com vigilância permanente',ca:'Instalar ECI de acordo com o PPCI aprovado.'},
+    {id:'h50',obj:'IN 12',c:'Funcionamento da ECI testado (painel + avisadores sonoros/luminosos)',ca:'O sistema de alarme não funcionou adequadamente.'},
+    {id:'h51',obj:'IN 12',c:'Quantidade de acionadores manuais conforme PPCI',ca:'Os acionadores manuais estão em desacordo com o PPCI aprovado.'},
+    {id:'h52',obj:'IN 12',c:'Quantidade de avisadores audiovisuais conforme PPCI',ca:'Quantidade de avisadores audiovisuais em desacordo com o PPCI aprovado.'},
+    {id:'h53',obj:'IN 12',c:'Quantidade de detectores automáticos conforme PPCI',ca:'A quantidade de detectores automáticos está em desacordo com o PPCI aprovado.'}
+  ],
+  'Sinalização de Abandono — IN 13': [
+    {id:'h54',obj:'IN 13',c:'Placas SAL nas mudanças de direção, saídas e acessos a escadas (amostragem)',ca:'Instalar sinalização de abandono nas mudanças de direção, saídas e acessos a escadas e rampas.'},
+    {id:'h55',obj:'IN 13',c:'Placas luminosas para F-6 (lotação > 200) e F-11',ca:'Para ocupações F-6 (lotação > 200) e F-11, as placas de SAL devem ser luminosas.'},
+    {id:'h56',obj:'IN 13',c:'Placas luminosas funcionando (amostragem)',ca:'As placas luminosas (todas ou algumas) não estão funcionando.'}
+  ],
+  'Compartimentação e TRF — IN 14': [
+    {id:'h57',obj:'IN 14',c:'Isolamento de risco por afastamento entre blocos conforme PPCI',ca:'Inexistência de afastamento horizontal entre os blocos considerados isolados.'},
+    {id:'h58',obj:'IN 14',c:'Aberturas entre áreas de compartimentação protegidas por elemento corta-fogo',ca:'As aberturas entre áreas de compartimentação devem ser protegidas por elementos corta-fogo ou para-chama.'}
+  ],
+  'Sprinklers — IN 15': [
+    {id:'h59',obj:'IN 15',c:'Relatório de comissionamento do SPK (Anexo B — IN 15) com DRT',ca:'Apresentar relatório de comissionamento do SPK conforme Art. 30 da IN 15, com DRT.'},
+    {id:'h60',obj:'IN 15',c:'Quantidade de chuveiros automáticos conforme PPCI',ca:'Quantidade de chuveiros automáticos em desacordo com o PPCI aprovado.'},
+    {id:'h61',obj:'IN 15',c:'Hidrante de recalque duplo exclusivo SPK com engates 45° e válvula de retenção',ca:'Instalar Hidrante de Recalque duplo exclusivo para o SPK conforme o PPCI aprovado.'},
+    {id:'h62',obj:'IN 15',c:'Bombas do SPK instaladas conforme PPCI',ca:'Instalar as bombas do sistema sprinkler conforme o PPCI.'}
+  ],
+  'Materiais de Acabamento — IN 18': [
+    {id:'h63',obj:'IN 18',c:'Declaração do RT de cumprimento integral dos requisitos de CMAR (Art. 14)',ca:'Apresentar declaração do RT informando o atendimento pleno dos requisitos de CMAR da IN 18.'}
+  ],
+  'Instalações Elétricas — IN 19': [
+    {id:'h64',obj:'IN 19',c:'DRT de execução da instalação elétrica de baixa tensão',ca:'Apresentar DRT de execução da instalação elétrica de baixa tensão.'},
+    {id:'h65',obj:'IN 19',c:'DRT de execução do aterramento elétrico',ca:'Apresentar DRT de execução do aterramento.'},
+    {id:'h66',obj:'IN 19',c:'DRT de verificação final da instalação elétrica',ca:'Apresentar DRT de verificação final da instalação elétrica de baixa tensão.'}
+  ],
+  'Plano de Emergência — IN 31': [
+    {id:'h67',obj:'IN 31',c:'Plantas de emergência elaboradas conforme Art. 18 da IN 31',ca:'As plantas de emergência devem ser elaboradas conforme o Art. 18 da IN 31.'},
+    {id:'h68',obj:'IN 31',c:'Plantas de emergência instaladas nos locais corretos (Art. 19)',ca:'As plantas de emergência devem ser instaladas nos locais estipulados no Art. 19 da IN 31.'}
+  ],
+  'Brigada de Incêndio — IN 28': [
+    {id:'h69',obj:'IN 28',c:'Dimensionamento de Brigadistas Orgânicos previsto no PPCI (Art. 16)',ca:'Apresentar dimensionamento de Brigadistas Orgânicos previstos para a edificação.'}
+  ],
+  'Acesso de Viaturas — IN 35': [
+    {id:'h70',obj:'IN 35',c:'Acesso de viaturas executado conforme PPCI',ca:'Executar o acesso de viaturas conforme o PPCI aprovado.'}
+  ]
+};
+
+var CL_FN = {
+  'Documentação': [
+    {id:'f1',obj:'DRT',c:'Comprovante de recolhimento da taxa de funcionamento',ca:'O comprovante de recolhimento da taxa de funcionamento não foi apresentado.'},
+    {id:'f2',obj:'DRT',c:'Declaração com Termo de Responsabilidade (Anexo G — IN 1 Parte 1)',ca:'Declaração com termo de responsabilidade não apresentada.'},
+    {id:'f3',obj:'PPCI',c:'PPCI aprovado e em condições para vistoria',ca:'O imóvel não possui PPCI aprovado.'}
+  ],
+  'Características Gerais': [
+    {id:'f4',obj:'Bloco',c:'Endereço da edificação correto conforme PPCI',ca:'Endereço da edificação incorreto. Necessário corrigir no PPCI.'},
+    {id:'f5',obj:'Bloco',c:'Altura, área e número de pavimentos conforme PPCI',ca:'As características gerais do bloco não correspondem ao PPCI.'},
+    {id:'f6',obj:'Bloco',c:'Ocupação do imóvel conforme PPCI',ca:'Foi identificada ocupação divergente do PPCI.'}
+  ],
+  'Extintores — IN 6': [
+    {id:'f7',obj:'IN 6',c:'Quantidade de extintores conforme PPCI',ca:'Quantidade de extintores em desacordo com o PPCI.'},
+    {id:'f8',obj:'IN 6',c:'Extintores em circulação/comum, fora de escadas e antecâmaras',ca:'Extintores devem estar em área de circulação ou comum, fora de escadas, rampas e antecâmaras.'},
+    {id:'f9',obj:'IN 6',c:'Extintores pressurizados, lacre intacto, hidrostático válido (5 anos)',ca:'Todos os extintores devem estar com lacre intacto, pressurizados e hidrostático válido (5 anos).'}
+  ],
+  'Sistema Hidráulico Preventivo — IN 7': [
+    {id:'f10',obj:'IN 7',c:'Inspeção do reservatório e tubulações a cada 5 anos por RT (DRT)',ca:'Necessário realizar inspeção do reservatório e tubulações por RT, com emissão de DRT.'},
+    {id:'f11',obj:'IN 7',c:'Manutenção das bombas de incêndio a cada 3 anos (DRT)',ca:'Necessário realizar manutenção das bombas de incêndio com DRT.'},
+    {id:'f12',obj:'IN 7',c:'Abrigos com mangueira, esguicho e conexão tipo storz',ca:'Todos os abrigos devem possuir mangueira(s), esguicho e conexão tipo storz.'},
+    {id:'f13',obj:'IN 7',c:'Hidrante de recalque com adaptador storz, tampão e livre de entulho',ca:'Falta adaptador storz / tampão no hidrante de recalque ou há sujeira/entulhos.'}
+  ],
+  'Instalações de Gás — IN 8': [
+    {id:'f14',obj:'IN 8',c:'Laudo de estanqueidade com DRT — a cada 5 anos',ca:'Apresentar laudo de estanqueidade da rede de gás com DRT.'}
+  ],
+  'Saídas de Emergência — IN 9': [
+    {id:'f15',obj:'IN 9',c:'Portas corta-fogo reguladas e fechando corretamente',ca:'Necessário realizar manutenção nas portas corta-fogo.'},
+    {id:'f16',obj:'IN 9',c:'Rotas de fuga desobstruídas e sem dispositivos de bloqueio',ca:'As rotas de fuga devem permanecer destrancadas e desobstruídas.'},
+    {id:'f17',obj:'IN 9',c:'Escada pressurizada: laudo de manutenção anual com DRT',ca:'Necessário apresentar laudo de manutenção anual do sistema de pressurização com DRT, conforme Art. 123 da IN 09.'}
+  ],
+  'Controle de Fumaça — IN 10': [
+    {id:'f18',obj:'IN 10',c:'Relatório de inspeção anual do controle de fumaça com DRT (Anexo C)',ca:'Necessário apresentar relatório de inspeção do controle de fumaça com DRT.'}
+  ],
+  'Iluminação de Emergência — IN 11': [
+    {id:'f19',obj:'IN 11',c:'Sistema funcionando (teste amostragem)',ca:'As luminárias de emergência não estão funcionando.'},
+    {id:'f20',obj:'IN 11',c:'Quantidade de pontos conforme PPCI',ca:'Quantidade de pontos de iluminação em desacordo com o PPCI.'}
+  ],
+  'Detecção e Alarme — IN 12': [
+    {id:'f21',obj:'IN 12',c:'Relatório de manutenção anual com DRT (com detectores automáticos)',ca:'Necessário apresentar relatório de manutenção anual com DRT, conforme Art. 48 da IN 12.'},
+    {id:'f22',obj:'IN 12',c:'Relatório de manutenção a cada 3 anos (sem detectores automáticos)',ca:'Necessário apresentar relatório de manutenção a cada 3 anos com DRT, conforme Art. 48 da IN 12.'}
+  ],
+  'Sinalização de Abandono — IN 13': [
+    {id:'f23',obj:'IN 13',c:'Placas de SAL nas mudanças de direção, saídas e acessos a escadas',ca:'Instalar sinalização de abandono nas mudanças de direção, saídas e acessos a escadas e rampas.'},
+    {id:'f24',obj:'IN 13',c:'Placas luminosas para F-6 (> 200) e F-11 funcionando',ca:'Para ocupações F-6 (lotação > 200) e F-11, as placas SAL devem ser luminosas.'}
+  ],
+  'Compartimentação/TRF — IN 14': [
+    {id:'f25',obj:'IN 14',c:'DRT de manutenção anual dos dispositivos automatizados de compartimentação',ca:'Apresentar DRT de manutenção dos dispositivos automatizados de compartimentação, conforme Art. 15 da IN 4.'}
+  ],
+  'Sprinklers — IN 15': [
+    {id:'f26',obj:'IN 15',c:'Relatório de inspeção técnica do SPK com DRT (Anexo C — IN 15)',ca:'Necessário apresentar inspeção técnica do SPK por profissional competente com DRT.'}
+  ],
+  'Instalações Elétricas — IN 19': [
+    {id:'f27',obj:'IN 19',c:'DRT de manutenção: Risco III → 10 anos; Risco IV → 5 anos; Risco V → 3 anos',ca:'Necessário apresentar DRT de manutenção/reforma das instalações elétricas, conforme Art. 19 da IN 19.'}
+  ],
+  'Brigada de Incêndio — IN 28': [
+    {id:'f28',obj:'IN 28',c:'PIBI apresentado com DRT (Anexo C — IN 28)',ca:'Necessário apresentar PIBI conforme a IN 28.'},
+    {id:'f29',obj:'IN 28',c:'Brigadistas Particulares presentes (se exigido)',ca:'Necessária a presença de Brigadistas Particulares conforme IN 28.'}
+  ],
+  'Plano de Emergência — IN 31': [
+    {id:'f30',obj:'IN 31',c:'Plano de emergência com DRT apresentado',ca:'Necessário apresentar plano de emergência conforme IN 31.'},
+    {id:'f31',obj:'IN 31',c:'Plantas de emergência instaladas nos locais corretos (Art. 19)',ca:'Necessário instalar as plantas de emergência conforme IN 31.'},
+    {id:'f32',obj:'IN 31',c:'Plantas de risco: escadas (> 750 m²) e hall dos andares de descarga',ca:'As plantas de risco devem ser instaladas conforme Art. 21 da IN 31.'}
+  ]
+};
+
+var PREV_GRUPOS = {
+  'ext': ['Extintores — IN 6'],
+  'shp': ['Sistema Hidráulico Preventivo — IN 7'],
+  'gas': ['Instalações de Gás — IN 8'],
+  'sai': ['Saídas de Emergência — IN 9'],
+  'fum': ['Controle de Fumaça — IN 10'],
+  'ilu': ['Iluminação de Emergência — IN 11'],
+  'ala': ['Detecção e Alarme — IN 12'],
+  'sal': ['Sinalização de Abandono — IN 13'],
+  'com': ['Compartimentação e TRF — IN 14','Compartimentação/TRF — IN 14'],
+  'spr': ['Sprinklers — IN 15'],
+  'cmar': ['Materiais de Acabamento — IN 18'],
+  'ele': ['Instalações Elétricas — IN 19'],
+  'bri': ['Brigada de Incêndio — IN 28'],
+  'plano': ['Plano de Emergência — IN 31'],
+  'aces': ['Acesso de Viaturas — IN 35'],
+  'hidr': [],
+  'glp': [],
+  'pis': [],
+  'liq': []
+};
+var GRUPOS_FIXOS = ['Documentação','Características Gerais','Características Gerais do Bloco'];
+function getGruposAtivos(edif, tipo) {
+  var ativos = GRUPOS_FIXOS.slice();
+  var prev = edif ? edif.preventivos || {} : {};
+  Object.keys(prev).forEach(function(id) {
+    if(prev[id] && prev[id].ativo) {
+      var grupos = PREV_GRUPOS[id] || [];
+      grupos.forEach(function(g) {
+        if(ativos.indexOf(g) < 0) ativos.push(g);
+      });
+    }
+  });
+  return ativos;
+}
+
+
+// ════════ MUNICÍPIOS ════════
+function renderMunicipios() {
+  var c = document.getElementById('lista-mun');
+  if(!S.municipios.length) {
+    c.innerHTML = '<div style="color:var(--sub);font-size:13px;text-align:center;padding:16px">Nenhum município cadastrado</div>';
+    return;
+  }
+  c.innerHTML = S.municipios.map(function(m, i) {
+    return '<div class="mun-item"><span class="mun-name">'+m+'</span><button class="mun-del" onclick="excluirMunicipio('+i+')">✕</button></div>';
+  }).join('');
+}
+
+function adicionarMunicipio() {
+  var inp = document.getElementById('mun-novo');
+  var nome = inp.value.trim();
+  if(!nome) { alert('Digite o nome do município.'); return; }
+  if(S.municipios.indexOf(nome) >= 0) { alert('Município já cadastrado.'); return; }
+  S.municipios.push(nome);
+  S.municipios.sort();
+  save();
+  inp.value = '';
+  renderMunicipios();
+  atualizarSelectMunicipio();
+}
+
+function excluirMunicipio(idx) {
+  if(!confirm('Excluir município "'+S.municipios[idx]+'"?')) return;
+  S.municipios.splice(idx, 1);
+  save();
+  renderMunicipios();
+  atualizarSelectMunicipio();
+}
+
+function atualizarSelectMunicipio() {
+  var sel = document.getElementById('e-mun');
+  if(!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">Selecione o município...</option>';
+  S.municipios.forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m; opt.textContent = m;
+    if(m === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // Opção "outro" para digitar manualmente caso não tenha cadastrado
+  var outroOpt = document.createElement('option');
+  outroOpt.value = '__outro__'; outroOpt.textContent = '+ Outro (digitar)...';
+  sel.appendChild(outroOpt);
+}
+
+// Quando seleciona "outro" no select, vira input de texto
+function onMunChange(sel) {
+  if(sel.value === '__outro__') {
+    var inp = document.createElement('input');
+    inp.className = 'fi'; inp.id = 'e-mun'; inp.placeholder = 'Digite o município';
+    inp.style.marginTop = '6px';
+    sel.parentNode.appendChild(inp);
+    sel.style.display = 'none';
+    inp.focus();
+  }
+}
+
+// Renderizar pills de município num container
+function renderPillsMun(containerId, filtroAtual, onClickFn) {
+  var c = document.getElementById(containerId);
+  if(!c) return;
+  if(!S.municipios.length) { c.innerHTML = ''; return; }
+  var html = '<button class="mun-pill mun-pill-all '+(filtroAtual===''?'on':'')+'" onclick="'+onClickFn+'(\'\')">Todos</button>';
+  S.municipios.forEach(function(m) {
+    html += '<button class="mun-pill '+(filtroAtual===m?'on':'')+'" onclick="'+onClickFn+'(\''+m.replace(/'/g,"\\'")+'\')">' + m + '</button>';
+  });
+  c.innerHTML = html;
+}
+
+function setFiltMunVist(mun) {
+  filtMunVist = mun;
+  renderPillsMun('pills-mun-vist', filtMunVist, 'setFiltMunVist');
+  renderEdifSelectVist(document.getElementById('srch-edif-vist').value);
+}
+
+function setFiltMunRota(mun) {
+  filtMunRota = mun;
+  renderPillsMun('pills-mun-rota', filtMunRota, 'setFiltMunRota');
+  renderVistSelectRota(document.getElementById('srch-vist-rota').value);
+}
+
+
+// ════════ PAVIMENTOS — CADASTRO ════════
+function renderPavimentosForm() {
+  var n = parseInt(document.getElementById('e-npav').value) || 0;
+  var terreo = document.getElementById('e-terreo').value === 'sim';
+  var c = document.getElementById('pavimentos-form');
+  if(!n) { c.innerHTML = ''; return; }
+
+  // Pegar dados já existentes se estiver editando
+  var edifId = document.getElementById('e-id').value;
+  var edif = edifId ? S.edificacoes.find(function(x){return x.id===edifId;}) : null;
+  var pavExist = edif ? edif.pavimentos || [] : [];
+
+  // Preventivos ativos (apenas os marcados)
+  var prevAtivos = SIST.filter(function(s){
+    var pc = document.getElementById('pc-'+s.id);
+    return pc && pc.classList.contains('on');
+  });
+
+  var html = '<div class="sec">Preventivos por Pavimento</div>';
+  for(var i = 0; i < n; i++) {
+    var label = terreo ? (i === 0 ? 'Térreo' : i+'º Andar') : (i+1)+'º Andar';
+    var pavData = pavExist[i] || {};
+    html += '<div class="pav-block">';
+    html += '<div class="pav-title"><div class="pav-num">'+(terreo?(i===0?'T':i):(i+1))+'</div>'+label+'</div>';
+    if(!prevAtivos.length) {
+      html += '<div style="font-size:12px;color:var(--sub)">Nenhum preventivo marcado acima.</div>';
+    } else {
+      prevAtivos.forEach(function(s) {
+        var ativo = pavData.sist && pavData.sist[s.id] && pavData.sist[s.id].ativo;
+        var qty = (pavData.sist && pavData.sist[s.id] && pavData.sist[s.id].qty) || 1;
+        html +=
+          '<div class="pav-sist">'+
+          '<div class="pav-pc '+(ativo?'on':'')+'" id="ppc-'+i+'-'+s.id+'" onclick="togPavSist('+i+',\''+s.id+'\')">'+(ativo?'v':'')+'</div>'+
+          '<span class="pav-sist-label">'+s.l+'</span>'+
+          '<div class="pav-qty '+(ativo?'on':'')+'" id="ppq-'+i+'-'+s.id+'">'+
+            '<button class="pav-qb" onclick="chgPavQ('+i+',\''+s.id+'\',-1)">-</button>'+
+            '<span class="pav-qn" id="ppqn-'+i+'-'+s.id+'">'+qty+'</span>'+
+            '<button class="pav-qb" onclick="chgPavQ('+i+',\''+s.id+'\',1)">+</button>'+
+          '</div>'+
+          '</div>';
+      });
+    }
+    html += '</div>';
+  }
+  c.innerHTML = html;
+}
+
+function togPavSist(pav, sid) {
+  var pc = document.getElementById('ppc-'+pav+'-'+sid);
+  var pq = document.getElementById('ppq-'+pav+'-'+sid);
+  var on = pc.classList.contains('on');
+  if(on) { pc.classList.remove('on'); pc.textContent=''; pq.classList.remove('on'); }
+  else { pc.classList.add('on'); pc.textContent='v'; pq.classList.add('on'); }
+}
+function chgPavQ(pav, sid, d) {
+  var el = document.getElementById('ppqn-'+pav+'-'+sid);
+  var v = parseInt(el.textContent) + d; if(v<0)v=0; el.textContent = v;
+}
+
+function getPavDom() {
+  var n = parseInt(document.getElementById('e-npav').value) || 0;
+  var terreo = document.getElementById('e-terreo').value === 'sim';
+  var result = [];
+  for(var i = 0; i < n; i++) {
+    var label = terreo ? (i===0?'Térreo':i+'º Andar') : (i+1)+'º Andar';
+    var sist = {};
+    SIST.forEach(function(s) {
+      var pc = document.getElementById('ppc-'+i+'-'+s.id);
+      var qn = document.getElementById('ppqn-'+i+'-'+s.id);
+      if(pc) {
+        sist[s.id] = { ativo: pc.classList.contains('on'), qty: qn?parseInt(qn.textContent)||0:0 };
+      }
+    });
+    result.push({ label: label, sist: sist });
+  }
+  return result;
+}
+
+
+// ════════ NAVEGAR NO MAPS ════════
+function abrirNoMaps(rotaId) {
+  var r = S.rotas.find(function(x){return x.id===rotaId;});
+  if(!r) return;
+
+  // Coletar destinos em ordem
+  var destinos = [];
+  (r.vistorias||[]).forEach(function(vid) {
+    var v = S.vistorias.find(function(x){return x.id===vid;});
+    var e = v ? S.edificacoes.find(function(x){return x.id===v.edificacaoId;}) : null;
+    if(!e) return;
+    // Preferir coordenadas; se não tiver, usar endereço
+    if(e.lat && e.lng) {
+      destinos.push(e.lat+','+e.lng);
+    } else if(e.endereco) {
+      destinos.push(encodeURIComponent(e.endereco+(e.municipio?', '+e.municipio:'')+', SC'));
+    }
+  });
+
+  if(!destinos.length) {
+    alert('Nenhuma edificação com endereço ou coordenadas cadastradas nesta rota.');
+    return;
+  }
+
+  var url = '';
+  if(destinos.length === 1) {
+    url = 'https://www.google.com/maps/dir/?api=1&destination='+destinos[0]+'&travelmode=driving';
+  } else {
+    // Google Maps aceita até 10 waypoints na URL
+    // Formato: /maps/dir/ponto1/ponto2/.../pontoN
+    // O Maps reorganiza automaticamente para a rota mais eficiente
+    if(destinos.length > 10) {
+      if(!confirm('A rota tem '+destinos.length+' destinos. O Google Maps suporta até 10 por vez. Deseja abrir com os primeiros 10?')) return;
+      destinos = destinos.slice(0, 10);
+    }
+    url = 'https://www.google.com/maps/dir/'+destinos.join('/');
+  }
+
+  window.open(url, '_blank');
+}
+
+// ════════ EXPORTAR ROTA ════════
+function exportarRota(rotaId) {
+  var r = S.rotas.find(function(x){return x.id===rotaId;});
+  if(!r) return;
+
+  // Montar pacote com tudo que a rota precisa
+  var edifIds = [];
+  var vistoriasRota = [];
+
+  (r.vistorias||[]).forEach(function(vid) {
+    var v = S.vistorias.find(function(x){return x.id===vid;});
+    if(v) {
+      vistoriasRota.push(v);
+      if(edifIds.indexOf(v.edificacaoId) < 0) edifIds.push(v.edificacaoId);
+    }
+  });
+
+  var edificacoesRota = S.edificacoes.filter(function(e){
+    return edifIds.indexOf(e.id) >= 0;
+  });
+
+  var pacote = {
+    tipo: 'rota_cbmsc',
+    versao: '1.0',
+    exportadoEm: new Date().toISOString(),
+    rota: r,
+    vistorias: vistoriasRota,
+    edificacoes: edificacoesRota
+  };
+
+  var json = JSON.stringify(pacote, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  var dt = r.data ? r.data : new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = 'rota_'+r.nome.replace(/[^a-zA-Z0-9]/g,'_')+'_'+dt+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('Rota exportada! Compartilhe o arquivo .json com o outro dispositivo.');
+}
+
+// ════════ IMPORTAR ROTA ════════
+function importarRota(input) {
+  var file = input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var pacote = JSON.parse(ev.target.result);
+      if(pacote.tipo !== 'rota_cbmsc') {
+        alert('Arquivo inválido. Use um arquivo de rota exportado por este aplicativo.');
+        return;
+      }
+
+      var edifAdd=0, edifUpd=0, vistAdd=0, vistUpd=0;
+
+      // Importar edificações
+      (pacote.edificacoes||[]).forEach(function(edif) {
+        var idx = S.edificacoes.findIndex(function(e){return e.id===edif.id;});
+        if(idx>=0){S.edificacoes[idx]=edif;edifUpd++;}
+        else{S.edificacoes.push(edif);edifAdd++;}
+      });
+
+      // Importar vistorias
+      (pacote.vistorias||[]).forEach(function(v) {
+        var idx = S.vistorias.findIndex(function(x){return x.id===v.id;});
+        if(idx>=0){S.vistorias[idx]=v;vistUpd++;}
+        else{S.vistorias.push(v);vistAdd++;}
+      });
+
+      // Importar a rota (não duplicar)
+      var rotaIdx = S.rotas.findIndex(function(x){return x.id===pacote.rota.id;});
+      var rotaAcao = '';
+      if(rotaIdx>=0){
+        if(confirm('Esta rota já existe. Deseja substituí-la?')) {
+          S.rotas[rotaIdx]=pacote.rota;
+          rotaAcao='atualizada';
+        }
+      } else {
+        S.rotas.push(pacote.rota);
+        rotaAcao='adicionada';
+      }
+
+      save();
+      renderRotas();
+      renderHome();
+
+      var msg = 'Importação concluída!\n';
+      msg += 'Rota: '+pacote.rota.nome+' ('+rotaAcao+')\n';
+      msg += 'Edificações: '+edifAdd+' novas, '+edifUpd+' atualizadas\n';
+      msg += 'Vistorias: '+vistAdd+' novas, '+vistUpd+' atualizadas';
+      alert(msg);
+
+    } catch(err) {
+      alert('Erro ao importar: '+err.message);
+    }
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+
+// ════════ OTIMIZAR ROTA ════════
+function distancia(e1, e2) {
+  // Distância euclidiana simples em graus (suficiente para ordenação local)
+  if(!e1||!e2||!e1.lat||!e1.lng||!e2.lat||!e2.lng) return Infinity;
+  var dlat = parseFloat(e1.lat) - parseFloat(e2.lat);
+  var dlng = parseFloat(e1.lng) - parseFloat(e2.lng);
+  return Math.sqrt(dlat*dlat + dlng*dlng);
+}
+
+function otimizarRota() {
+  if(rotaVistSel.length < 2) {
+    alert('Selecione ao menos 2 vistorias para otimizar.');
+    return;
+  }
+
+  // Separar as que têm GPS das que não têm
+  var comGPS = [], semGPS = [];
+  rotaVistSel.forEach(function(vid) {
+    var v = S.vistorias.find(function(x){return x.id===vid;});
+    var e = v ? S.edificacoes.find(function(x){return x.id===v.edificacaoId;}) : null;
+    if(e && e.lat && e.lng) comGPS.push(vid);
+    else semGPS.push(vid);
+  });
+
+  if(comGPS.length < 2) {
+    alert('São necessárias ao menos 2 edificações com coordenadas GPS para otimizar.\n\nDica: ao navegar pelo botão "Navegar", o Google Maps otimiza automaticamente.');
+    return;
+  }
+
+  // Algoritmo do vizinho mais próximo
+  var getEdif = function(vid) {
+    var v = S.vistorias.find(function(x){return x.id===vid;});
+    return v ? S.edificacoes.find(function(x){return x.id===v.edificacaoId;}) : null;
+  };
+
+  var restantes = comGPS.slice();
+  var ordenados = [restantes.shift()]; // começa pela primeira
+
+  while(restantes.length > 0) {
+    var ultimo = getEdif(ordenados[ordenados.length-1]);
+    var melhorIdx = 0;
+    var melhorDist = Infinity;
+    restantes.forEach(function(vid, idx) {
+      var e = getEdif(vid);
+      var d = distancia(ultimo, e);
+      if(d < melhorDist) { melhorDist = d; melhorIdx = idx; }
+    });
+    ordenados.push(restantes.splice(melhorIdx, 1)[0]);
+  }
+
+  // Tentar fechar o ciclo: comparar rota direta vs rota invertida
+  // Calcular distância total da rota atual
+  var calcTotal = function(arr) {
+    var total = 0;
+    for(var i=0; i<arr.length-1; i++) {
+      total += distancia(getEdif(arr[i]), getEdif(arr[i+1]));
+    }
+    // Adicionar retorno ao início para avaliar circularidade
+    total += distancia(getEdif(arr[arr.length-1]), getEdif(arr[0]));
+    return total;
+  };
+
+  var invertido = ordenados.slice().reverse();
+  var distDireta = calcTotal(ordenados);
+  var distInvert = calcTotal(invertido);
+  var melhorOrdem = distInvert < distDireta ? invertido : ordenados;
+
+  // Colocar as sem GPS no final
+  rotaVistSel = melhorOrdem.concat(semGPS);
+
+  renderOrdemRota();
+  renderEstimativa(rotaVistSel);
+
+  var msg = '✅ Rota otimizada!\n';
+  msg += melhorOrdem.length + ' edificação(ões) ordenadas por proximidade GPS.';
+  if(semGPS.length) msg += '\n' + semGPS.length + ' edificação(ões) sem GPS adicionada(s) ao final.';
+  msg += '\n\nVocê ainda pode ajustar manualmente com ↑↓.';
+  alert(msg);
+}
+
+
+// ════════ ESTIMATIVA DE TEMPO ════════
+
+// Converte graus para km (aproximação para SC)
+function grausParaKm(dlat, dlng) {
+  var R = 6371; // raio da Terra em km
+  var dlatR = dlat * Math.PI / 180;
+  var dlngR = dlng * Math.PI / 180;
+  // Fórmula haversine simplificada para distâncias curtas
+  var a = Math.sin(dlatR/2)*Math.sin(dlatR/2) +
+          Math.cos(-27.5*Math.PI/180)*Math.cos(-27.5*Math.PI/180)*
+          Math.sin(dlngR/2)*Math.sin(dlngR/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function calcularEstimativa(vids) {
+  var VEL_MEDIA_KMH = 30;      // velocidade média urbana
+  var PAUSA_MIN = 15;           // minutos por edificação
+  var n = vids.length;
+
+  var totalDeslocKm = 0;
+  var totalDeslocMin = 0;
+  var trechos = [];
+  var semGPS = 0;
+
+  var getEdif = function(vid) {
+    var v = S.vistorias.find(function(x){return x.id===vid;});
+    return v ? S.edificacoes.find(function(x){return x.id===v.edificacaoId;}) : null;
+  };
+
+  for(var i = 0; i < vids.length - 1; i++) {
+    var e1 = getEdif(vids[i]);
+    var e2 = getEdif(vids[i+1]);
+    if(e1&&e1.lat&&e1.lng&&e2&&e2.lat&&e2.lng) {
+      var dlat = parseFloat(e2.lat) - parseFloat(e1.lat);
+      var dlng = parseFloat(e2.lng) - parseFloat(e1.lng);
+      var km = grausParaKm(dlat, dlng);
+      var minutos = (km / VEL_MEDIA_KMH) * 60;
+      totalDeslocKm += km;
+      totalDeslocMin += minutos;
+      trechos.push({de: i+1, para: i+2, km: km, min: minutos});
+    } else {
+      semGPS++;
+      trechos.push({de: i+1, para: i+2, km: null, min: null});
+    }
+  }
+
+  var totalPausaMin = n * PAUSA_MIN;
+  var totalMin = totalDeslocMin + totalPausaMin;
+  var horas = Math.floor(totalMin / 60);
+  var min = Math.round(totalMin % 60);
+
+  return {
+    n: n,
+    totalKm: totalDeslocKm,
+    totalDeslocMin: totalDeslocMin,
+    totalPausaMin: totalPausaMin,
+    totalMin: totalMin,
+    horas: horas,
+    min: min,
+    trechos: trechos,
+    semGPS: semGPS
+  };
+}
+
+function formatMin(min) {
+  if(min < 1) return '< 1 min';
+  if(min < 60) return Math.round(min)+' min';
+  var h = Math.floor(min/60);
+  var m = Math.round(min%60);
+  return h+'h'+(m>0?m+'min':'');
+}
+
+function renderEstimativa(vids) {
+  var c = document.getElementById('rota-estimativa');
+  if(!c) return;
+  if(vids.length < 1) { c.innerHTML=''; return; }
+
+  var est = calcularEstimativa(vids);
+  var hTotal = est.horas > 0 ? est.horas+'h '+est.min+'min' : est.min+'min';
+
+  var detalhe =
+    '🚗 Deslocamento: '+est.totalKm.toFixed(1)+' km · '+formatMin(est.totalDeslocMin)+'\n'+
+    '⏸️ Pausas: '+est.n+' × 15 min = '+formatMin(est.totalPausaMin)+'\n'+
+    '📋 Total estimado: '+hTotal;
+
+  var horaInicio = document.getElementById('r-inicio') ? document.getElementById('r-inicio').value : '';
+  var previsaoFim = '';
+  if(horaInicio) {
+    var partes = horaInicio.split(':');
+    var h = parseInt(partes[0]), m = parseInt(partes[1]);
+    var totalM = h*60 + m + Math.round(est.totalMin);
+    var hF = Math.floor(totalM/60)%24;
+    var mF = totalM%60;
+    previsaoFim = 'Previsão de término: '+(hF<10?'0':'')+hF+':'+(mF<10?'0':'')+mF;
+  }
+
+  var aviso = est.semGPS > 0
+    ? est.semGPS+' edificação(ões) sem GPS — deslocamento entre elas não calculado.'
+    : '';
+
+  c.innerHTML =
+    '<div class="estimativa-card">'+
+      '<div class="est-titulo">⏱️ Estimativa da Rota</div>'+
+      '<div class="est-grid">'+
+        '<div class="est-item"><div class="est-num">'+hTotal+'</div><div class="est-label">Tempo total</div></div>'+
+        '<div class="est-item"><div class="est-num">'+est.totalKm.toFixed(1)+' km</div><div class="est-label">Distância total</div></div>'+
+        '<div class="est-item"><div class="est-num">'+est.n+'</div><div class="est-label">Edificações</div></div>'+
+        '<div class="est-item"><div class="est-num">'+formatMin(est.totalDeslocMin)+'</div><div class="est-label">Deslocamento</div></div>'+
+      '</div>'+
+      '<div class="est-detalhe">'+detalhe.replace(/\n/g,'<br>')+(previsaoFim?'<br>🏁 '+previsaoFim:'')+'</div>'+
+      (aviso?'<div class="est-aviso">⚠️ '+aviso+'</div>':'')+
+    '</div>';
+}
+
+
+// ════════════════════════════════════════
+// TELA DADOS
+// ════════════════════════════════════════
+var expSelEdif = {};
+var expSelVist = {};
+var expSelRotas = {};
+var expFiltMun = '';
+var expFiltRota = '';
+
+function setTabDados(tab, btn) {
+  document.querySelectorAll('#tabs-dados .tab').forEach(function(t){t.classList.remove('on');});
+  btn.classList.add('on');
+  ['exportar','planejar','excluir'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'block':'none';
+  });
+  if(tab==='exportar') renderExportacao();
+  if(tab==='planejar') initPlanejar();
+  if(tab==='excluir') renderExcluir();
+}
+
+function initDados() {
+  setTabDados('exportar', document.querySelector('#tabs-dados .tab'));
+}
+
+// ─── EXPORTAÇÃO ───────────────────────────────────────────────
+function renderExportacao() {
+  expSelEdif={}; expSelVist={}; expSelRotas={};
+  expFiltMun=''; expFiltRota='';
+  renderExpPills();
+  renderExpListas();
+}
+
+function renderExpPills() {
+  // Pills município
+  var cm = document.getElementById('exp-pills-mun');
+  var cr = document.getElementById('exp-pills-rota');
+  if(!cm||!cr) return;
+
+  var munHTML = '<span class="exp-filter-pill '+(expFiltMun===''?'on':'')+'" onclick="setExpFiltMun(\'\')">Todos</span>';
+  S.municipios.forEach(function(m){
+    munHTML += '<span class="exp-filter-pill '+(expFiltMun===m?'on':'')+'" onclick="setExpFiltMun(\''+m.replace(/'/g,"\\'")+'\')" >'+m+'</span>';
+  });
+  cm.innerHTML = munHTML;
+
+  var rotaHTML = '<span class="exp-filter-pill '+(expFiltRota===''?'on':'')+'" onclick="setExpFiltRota(\'\')">Todas</span>';
+  S.rotas.forEach(function(r){
+    rotaHTML += '<span class="exp-filter-pill '+(expFiltRota===r.id?'on':'')+'" onclick="setExpFiltRota(\''+r.id+'\')" >'+r.nome+'</span>';
+  });
+  cr.innerHTML = rotaHTML;
+}
+
+function setExpFiltMun(mun) {
+  expFiltMun = mun; expFiltRota = '';
+  renderExpPills(); renderExpListas();
+}
+function setExpFiltRota(rotaId) {
+  expFiltRota = rotaId; expFiltMun = '';
+  renderExpPills(); renderExpListas();
+}
+
+function renderExpListas() {
+  // Filtrar edificações
+  var edifs = S.edificacoes.filter(function(e){
+    if(expFiltMun) return (e.municipio||'')===expFiltMun;
+    if(expFiltRota) {
+      var r = S.rotas.find(function(x){return x.id===expFiltRota;});
+      if(!r) return false;
+      return (r.vistorias||[]).some(function(vid){
+        var v=S.vistorias.find(function(x){return x.id===vid;});
+        return v && v.edificacaoId===e.id;
+      });
+    }
+    return true;
+  });
+
+  // Filtrar vistorias
+  var vists = S.vistorias.filter(function(v){
+    var e = S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+    if(expFiltMun) return e&&(e.municipio||'')===expFiltMun;
+    if(expFiltRota) {
+      var r=S.rotas.find(function(x){return x.id===expFiltRota;});
+      return r&&(r.vistorias||[]).indexOf(v.id)>=0;
+    }
+    return true;
+  });
+
+  // Filtrar rotas
+  var rotas = S.rotas.filter(function(r){
+    if(expFiltRota) return r.id===expFiltRota;
+    if(expFiltMun) {
+      return (r.vistorias||[]).some(function(vid){
+        var v=S.vistorias.find(function(x){return x.id===vid;});
+        var e=v?S.edificacoes.find(function(x){return x.id===v.edificacaoId;}):null;
+        return e&&(e.municipio||'')===expFiltMun;
+      });
+    }
+    return true;
+  });
+
+  // Render edificações
+  var ce = document.getElementById('exp-lista-edif');
+  ce.innerHTML = edifs.length ? edifs.map(function(e){
+    var sel = expSelEdif[e.id];
+    return '<div class="exp-item" onclick="togExpEdif(\''+e.id+'\')">'+
+      '<div class="exp-chk '+(sel?'on':'')+'" id="expce-'+e.id+'">'+(sel?'✓':'')+'</div>'+
+      '<div class="exp-info">'+
+        '<div class="exp-nome">Nº '+e.numero+' — '+e.nome+'</div>'+
+        '<div class="exp-sub">'+(e.municipio||'')+(e.endereco?' · '+e.endereco:'')+'</div>'+
+      '</div></div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma edificação neste filtro.</div>';
+
+  // Render vistorias
+  var cv = document.getElementById('exp-lista-vist');
+  cv.innerHTML = vists.length ? vists.map(function(v){
+    var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+    var sel=expSelVist[v.id];
+    var dt=v.concluidaEm?new Date(v.concluidaEm).toLocaleDateString('pt-BR'):'Pendente';
+    return '<div class="exp-item" onclick="togExpVist(\''+v.id+'\')">'+
+      '<div class="exp-chk '+(sel?'on':'')+'" id="expcv-'+v.id+'">'+(sel?'✓':'')+'</div>'+
+      '<div class="exp-info">'+
+        '<div class="exp-nome">Nº '+(e?e.numero:'—')+' — '+(e?e.nome:'—')+'</div>'+
+        '<div class="exp-sub">'+(TIPO_L[v.tipo]||v.tipo)+' · '+dt+(v.concluida?' ✅':'')+'</div>'+
+      '</div></div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma vistoria neste filtro.</div>';
+
+  // Render rotas
+  var cr2 = document.getElementById('exp-lista-rotas');
+  cr2.innerHTML = rotas.length ? rotas.map(function(r){
+    var sel=expSelRotas[r.id];
+    var dt=r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+    return '<div class="exp-item" onclick="togExpRota(\''+r.id+'\')">'+
+      '<div class="exp-chk '+(sel?'on':'')+'" id="expcr-'+r.id+'">'+(sel?'✓':'')+'</div>'+
+      '<div class="exp-info">'+
+        '<div class="exp-nome">'+r.nome+'</div>'+
+        '<div class="exp-sub">'+dt+' · '+(r.vistorias||[]).length+' vistoria(s)</div>'+
+      '</div></div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma rota neste filtro.</div>';
+}
+
+function togExpEdif(id){ expSelEdif[id]=!expSelEdif[id]; var el=document.getElementById('expce-'+id); if(el){el.className='exp-chk '+(expSelEdif[id]?'on':'');el.textContent=expSelEdif[id]?'✓':'';}  }
+function togExpVist(id){ expSelVist[id]=!expSelVist[id]; var el=document.getElementById('expcv-'+id); if(el){el.className='exp-chk '+(expSelVist[id]?'on':'');el.textContent=expSelVist[id]?'✓':'';} }
+function togExpRota(id){ expSelRotas[id]=!expSelRotas[id]; var el=document.getElementById('expcr-'+id); if(el){el.className='exp-chk '+(expSelRotas[id]?'on':'');el.textContent=expSelRotas[id]?'✓':'';} }
+
+function expSelecionarTudo(){
+  S.edificacoes.forEach(function(e){expSelEdif[e.id]=true;});
+  S.vistorias.forEach(function(v){expSelVist[v.id]=true;});
+  S.rotas.forEach(function(r){expSelRotas[r.id]=true;});
+  renderExpListas();
+}
+function expDeselecionarTudo(){
+  expSelEdif={}; expSelVist={}; expSelRotas={};
+  renderExpListas();
+}
+
+function executarExportacao(){
+  var edifs = S.edificacoes.filter(function(e){return expSelEdif[e.id];});
+  var vists = S.vistorias.filter(function(v){return expSelVist[v.id];});
+  var rotas = S.rotas.filter(function(r){return expSelRotas[r.id];});
+
+  if(!edifs.length && !vists.length && !rotas.length){
+    alert('Selecione ao menos um item para exportar.');
+    return;
+  }
+
+  var pacote = {
+    tipo: 'cbmsc_dados',
+    versao: '1.0',
+    exportadoEm: new Date().toISOString(),
+    municipios: S.municipios,
+    edificacoes: edifs,
+    vistorias: vists,
+    rotas: rotas
+  };
+
+  var json = JSON.stringify(pacote, null, 2);
+  var blob = new Blob([json],{type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'cbmsc_dados_'+new Date().toISOString().split('T')[0]+'.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('Exportado!\n'+edifs.length+' edificação(ões)\n'+vists.length+' vistoria(s)\n'+rotas.length+' rota(s)');
+}
+
+// ─── PLANEJAMENTO ─────────────────────────────────────────────
+function initPlanejar(){
+  document.getElementById('plan-data-ini').value = new Date().toISOString().split('T')[0];
+  // Popular select de município
+  var sel = document.getElementById('plan-mun');
+  sel.innerHTML = '<option value="">Todos os municípios</option>';
+  S.municipios.forEach(function(m){
+    var opt=document.createElement('option'); opt.value=m; opt.textContent=m; sel.appendChild(opt);
+  });
+  document.getElementById('plan-resultado').innerHTML='';
+}
+
+var planRotasSugeridas = [];
+
+function gerarPlanejamento(){
+  var horasDia = parseFloat(document.getElementById('plan-horas').value)||6;
+  var minPorVist = parseInt(document.getElementById('plan-min-vist').value)||15;
+  var dataIni = document.getElementById('plan-data-ini').value;
+  var diasDisp = parseInt(document.getElementById('plan-dias').value)||5;
+  var munFilt = document.getElementById('plan-mun').value;
+  var horaIni = document.getElementById('plan-hora-ini').value||'08:00';
+  var velKmh = 30;
+
+  if(!dataIni){ alert('Informe a data inicial.'); return; }
+
+  // Vistorias pendentes filtradas
+  var vistsPend = S.vistorias.filter(function(v){
+    if(v.concluida) return false;
+    if(munFilt){
+      var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+      return e&&(e.municipio||'')===munFilt;
+    }
+    return true;
+  });
+
+  if(!vistsPend.length){
+    document.getElementById('plan-resultado').innerHTML=
+      '<div class="card" style="text-align:center;color:var(--sub)">Nenhuma vistoria pendente'+
+      (munFilt?' em '+munFilt:'')+'.</div>';
+    return;
+  }
+
+  // Ordenar por proximidade (vizinho mais próximo global)
+  var getEdif = function(vid){
+    var v=S.vistorias.find(function(x){return x.id===vid;});
+    return v?S.edificacoes.find(function(x){return x.id===v.edificacaoId;}):null;
+  };
+
+  var restantes = vistsPend.map(function(v){return v.id;});
+  var ordenados = [];
+  var atual = restantes.shift();
+  ordenados.push(atual);
+  while(restantes.length){
+    var eAtual=getEdif(atual);
+    var melhorIdx=0, melhorDist=Infinity;
+    restantes.forEach(function(vid,idx){
+      var d=distancia(eAtual,getEdif(vid));
+      if(d<melhorDist){melhorDist=d;melhorIdx=idx;}
+    });
+    atual=restantes.splice(melhorIdx,1)[0];
+    ordenados.push(atual);
+  }
+
+  // Distribuir em dias respeitando o tempo
+  var minutosDispDia = horasDia * 60;
+  var rotas = [];
+  var diaIdx = 0;
+  var i = 0;
+
+  while(i < ordenados.length && diaIdx < diasDisp){
+    var rotaDia = [];
+    var minUsados = 0;
+
+    while(i < ordenados.length){
+      var vid = ordenados[i];
+      // Calcular tempo de deslocamento até este ponto
+      var minDesl = 0;
+      if(rotaDia.length > 0){
+        var ePrev=getEdif(rotaDia[rotaDia.length-1]);
+        var eCur=getEdif(vid);
+        if(ePrev&&ePrev.lat&&ePrev.lng&&eCur&&eCur.lat&&eCur.lng){
+          var dlat=parseFloat(eCur.lat)-parseFloat(ePrev.lat);
+          var dlng=parseFloat(eCur.lng)-parseFloat(ePrev.lng);
+          var km=grausParaKm(dlat,dlng);
+          minDesl=(km/velKmh)*60;
+        } else {
+          minDesl=10; // estimativa padrão sem GPS
+        }
+      }
+      var minNecessario = minDesl + minPorVist;
+      if(minUsados + minNecessario <= minutosDispDia){
+        rotaDia.push(vid);
+        minUsados += minNecessario;
+        i++;
+      } else {
+        break;
+      }
+    }
+
+    if(rotaDia.length > 0){
+      // Calcular data
+      var d = new Date(dataIni+'T12:00:00');
+      d.setDate(d.getDate() + diaIdx);
+      var dataStr = d.toISOString().split('T')[0];
+      var dataBR = d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+
+      // Calcular estimativa real
+      var est = calcularEstimativa(rotaDia);
+      // Recalcular com minPorVist customizado
+      var totalCustom = est.totalDeslocMin + rotaDia.length * minPorVist;
+      var hC = Math.floor(totalCustom/60), mC = Math.round(totalCustom%60);
+
+      rotas.push({
+        dia: diaIdx+1,
+        data: dataStr,
+        dataBR: dataBR,
+        horaIni: horaIni,
+        vids: rotaDia,
+        minTotal: totalCustom,
+        horas: hC,
+        mins: mC,
+        km: est.totalKm
+      });
+    }
+    diaIdx++;
+  }
+
+  planRotasSugeridas = rotas;
+
+  // Renderizar resultado
+  var resto = ordenados.length - i;
+  var html = '';
+
+  if(resto > 0){
+    html += '<div style="background:#FFF8E1;border-left:3px solid #FF9500;border-radius:8px;padding:10px 12px;font-size:12px;color:#E65100;margin-bottom:12px">'+
+      '⚠️ '+resto+' vistoria(s) não couberam nos '+diasDisp+' dias com '+horasDia+'h por dia. Aumente os dias ou o tempo diário.</div>';
+  }
+
+  html += '<div style="font-size:13px;font-weight:700;margin-bottom:10px">'+rotas.length+' rota(s) sugerida(s)</div>';
+
+  rotas.forEach(function(r,ri){
+    var items = r.vids.map(function(vid,vi){
+      var e=getEdif(vid);
+      return '<div class="plan-edif-row"><span class="plan-badge">'+(vi+1)+'</span>'+
+        (e?'Nº '+e.numero+' — '+e.nome:'—')+
+        (e&&e.municipio?' <span style="color:var(--sub)">· '+e.municipio+'</span>':'')+
+        '</div>';
+    }).join('');
+
+    var hT = r.horas>0?r.horas+'h '+r.mins+'min':r.mins+'min';
+
+    html +=
+      '<div class="plan-rota-card">'+
+        '<div class="plan-rota-header">'+
+          '<div class="plan-rota-title">Rota '+r.dia+' — '+r.dataBR+'</div>'+
+          '<div class="plan-rota-info">'+r.vids.length+' vistoria(s) · ⏱️ '+hT+' · 🚗 '+r.km.toFixed(1)+' km</div>'+
+          '<div style="margin-top:8px;display:flex;gap:6px;align-items:center">'+
+            '<input type="date" value="'+r.data+'" onchange="alterarDataPlan('+ri+',this.value)" style="flex:1;padding:6px 10px;border:1.5px solid var(--borda);border-radius:7px;font-size:13px;font-family:inherit">'+
+            '<input type="time" value="'+r.horaIni+'" onchange="alterarHoraPlan('+ri+',this.value)" style="width:90px;padding:6px 10px;border:1.5px solid var(--borda);border-radius:7px;font-size:13px;font-family:inherit">'+
+          '</div>'+
+        '</div>'+
+        '<div class="plan-rota-body">'+items+'</div>'+
+      '</div>';
+  });
+
+  if(rotas.length){
+    html += '<button class="btn btn-p" onclick="confirmarPlanejamento()" style="margin-top:4px">✅ Criar estas rotas</button>';
+  }
+
+  document.getElementById('plan-resultado').innerHTML = html;
+}
+
+function alterarDataPlan(idx, val){ if(planRotasSugeridas[idx]) planRotasSugeridas[idx].data=val; }
+function alterarHoraPlan(idx, val){ if(planRotasSugeridas[idx]) planRotasSugeridas[idx].horaIni=val; }
+
+function confirmarPlanejamento(){
+  var criadas=0;
+  planRotasSugeridas.forEach(function(r,i){
+    var nomeRota = 'Rota planejada '+r.dataBR;
+    var nova={
+      id:'r_plan_'+Date.now()+'_'+i,
+      nome:nomeRota,
+      data:r.data,
+      horaInicio:r.horaIni,
+      vistoriador:'',
+      vistorias:r.vids,
+      concluida:false
+    };
+    S.rotas.push(nova);
+    criadas++;
+  });
+  save();
+  alert('✅ '+criadas+' rota(s) criada(s)!\nAcesse a tela Rotas para ver e editar.');
+  navTo('rotas');
+}
+
+// ─── EXCLUIR ──────────────────────────────────────────────────
+function renderExcluir(){
+  var ce=document.getElementById('excl-lista-edif');
+  var cr=document.getElementById('excl-lista-rotas');
+  var cv=document.getElementById('excl-lista-vist');
+
+  ce.innerHTML = S.edificacoes.length ? S.edificacoes.map(function(e){
+    return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+      '<div style="flex:1"><div style="font-size:11px;color:var(--sub)">Nº '+e.numero+(e.municipio?' · '+e.municipio:'')+'</div>'+
+      '<div style="font-size:14px;font-weight:600">'+e.nome+'</div></div>'+
+      '<button class="btn btn-danger btn-sm" onclick="excluirEdifId(\''+e.id+'\')">🗑️</button>'+
+    '</div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma edificação.</div>';
+
+  cr.innerHTML = S.rotas.length ? S.rotas.map(function(r){
+    var dt=r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+    return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+      '<div style="flex:1"><div style="font-size:14px;font-weight:600">'+r.nome+'</div>'+
+      '<div style="font-size:12px;color:var(--sub)">'+dt+' · '+(r.vistorias||[]).length+' vistoria(s)</div></div>'+
+      '<button class="btn btn-danger btn-sm" onclick="excluirRotaId(\''+r.id+'\')">🗑️</button>'+
+    '</div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma rota.</div>';
+
+  cv.innerHTML = S.vistorias.length ? S.vistorias.map(function(v){
+    var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+    var dt=v.concluidaEm?new Date(v.concluidaEm).toLocaleDateString('pt-BR'):'Pendente';
+    return '<div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+      '<div style="flex:1">'+
+      '<div style="font-size:11px;color:var(--sub)">Nº '+(e?e.numero:'—')+(e&&e.municipio?' · '+e.municipio:'')+'</div>'+
+      '<div style="font-size:14px;font-weight:600">'+(e?e.nome:'—')+'</div>'+
+      '<div style="font-size:12px;color:var(--sub)">'+(TIPO_L[v.tipo]||v.tipo)+' · '+dt+'</div></div>'+
+      '<button class="btn btn-danger btn-sm" onclick="excluirVistId(\''+v.id+'\')">🗑️</button>'+
+    '</div>';
+  }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma vistoria.</div>';
+}
+
+function excluirEdifId(id){
+  if(!confirm('Excluir esta edificação? Esta ação não pode ser desfeita.'))return;
+  S.edificacoes=S.edificacoes.filter(function(e){return e.id!==id;});
+  save(); renderExcluir(); renderEdif(); renderHome();
+}
+function excluirRotaId(id){
+  if(!confirm('Excluir esta rota?'))return;
+  S.rotas=S.rotas.filter(function(r){return r.id!==id;});
+  save(); renderExcluir(); renderRotas(); renderHome();
+}
+function excluirVistId(id){
+  if(!confirm('Excluir esta vistoria?'))return;
+  S.vistorias=S.vistorias.filter(function(v){return v.id!==id;});
+  save(); renderExcluir(); renderVist(); renderHome();
+}
+
+// ─── IMPORTAÇÃO GERAL ─────────────────────────────────────────
+function importarGeral(input){
+  var file=input.files[0]; if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var p=JSON.parse(ev.target.result);
+      var tipo=p.tipo||'';
+      if(tipo==='rota_cbmsc'){importarRota({files:[file]});return;}
+      if(tipo!=='cbmsc_dados'&&tipo!=='cbmsc_edificacoes'&&!p.edificacoes){
+        alert('Arquivo inválido.');return;
+      }
+      var ea=0,eu=0,va=0,vu=0,ra=0,ru=0;
+      (p.municipios||[]).forEach(function(m){if(S.municipios.indexOf(m)<0)S.municipios.push(m);});
+      (p.edificacoes||[]).forEach(function(e){var i=S.edificacoes.findIndex(function(x){return x.id===e.id;});if(i>=0){S.edificacoes[i]=e;eu++;}else{S.edificacoes.push(e);ea++;}});
+      (p.vistorias||[]).forEach(function(v){var i=S.vistorias.findIndex(function(x){return x.id===v.id;});if(i>=0){S.vistorias[i]=v;vu++;}else{S.vistorias.push(v);va++;}});
+      (p.rotas||[]).forEach(function(r){var i=S.rotas.findIndex(function(x){return x.id===r.id;});if(i>=0){S.rotas[i]=r;ru++;}else{S.rotas.push(r);ra++;}});
+      save();renderHome();renderEdif();renderVist();renderRotas();
+      alert('Importado!\nEdificações: '+ea+' novas, '+eu+' atualizadas\nVistorias: '+va+' novas, '+vu+' atualizadas\nRotas: '+ra+' novas, '+ru+' atualizadas');
+    }catch(err){alert('Erro: '+err.message);}
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
+
+// ════════ GPS ════════
+function capturarGPS(idLat, idLng, idStatus) {
+  var statusEl = document.getElementById(idStatus);
+  if(statusEl) statusEl.textContent = '⏳ Obtendo localização...';
+
+  if(!navigator.geolocation) {
+    if(statusEl) statusEl.textContent = '❌ GPS não disponível neste dispositivo.';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude.toFixed(6);
+      var lng = pos.coords.longitude.toFixed(6);
+      var acc = Math.round(pos.coords.accuracy);
+      var elLat = document.getElementById(idLat);
+      var elLng = document.getElementById(idLng);
+      if(elLat) elLat.value = lat;
+      if(elLng) elLng.value = lng;
+      if(statusEl) statusEl.textContent = '✅ Capturado! Precisão: ±' + acc + ' metros.';
+    },
+    function(err) {
+      var msg = '❌ ';
+      if(err.code === 1) msg += 'Permissão negada. Habilite o GPS nas configurações.';
+      else if(err.code === 2) msg += 'Posição indisponível. Verifique o GPS.';
+      else msg += 'Tempo esgotado. Tente novamente ao ar livre.';
+      if(statusEl) statusEl.textContent = msg;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function capturarGPSVistoria(edificacaoId) {
+  var statusEl = document.getElementById('gps-status-vist');
+  if(statusEl) statusEl.textContent = '⏳ Obtendo localização...';
+
+  if(!navigator.geolocation) {
+    if(statusEl) statusEl.textContent = '❌ GPS não disponível.';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude.toFixed(6);
+      var lng = pos.coords.longitude.toFixed(6);
+      var acc = Math.round(pos.coords.accuracy);
+
+      // Salvar direto no cadastro da edificação
+      var idx = S.edificacoes.findIndex(function(e){return e.id===edificacaoId;});
+      if(idx >= 0) {
+        S.edificacoes[idx].lat = lat;
+        S.edificacoes[idx].lng = lng;
+        save();
+        if(statusEl) statusEl.textContent = '✅ Coordenadas salvas! (' + lat + ', ' + lng + ') ±' + acc + 'm';
+        // Atualizar o display sem recarregar tudo
+        setTimeout(function(){
+          // Recarregar o cabeçalho da vistoria
+          if(vistAtiva) renderChecklist();
+        }, 1500);
+      } else {
+        if(statusEl) statusEl.textContent = '❌ Edificação não encontrada.';
+      }
+    },
+    function(err) {
+      var msg = '❌ ';
+      if(err.code === 1) msg += 'Permissão negada.';
+      else if(err.code === 2) msg += 'GPS indisponível.';
+      else msg += 'Tempo esgotado.';
+      if(statusEl) statusEl.textContent = msg;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+
+// ════════ VENCIMENTO FUNCIONAMENTO ════════
+function atualizarStatusFunc() {
+  var el = document.getElementById('e-venc-func');
+  var st = document.getElementById('e-venc-func-status');
+  if(!el || !st) return;
+  var val = el.value;
+  if(!val) { st.textContent=''; return; }
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var d = new Date(val+'T12:00:00');
+  var dias = Math.round((d - hoje) / (1000*60*60*24));
+  if(dias < 0) st.innerHTML='<span class="venc-alerta venc-vencido">⚠️ Vencido há '+Math.abs(dias)+' dia(s)</span>';
+  else if(dias <= 30) st.innerHTML='<span class="venc-alerta venc-prox">🟡 Vence em '+dias+' dia(s)</span>';
+  else st.innerHTML='<span class="venc-alerta venc-ok">✅ Válido por '+dias+' dia(s)</span>';
+}
+
+function statusVencFunc(dataStr) {
+  if(!dataStr) return '';
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var d = new Date(dataStr+'T12:00:00');
+  var dias = Math.round((d - hoje) / (1000*60*60*24));
+  if(dias < 0) return '<span class="venc-alerta venc-vencido">⚠️ Vencido há '+Math.abs(dias)+'d</span>';
+  if(dias <= 30) return '<span class="venc-alerta venc-prox">🟡 Vence em '+dias+'d</span>';
+  return '<span class="venc-alerta venc-ok">✅ '+dias+'d</span>';
+}
+
+// ════════ EDIFICAÇÕES PRÓXIMAS ════════
+function buscarEdificacoesProximas(edifId) {
+  var ref = S.edificacoes.find(function(e){return e.id===edifId;});
+  if(!ref || !ref.lat || !ref.lng) {
+    alert('Esta edificação não tem coordenadas GPS cadastradas.');
+    return;
+  }
+  var RAIO_KM = 15;
+  var latRef = parseFloat(ref.lat);
+  var lngRef = parseFloat(ref.lng);
+
+  var proximas = S.edificacoes
+    .filter(function(e){ return e.id !== edifId && e.lat && e.lng; })
+    .map(function(e){
+      var dlat = parseFloat(e.lat) - latRef;
+      var dlng = parseFloat(e.lng) - lngRef;
+      var km = grausParaKm(dlat, dlng);
+      return {e:e, km:km};
+    })
+    .filter(function(x){ return x.km <= RAIO_KM; })
+    .sort(function(a,b){ return a.km - b.km; });
+
+  var el = document.getElementById('proximas-content');
+  if(!el) return;
+
+  if(!proximas.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--sub);padding:8px 0">Nenhuma edificação encontrada num raio de '+RAIO_KM+' km.</div>';
+    return;
+  }
+
+  el.innerHTML = '<div style="font-size:12px;color:var(--sub);margin-bottom:8px">'+proximas.length+' edificação(ões) em até '+RAIO_KM+' km:</div>'+
+    proximas.map(function(x){
+      var distStr = x.km < 1 ? (x.km*1000).toFixed(0)+' m' : x.km.toFixed(1)+' km';
+      return '<div class="prox-edif-item" onclick="verEdif(\''+x.e.id+'\')">'+
+        '<span class="prox-edif-dist">'+distStr+'</span>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nº '+x.e.numero+' — '+x.e.nome+'</div>'+
+          '<div style="font-size:11px;color:var(--sub)">'+(x.e.municipio||'')+(x.e.endereco?' · '+x.e.endereco:'')+'</div>'+
+        '</div>'+
+        (x.e.lat&&x.e.lng?'<button class="btn btn-maps btn-sm" onclick="event.stopPropagation();maps(\''+x.e.lat+'\',\''+x.e.lng+'\')" style="flex-shrink:0">📍</button>':'')+
+      '</div>';
+    }).join('');
+}
+
+function getCL(tipo) { return tipo === 'funcionamento' ? CL_FN : CL_HS; }
+var TIPO_L = {'habite-se':'Habite-se','funcionamento':'Funcionamento','oficio':'Existente/Oficio'};
+var TIPO_B = {'habite-se':'b-hs','funcionamento':'b-fn','oficio':'b-of'};
+var TIPO_R = {'habite-se':'HABITE-SE','funcionamento':'FUNCIONAMENTO','oficio':'EXISTENTE/OFICIO'};
+function navTo(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});document.getElementById('s-'+id).classList.add('on');document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var ni=document.getElementById('ni-'+id);if(ni)ni.classList.add('on');document.getElementById('btnBack').classList.remove('on');backFn=null;var ts={home:['Vistoria CBMSC','CBMSC - SC'],edificacoes:['Edificacoes','Cadastro'],vistorias:['Vistorias','Lista de pendencias'],rotas:['Rotas','Roteiros do dia'],exec:['Execucao',''],relatorio:['Relatorios','Gerar relatorio'],dados:['Dados','Exportar · Planejar · Excluir']};var t=ts[id]||['CBMSC',''];document.getElementById('hdrT').textContent=t[0];document.getElementById('hdrS').textContent=t[1];if(id==='home')renderHome();if(id==='edificacoes')renderEdif();if(id==='vistorias')renderVist();if(id==='rotas')renderRotas();if(id==='relatorio')renderRel();
+  if(id==='dados')initDados();}
+function goBack(){if(backFn)backFn();else navTo('home');}
+function setBack(fn,title,sub){backFn=fn;document.getElementById('btnBack').classList.add('on');if(title)document.getElementById('hdrT').textContent=title;if(sub)document.getElementById('hdrS').textContent=sub;}
+function openM(id){document.getElementById(id).classList.add('on');}
+function closeM(id){document.getElementById(id).classList.remove('on');}
+function renderHome(){document.getElementById('cnt-e').textContent=S.edificacoes.length;document.getElementById('cnt-v').textContent=S.vistorias.length;document.getElementById('cnt-c').textContent=S.vistorias.filter(function(v){return v.concluida;}).length;var hoje=new Date().toISOString().split('T')[0];var rh=S.rotas.filter(function(r){return r.data===hoje;});var el=document.getElementById('home-rotas');if(!rh.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--sub);padding:16px">Nenhuma rota agendada para hoje</div>';}else{el.innerHTML=rh.map(function(r){var n=(r.vistorias||[]).length;return '<div class="card" style="cursor:pointer" onclick="abrirRota(\''+r.id+'\')"><div class="card-row"><div><div class="card-t">'+r.nome+'</div><div class="card-s">'+n+' vistoria(s) - '+(r.vistoriador||'---')+'</div></div><span class="bdg '+(r.concluida?'b-ok':'b-pend')+'">'+(r.concluida?'Concluida':'Pendente')+'</span></div></div>';}).join('');}}
+function exportarDados(){var data=JSON.stringify({edificacoes:S.edificacoes,exportadoEm:new Date().toISOString()},null,2);var blob=new Blob([data],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='cbmsc_edificacoes_'+new Date().toISOString().split('T')[0]+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+function importarDados(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(!data.edificacoes||!Array.isArray(data.edificacoes)){alert('Arquivo invalido.');return;}var add=0,upd=0;data.edificacoes.forEach(function(edif){var idx=S.edificacoes.findIndex(function(e){return e.id===edif.id;});if(idx>=0){S.edificacoes[idx]=edif;upd++;}else{S.edificacoes.push(edif);add++;}});save();renderEdif();renderHome();alert('OK! '+add+' adicionada(s), '+upd+' atualizada(s)');}catch(err){alert('Erro: '+err.message);}input.value='';};reader.readAsText(file);}
+function renderPrevForm(prevExist){var html=SIST.map(function(s){var at=prevExist&&prevExist[s.id]&&prevExist[s.id].ativo;var q=(prevExist&&prevExist[s.id]&&prevExist[s.id].qty)||1;var obs=(prevExist&&prevExist[s.id]&&prevExist[s.id].obs)||'';return '<div class="pi" id="pi-wrap-'+s.id+'" style="flex-wrap:wrap">'+
+  '<div class="pc '+(at?'on':'')+'" id="pc-'+s.id+'" onclick="togPrev(\''+s.id+'\')">'+(at?'v':'')+'</div>'+
+  '<div style="flex:1"><div class="pi-n">'+s.l+'</div><div class="pi-in">'+s.n+'</div></div>'+
+  '<div class="pq '+(at?'on':'')+'" id="pq-'+s.id+'">'+
+    '<button class="qb" onclick="chgQ(\''+s.id+'\',-1)">-</button>'+
+    '<span class="qn" id="qn-'+s.id+'">'+q+'</span>'+
+    '<button class="qb" onclick="chgQ(\''+s.id+'\',1)">+</button>'+
+  '</div>'+
+  '<div style="width:100%">'+
+    '<button class="pi-obs-btn" onclick="togPrevObs(\''+s.id+'\')" id="pi-obs-btn-'+s.id+'">'+(obs?'📝 Ver obs.':'+ Observação')+'</button>'+
+    '<textarea class="pi-obs '+(obs?'on':'')+'" id="pi-obs-'+s.id+'" placeholder="Observações sobre este sistema (exceções, adaptações permitidas, condições especiais...)">'+obs+'</textarea>'+
+  '</div>'+
+'</div>';}).join('');document.getElementById('prev-lista').innerHTML=html;}
+
+function togPrevObs(id) {
+  var ta = document.getElementById('pi-obs-'+id);
+  var btn = document.getElementById('pi-obs-btn-'+id);
+  if(ta.classList.contains('on')) {
+    ta.classList.remove('on');
+    btn.textContent = ta.value ? '📝 Ver obs.' : '+ Observação';
+  } else {
+    ta.classList.add('on');
+    btn.textContent = '▲ Fechar';
+    ta.focus();
+  }
+}
+function togPrev(id){var pc=document.getElementById('pc-'+id);var pq=document.getElementById('pq-'+id);var on=pc.classList.contains('on');if(on){pc.classList.remove('on');pc.textContent='';pq.classList.remove('on');}else{pc.classList.add('on');pc.textContent='v';pq.classList.add('on');}}
+function chgQ(id,d){var el=document.getElementById('qn-'+id);var v=parseInt(el.textContent)+d;if(v<1)v=1;el.textContent=v;}
+function getPrevDom(){var r={};SIST.forEach(function(s){var pc=document.getElementById('pc-'+s.id);var qn=document.getElementById('qn-'+s.id);var ta=document.getElementById('pi-obs-'+s.id);r[s.id]={ativo:pc?pc.classList.contains('on'):false,qty:qn?parseInt(qn.textContent)||1:1,obs:ta?ta.value.trim():''};});return r;}
+var iqCnt=0;
+function addInq(data){iqCnt++;var d=document.createElement('div');d.className='ir';d.id='iq-'+iqCnt;d.innerHTML='<button class="ir-x" onclick="this.parentElement.remove()">X</button><div class="fr"><div class="fg"><label class="fl">Nome</label><input class="fi" placeholder="Nome" data-f="nome" value="'+(data&&data.nome?data.nome:'')+'"></div><div class="fg"><label class="fl">Telefone</label><input class="fi" placeholder="(48) 9..." data-f="tel" value="'+(data&&data.tel?data.tel:'')+'"></div></div><div class="fg"><label class="fl">Bloco / Unidade</label><input class="fi" placeholder="Ex: Bloco A, Loja 01" data-f="bloco" value="'+(data&&data.bloco?data.bloco:'')+'"></div>';document.getElementById('inq-list').appendChild(d);}
+function getInqs(){return Array.from(document.querySelectorAll('#inq-list .ir')).map(function(r){return{nome:(r.querySelector('[data-f="nome"]')||{}).value||'',tel:(r.querySelector('[data-f="tel"]')||{}).value||'',bloco:(r.querySelector('[data-f="bloco"]')||{}).value||''};});}
+var prCnt=0;
+function addProj(data){prCnt++;var d=document.createElement('div');d.className='ir';d.id='pr-'+prCnt;d.innerHTML='<button class="ir-x" onclick="this.parentElement.remove()">X</button><div class="fr"><div class="fg"><label class="fl">N. Projeto</label><input class="fi" placeholder="2024/001" data-f="num" value="'+(data&&data.num?data.num:'')+'"></div><div class="fg"><label class="fl">Habite-se</label><input class="fi" placeholder="HS-2024-001" data-f="hs" value="'+(data&&data.hs?data.hs:'')+'"></div></div><div class="fg"><label class="fl">Tipo</label><select class="fs" data-f="tipo"><option value="original"'+(data&&data.tipo==='original'?' selected':'')+'>Original</option><option value="ampliacao"'+(data&&data.tipo==='ampliacao'?' selected':'')+'>Ampliacao</option><option value="reforma"'+(data&&data.tipo==='reforma'?' selected':'')+'>Reforma</option></select></div>';document.getElementById('proj-list').appendChild(d);}
+function getProjs(){return Array.from(document.querySelectorAll('#proj-list .ir')).map(function(r){return{num:(r.querySelector('[data-f="num"]')||{}).value||'',hs:(r.querySelector('[data-f="hs"]')||{}).value||'',tipo:(r.querySelector('[data-f="tipo"]')||{}).value||'original'};});}
+function abrirModalEdif(edif){document.getElementById('e-id').value=edif?edif.id:'';document.getElementById('e-num').value=edif?edif.numero||'':'';document.getElementById('e-mun').value=edif?edif.municipio||'':'';document.getElementById('e-nome').value=edif?edif.nome||'':'';document.getElementById('e-end').value=edif?edif.endereco||'':'';document.getElementById('e-lat').value=edif?edif.lat||'':'';document.getElementById('e-lng').value=edif?edif.lng||'':'';document.getElementById('e-pn').value=edif?(edif.prop&&edif.prop.nome)||'':'';document.getElementById('e-pt').value=edif?(edif.prop&&edif.prop.tel)||'':'';document.getElementById('e-lal').value=edif?edif.laudoAlarme||'':'';document.getElementById('e-lhi').value=edif?edif.laudoHidrante||'':'';document.getElementById('inq-list').innerHTML='';document.getElementById('proj-list').innerHTML='';if(edif&&edif.inquilinos)edif.inquilinos.forEach(function(i){addInq(i);});if(edif&&edif.projetos)edif.projetos.forEach(function(p){addProj(p);});document.getElementById('mo-edif-titulo').textContent=edif?'Editar Edificacao':'Nova Edificacao';atualizarSelectMunicipio();if(edif&&edif.municipio){var sel=document.getElementById('e-mun');if(sel)sel.value=edif.municipio;}renderPrevForm(edif?edif.preventivos:{});
+  // Popular pavimentos
+  var npav = edif ? edif.nPavimentos||0 : 0;
+  var terreo = edif ? edif.terreoCfg||'sim' : 'sim';
+  document.getElementById('e-npav').value = npav||'';
+  document.getElementById('e-terreo').value = terreo;
+  if(npav) {
+    // Renderizar depois de um tick para garantir que prev-lista já está renderizado
+    setTimeout(function(){
+      renderPavimentosForm();
+      // Restaurar valores salvos
+      if(edif && edif.pavimentos) {
+        edif.pavimentos.forEach(function(pav, i) {
+          Object.keys(pav.sist||{}).forEach(function(sid) {
+            var pd = pav.sist[sid];
+            var pc = document.getElementById('ppc-'+i+'-'+sid);
+            var pq = document.getElementById('ppq-'+i+'-'+sid);
+            var qn = document.getElementById('ppqn-'+i+'-'+sid);
+            if(pc && pd.ativo) { pc.classList.add('on'); pc.textContent='v'; if(pq) pq.classList.add('on'); }
+            if(qn && pd.qty) qn.textContent = pd.qty;
+          });
+        });
+      }
+    }, 50);
+  } else {
+    document.getElementById('pavimentos-form').innerHTML = '';
+  }
+  openM('mo-edif');}
+function salvarEdif(){var nome=document.getElementById('e-nome').value.trim();var num=document.getElementById('e-num').value.trim();if(!nome||!num){alert('Preencha o numero/RE e o nome da edificacao.');return;}var id=document.getElementById('e-id').value||('e_'+Date.now());var e_mun_el=document.getElementById('e-mun');var e_mun_val=e_mun_el?(e_mun_el.tagName==='SELECT'?e_mun_el.options[e_mun_el.selectedIndex]&&e_mun_el.options[e_mun_el.selectedIndex].value!=='__outro__'?e_mun_el.value:'':e_mun_el.value):'';var edif={id:id,numero:num,municipio:e_mun_val.trim(),nome:nome,endereco:document.getElementById('e-end').value,area:document.getElementById('e-area').value,vencFunc:document.getElementById('e-venc-func').value,areaVist:document.getElementById('e-area-vist').value,lat:document.getElementById('e-lat').value,lng:document.getElementById('e-lng').value,prop:{nome:document.getElementById('e-pn').value,tel:document.getElementById('e-pt').value},inquilinos:getInqs(),projetos:getProjs(),preventivos:getPrevDom(),pavimentos:getPavDom(),nPavimentos:parseInt(document.getElementById('e-npav').value)||0,terreoCfg:document.getElementById('e-terreo').value,laudoAlarme:document.getElementById('e-lal').value,laudoHidrante:document.getElementById('e-lhi').value,obs:document.getElementById('e-obs').value.trim()};var idx=S.edificacoes.findIndex(function(e){return e.id===id;});if(idx>=0)S.edificacoes[idx]=edif;else S.edificacoes.push(edif);save();closeM('mo-edif');renderEdif();renderHome();}
+function renderEdif(){
+  var c=document.getElementById('lista-edif');
+  if(!S.edificacoes.length){
+    c.innerHTML='<div class="emp"><div class="emp-i">🏢</div><div class="emp-t">Nenhuma edificacao</div><div class="emp-s">Toque em "+ Nova Edificacao"</div></div>';
+    return;
+  }
+  c.innerHTML=S.edificacoes.map(function(e){
+    // Preventivos ativos com IN
+    var prevAtivos=Object.keys(e.preventivos||{}).filter(function(k){return e.preventivos[k].ativo;});
+    var prevTags=prevAtivos.map(function(k){
+      var s=SIST.find(function(x){return x.id===k;});
+      var qty=e.preventivos[k].qty||1;
+      return '<span class="tag-prev"><span class="tag-prev-in">'+(s?s.n:k)+'</span><span class="tag-prev-nome">'+(s?s.l:k)+'</span><span class="tag-prev-qty">'+qty+'</span></span>';
+    }).join('');
+    return '<div class="card" onclick="verEdif(\''+e.id+'\')">'+
+      '<div class="card-row">'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:2px">Nº '+e.numero+(e.municipio?' · '+e.municipio:'')+(e.area?' · '+e.area+' m²':'')+'</div>'+
+          '<div class="card-t">'+e.nome+'</div>'+
+          '<div class="card-s">'+(e.endereco||'—')+'</div>'+
+        '</div>'+
+        (e.lat&&e.lng?'<button class="btn btn-maps btn-sm" onclick="event.stopPropagation();maps(\''+e.lat+'\',\''+e.lng+'\')" style="margin-left:8px">📍</button>':'')+
+      '</div>'+
+      (e.prop&&e.prop.nome?'<div style="font-size:12px;color:var(--sub);margin-top:6px">👤 '+e.prop.nome+(e.prop.tel?' · 📞 '+e.prop.tel:'')+'</div>':'')+
+      (prevAtivos.length?
+        '<div style="margin-top:8px">'+
+          '<div style="font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Sistemas preventivos ('+prevAtivos.length+')</div>'+
+          '<div style="display:flex;flex-wrap:wrap;gap:4px">'+prevTags+'</div>'+
+        '</div>':
+        '<div style="margin-top:6px;font-size:11px;color:var(--cinza)">Nenhum preventivo cadastrado</div>')+
+    '</div>';
+  }).join('');
+}
+function verEdif(id){edifDetId=id;var e=S.edificacoes.find(function(x){return x.id===id;});if(!e)return;document.getElementById('det-titulo').textContent='N.'+e.numero+' - '+e.nome;var pA=Object.keys(e.preventivos||{}).filter(function(k){return e.preventivos[k].ativo;}).map(function(k){var p=e.preventivos[k];var s=SIST.find(function(x){return x.id===k;});return'<span class="tag">'+(s?s.l:k)+': '+p.qty+'</span>';}).join('');var inqs=(e.inquilinos||[]).map(function(i){return'<div class="inr"><span class="ink">'+i.nome+' - '+i.bloco+'</span><span class="inv">'+i.tel+'</span></div>';}).join('')||'<div class="inr"><span class="ink" style="color:var(--cinza)">Nenhum inquilino</span></div>';var projs=(e.projetos||[]).map(function(p){return'<div class="inr"><span class="ink">Proj.'+p.num+' ('+p.tipo+')</span><span class="inv">HS:'+p.hs+'</span></div>';}).join('')||'<div class="inr"><span class="ink" style="color:var(--cinza)">Nenhum projeto</span></div>';document.getElementById('det-content').innerHTML='<div class="inr"><span class="ink">Numero/RE</span><span class="inv">'+e.numero+'</span></div><div class="inr"><span class="ink">Municipio</span><span class="inv">'+(e.municipio||'---')+'</span></div><div class="inr"><span class="ink">Endereco</span><span class="inv">'+(e.endereco||'---')+'</span></div><div class="inr"><span class="ink">Coord.</span><span class="inv">'+(e.lat&&e.lng?e.lat+','+e.lng:'---')+'</span></div>'+(e.lat&&e.lng?'<button class="btn btn-maps" onclick="maps(\''+e.lat+'\',\''+e.lng+'\')" style="margin:8px 0">Maps</button>':'')+'<div class="sec">Proprietario</div><div class="inr"><span class="ink">Nome</span><span class="inv">'+((e.prop&&e.prop.nome)||'---')+'</span></div><div class="inr"><span class="ink">Tel</span><span class="inv">'+((e.prop&&e.prop.tel)||'---')+'</span></div><div class="sec">Inquilinos</div>'+inqs+'<div class="sec">Projetos</div>'+projs+'<div class="sec">Sistemas Preventivos</div><div style="flex-wrap:wrap;display:flex">'+(pA||'<span class="tag">Nenhum</span>')+'</div><div class="sec">Laudos</div><div class="inr"><span class="ink">Alarme</span><span class="inv">'+(e.laudoAlarme||'---')+'</span></div><div class="inr"><span class="ink">Hidrante</span><span class="inv">'+(e.laudoHidrante||'---')+'</span></div>';openM('mo-detalhe');}
+function editarEdif(){closeM('mo-detalhe');abrirModalEdif(S.edificacoes.find(function(e){return e.id===edifDetId;}));}
+function excluirEdif(){if(!confirm('Excluir esta edificacao?'))return;S.edificacoes=S.edificacoes.filter(function(e){return e.id!==edifDetId;});save();closeM('mo-detalhe');renderEdif();}
+function maps(lat,lng){window.open('https://www.google.com/maps?q='+lat+','+lng,'_blank');}
+function filtVist(f,btn){vstFilt=f;document.querySelectorAll('#tabs-vist .tab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');renderVist();}
+function abrirModalVist(){edifVistSel=null;filtMunVist='';document.getElementById('srch-edif-vist').value='';renderPillsMun('pills-mun-vist',filtMunVist,'setFiltMunVist');renderEdifSelectVist('');openM('mo-vist');}
+function renderEdifSelectVist(filtro){var c=document.getElementById('vist-edif-select');var f=filtro.toLowerCase().trim();var lista=S.edificacoes.filter(function(e){if(filtMunVist&&(e.municipio||'')!==filtMunVist)return false;if(!f)return true;return(e.nome||'').toLowerCase().indexOf(f)>=0||(e.numero||'').toLowerCase().indexOf(f)>=0||(e.municipio||'').toLowerCase().indexOf(f)>=0||(e.endereco||'').toLowerCase().indexOf(f)>=0;});if(!lista.length){c.innerHTML='<div style="color:var(--sub);font-size:13px;padding:8px">'+(S.edificacoes.length===0?'Nenhuma edificacao cadastrada.':'Nenhuma encontrada.')+'</div>';return;}c.innerHTML=lista.map(function(e){var sel=edifVistSel===e.id;return'<div class="es '+(sel?'on':'')+'" id="es-'+e.id+'" onclick="togEdifVist(\''+e.id+'\')"><span class="es-num">N.'+e.numero+(e.municipio?' '+e.municipio:'')+'</span><div class="es-info"><div class="es-nome">'+e.nome+'</div><div class="es-end">'+(e.endereco||'---')+'</div></div></div>';}).join('');}
+function togEdifVist(id){edifVistSel=id;document.querySelectorAll('#vist-edif-select .es').forEach(function(el){el.classList.remove('on');});var el=document.getElementById('es-'+id);if(el)el.classList.add('on');}
+function salvarVist(){if(!edifVistSel){alert('Selecione uma edificacao.');return;}var tipo=document.getElementById('v-tipo').value;var v={id:'v_'+Date.now(),edificacaoId:edifVistSel,tipo:tipo,checklist:{},obs:'',concluida:false,criadoEm:new Date().toISOString()};S.vistorias.push(v);save();closeM('mo-vist');renderVist();renderHome();}
+function renderVist(){var c=document.getElementById('lista-vist');var vs=S.vistorias.filter(function(v){if(vstFilt==='pendente')return!v.concluida;if(vstFilt==='concluida')return v.concluida;return true;});if(!vs.length){c.innerHTML='<div class="emp"><div class="emp-i">+</div><div class="emp-t">Nenhuma vistoria</div><div class="emp-s">Adicione edificacoes a lista</div></div>';return;}c.innerHTML=vs.map(function(v){var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});var cl=getCL(v.tipo);var total=Object.values(cl).reduce(function(a,b){return a+b.length;},0);var conf=Object.values(v.checklist).filter(function(x){return x.status==='ok';}).length;var nc=Object.values(v.checklist).filter(function(x){return x.status==='nao';}).length;return'<div class="card"><div class="card-row"><div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--sub);font-weight:700">N.'+(e?e.numero:'---')+(e&&e.municipio?' '+e.municipio:'')+'</div><div class="card-t">'+(e?e.nome:'Removida')+'</div><div class="card-s">'+(e?e.endereco||'':'')+'</div></div><span class="bdg '+(TIPO_B[v.tipo]||'b-hs')+'">'+(TIPO_L[v.tipo]||v.tipo)+'</span></div><div style="margin-top:8px;font-size:11px;color:var(--sub)">OK:'+conf+' / NC:'+nc+' / Total:'+total+(v.concluida?' CONCLUIDA':'')+'</div><div style="display:flex;gap:6px;margin-top:10px">'+(!v.concluida?'<button class="btn btn-s btn-sm" onclick="executarVistoria(\''+v.id+'\')" style="flex:1">Executar</button>':'')+'<button class="btn btn-danger btn-sm" onclick="excluirVist(\''+v.id+'\')" style="color:var(--verm)">Excluir</button></div></div>';}).join('');}
+function excluirVist(id){if(!confirm('Remover?'))return;S.vistorias=S.vistorias.filter(function(v){return v.id!==id;});save();renderVist();renderHome();}
+function filtRota(f,btn){rotaFilt=f;document.querySelectorAll('#tabs-rota .tab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');renderRotas();}
+function abrirModalRota(){document.getElementById('r-nome').value='';document.getElementById('r-data').value=new Date().toISOString().split('T')[0];document.getElementById('r-vist').value='';document.getElementById('srch-vist-rota').value='';filtMunRota='';rotaVistSel=[];renderPillsMun('pills-mun-rota',filtMunRota,'setFiltMunRota');renderVistSelectRota('');document.getElementById('rota-ordem-wrap').style.display='none';document.getElementById('rota-ordem').innerHTML='';openM('mo-rota');}
+function renderVistSelectRota(filtro){var c=document.getElementById('rota-vist-select');var f=filtro.toLowerCase().trim();var pend=S.vistorias.filter(function(v){return!v.concluida;});var lista=pend.filter(function(v){var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});if(filtMunRota&&(!e||(e.municipio||'')!==filtMunRota))return false;if(!f)return true;return(e&&(e.nome||'').toLowerCase().indexOf(f)>=0)||(e&&(e.numero||'').toLowerCase().indexOf(f)>=0)||(e&&(e.municipio||'').toLowerCase().indexOf(f)>=0);});if(!lista.length){c.innerHTML='<div style="color:var(--sub);font-size:13px;padding:8px">'+(S.vistorias.filter(function(v){return!v.concluida;}).length===0?'Nenhuma vistoria pendente. Adicione primeiro.':'Nenhuma encontrada.')+'</div>';return;}c.innerHTML=lista.map(function(v){var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});var sel=rotaVistSel.indexOf(v.id)>=0;return'<div class="es '+(sel?'on':'')+'" id="rv-'+v.id+'" onclick="togRotaVist(\''+v.id+'\')"><span class="es-num">N.'+(e?e.numero:'---')+(e&&e.municipio?' '+e.municipio:'')+'</span><div class="es-info"><div class="es-nome">'+(e?e.nome:'?')+'</div><div class="es-end">'+(TIPO_L[v.tipo]||v.tipo)+' - '+(e?e.endereco||'':'')+'</div></div></div>';}).join('');}
+function togRotaVist(id){var idx=rotaVistSel.indexOf(id);var el=document.getElementById('rv-'+id);if(idx>=0){rotaVistSel.splice(idx,1);if(el)el.classList.remove('on');}else{rotaVistSel.push(id);if(el)el.classList.add('on');}renderOrdemRota();renderEstimativa(rotaVistSel);}
+function renderOrdemRota(){
+  var wrap=document.getElementById('rota-ordem-wrap');
+  var c=document.getElementById('rota-ordem');
+  if(!rotaVistSel.length){wrap.style.display='none';c.innerHTML='';return;}
+  wrap.style.display='block';
+  // Verificar quantas têm GPS
+  var comGPS=0, semGPS=0;
+  rotaVistSel.forEach(function(vid){
+    var v=S.vistorias.find(function(x){return x.id===vid;});
+    var e=v?S.edificacoes.find(function(x){return x.id===v.edificacaoId;}):null;
+    if(e&&e.lat&&e.lng) comGPS++; else semGPS++;
+  });
+  var aviso=document.getElementById('rota-otimizar-aviso');
+  if(aviso){
+    if(semGPS>0){
+      aviso.style.display='block';
+      aviso.innerHTML='<div style="background:#FFF8E1;border-left:3px solid #FF9500;border-radius:6px;padding:8px 10px;font-size:11px;color:#E65100;margin-bottom:8px">'+
+        '⚠️ '+semGPS+' edificação(ões) sem coordenadas GPS. A otimização usará apenas as '+comGPS+' com GPS. '+
+        'O Google Maps otimiza todas ao navegar.</div>';
+    } else {
+      aviso.style.display='none';
+    }
+  }
+  c.innerHTML=rotaVistSel.map(function(vid,i){
+    var v=S.vistorias.find(function(x){return x.id===vid;});
+    var e=S.edificacoes.find(function(x){return x.id===(v?v.edificacaoId:'');});
+    var temGPS=e&&e.lat&&e.lng;
+    return'<div class="ord-item">'+
+      '<div class="ord-num">'+(i+1)+'</div>'+
+      '<div class="ord-info">'+
+        '<div class="ord-n">'+
+          (temGPS?'<span style="color:var(--verde);font-size:10px" title="Tem GPS">📍</span> ':'<span style="color:var(--cinza);font-size:10px" title="Sem GPS">📍</span> ')+
+          'N.'+(e?e.numero:'---')+' — '+(e?e.nome:'?')+
+        '</div>'+
+        '<div class="ord-s">'+(TIPO_L[v?v.tipo:'']||'')+' · '+(e?e.endereco||'':'')+'</div>'+
+      '</div>'+
+      '<div class="ord-btns">'+
+        (i>0?'<button class="ord-btn" onclick="mvRota('+i+',-1)">↑</button>':'')+
+        (i<rotaVistSel.length-1?'<button class="ord-btn" onclick="mvRota('+i+',1)">↓</button>':'')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function mvRota(i,d){var j=i+d;var tmp=rotaVistSel[i];rotaVistSel[i]=rotaVistSel[j];rotaVistSel[j]=tmp;renderOrdemRota();renderEstimativa(rotaVistSel);}
+function salvarRota(){var nome=document.getElementById('r-nome').value.trim();if(!nome){alert('Informe o nome da rota.');return;}if(!rotaVistSel.length){alert('Selecione ao menos uma vistoria.');return;}var r={id:'r_'+Date.now(),nome:nome,data:document.getElementById('r-data').value,horaInicio:document.getElementById('r-inicio').value,vistoriador:document.getElementById('r-vist').value,vistorias:rotaVistSel.slice(),concluida:false};S.rotas.push(r);save();closeM('mo-rota');renderRotas();renderHome();}
+function renderRotas(){var c=document.getElementById('lista-rotas');var rs=S.rotas;var hoje=new Date().toISOString().split('T')[0];if(rotaFilt==='hoje')rs=rs.filter(function(r){return r.data===hoje;});if(rotaFilt==='pend')rs=rs.filter(function(r){return!r.concluida;});if(!rs.length){c.innerHTML='<div class="emp"><div class="emp-i">🗺️</div><div class="emp-t">Nenhuma rota</div><div class="emp-s">Crie uma rota com vistorias pendentes</div></div>';return;}c.innerHTML=rs.map(function(r){var dt=r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):'---';return'<div class="card">'+
+  '<div class="card-row" style="cursor:pointer" onclick="abrirRota(\''+r.id+'\')">'+
+    '<div><div class="card-t">'+r.nome+'</div>'+
+    '<div class="card-s">📅 '+dt+' · '+(r.vistorias||[]).length+' vistoria(s) · '+(r.vistoriador||'---')+'</div></div>'+
+    '<span class="bdg '+(r.concluida?'b-ok':'b-pend')+'">'+(r.concluida?'Concluída':'Pendente')+'</span>'+
+  '</div>'+
+  '<div style="display:flex;gap:8px;margin-top:10px">'+
+    '<button class="btn btn-s btn-sm" onclick="event.stopPropagation();abrirNoMaps(\''+r.id+'\')" style="flex:1">🗺️ Navegar</button>'+
+    '<button class="btn btn-s btn-sm" onclick="event.stopPropagation();exportarRota(\''+r.id+'\')" style="flex:1">📤 Exportar</button>'+
+  '</div>'+
+'</div>';}).join('');}
+function abrirRota(id){rotaAtiva=S.rotas.find(function(r){return r.id===id;});if(!rotaAtiva)return;navTo('exec');renderExecRota();}
+function renderExecRota(){var r=rotaAtiva;var dt=r.data?new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR'):'---';var items=(r.vistorias||[]).map(function(vid,i){var v=S.vistorias.find(function(x){return x.id===vid;});var e=v?S.edificacoes.find(function(x){return x.id===v.edificacaoId;}):null;var st=v?(v.concluida?'Concluida':'Pendente'):'Removida';var stC=v?(v.concluida?'st-ok':'st-pend'):'st-pend';return'<div class="vi-item" onclick="iniciarVist(\''+vid+'\')"><div class="vi-num">'+(i+1)+'</div><div class="vi-info"><div style="font-size:10px;color:var(--sub);font-weight:700">N.'+(e?e.numero:'---')+(e&&e.municipio?' '+e.municipio:'')+'</div><div class="vi-nome">'+(e?e.nome:'Edificacao')+'</div><div class="vi-sub">'+(TIPO_L[v?v.tipo:'']||'')+' - '+(e?e.endereco||'':'')+'</div>'+(e&&e.lat&&e.lng?'<button class="btn btn-maps btn-sm" style="margin-top:5px" onclick="event.stopPropagation();maps(\''+e.lat+'\',\''+e.lng+'\')">Maps</button>':'')+'</div><span class="vi-st '+stC+'">'+st+'</span></div>';}).join('');var concl=(r.vistorias||[]).filter(function(vid){var v=S.vistorias.find(function(x){return x.id===vid;});return v&&v.concluida;}).length;document.getElementById('exec-content').innerHTML='<div class="card"><div class="card-t">'+r.nome+'</div><div class="card-s">'+dt+' - '+(r.vistoriador||'---')+'</div><div style="margin-top:6px;font-size:12px;color:var(--sub)">'+concl+'/'+(r.vistorias||[]).length+' concluidas</div></div><div class="sec">Edificacoes da Rota</div>'+items+'<div style="display:flex;gap:8px;margin-top:10px">'+
+    '<button class="btn btn-s btn-sm" onclick="abrirNoMaps(\''+r.id+'\')" style="flex:1">🗺️ Navegar no Maps</button>'+
+    '<button class="btn btn-s btn-sm" onclick="exportarRota(\''+r.id+'\')" style="flex:1">📤 Exportar Rota</button>'+
+  '</div>'+
+  '<button class="btn btn-danger" onclick="excluirRota(\''+r.id+'\')" style="margin-top:8px;width:auto;padding:8px 14px">🗑️ Excluir Rota</button>';setBack(function(){navTo('rotas');},'Rota',r.nome);}
+function excluirRota(id){if(!confirm('Excluir?'))return;S.rotas=S.rotas.filter(function(r){return r.id!==id;});save();navTo('rotas');}
+function iniciarVist(vid){vistAtiva=S.vistorias.find(function(v){return v.id===vid;});if(!vistAtiva)return;clState=JSON.parse(JSON.stringify(vistAtiva.checklist||{}));renderChecklist();}
+function renderChecklist(){
+  var v=vistAtiva;
+  var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+  var cl=getCL(v.tipo);
+  var gruposAtivos=getGruposAtivos(e,v.tipo);
+  var clFiltrado={};
+  Object.keys(cl).forEach(function(grp){if(gruposAtivos.indexOf(grp)>=0)clFiltrado[grp]=cl[grp];});
+  var todos=Object.values(clFiltrado).reduce(function(a,b){return a.concat(b);}, []);
+  var conf=todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='ok';}).length;
+  var nc=todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='nao';}).length;
+  var pend=todos.length-conf-nc-todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='na';}).length;
+
+  // Projetos/Habite-se
+  var projHTML='';
+  if(e&&e.projetos&&e.projetos.length){
+    projHTML='<div class="sec2">Projetos / Habite-se</div>';
+    e.projetos.forEach(function(p){
+      projHTML+='<div class="inr2"><span class="ink2">'+p.tipo.charAt(0).toUpperCase()+p.tipo.slice(1)+' — Proj. '+p.num+'</span><span class="inv2">'+p.hs+'</span></div>';
+    });
+  } else {
+    projHTML='<div class="inr2"><span class="ink2" style="color:#FF9500">⚠️ Nenhum projeto/habite-se cadastrado</span></div>';
+  }
+
+  // Situação do habite-se/atestado
+  var sitVal = v.situacaoHS || '';
+  var sitHTML='<div class="sec2">Situação do Habite-se / Atestado</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+    '<button class="sit-btn '+(sitVal==='tem'?'sit-ok':'')+'" onclick="setSitHS(\'tem\')">✅ Possui</button>'+
+    '<button class="sit-btn '+(sitVal==='nao'?'sit-nao':'')+'" onclick="setSitHS(\'nao\')">❌ Não possui</button>'+
+    '<button class="sit-btn '+(sitVal==='pend'?'sit-pend':'')+'" onclick="setSitHS(\'pend\')">⏳ Em andamento</button>'+
+    '</div>'+
+    (sitVal==='nao'?'<div class="alerta-hs">Será gerado Auto de Infração com prazo de 90 dias para regularização. Caso não conclua as obras no prazo, será necessário solicitar prorrogação de prazo.</div>':'')+
+    (sitVal==='pend'?'<div class="alerta-pend">Processo em andamento. Verificar pendências e prazos vigentes.</div>':'');
+
+  // Inquilinos
+  var inqHTML='';
+  if(e&&e.inquilinos&&e.inquilinos.length){
+    inqHTML='<div class="sec2">Inquilinos / Responsáveis</div>';
+    e.inquilinos.forEach(function(i){
+      inqHTML+='<div class="inr2"><span class="ink2">'+i.nome+(i.bloco?' — '+i.bloco:'')+'</span><span class="inv2">'+i.tel+'</span></div>';
+    });
+  }
+
+  // Preventivos ativos
+  var prevAtivosNomes=Object.keys(e?e.preventivos||{}:{}).filter(function(k){return e&&e.preventivos[k]&&e.preventivos[k].ativo;}).map(function(k){var s=SIST.find(function(x){return x.id===k;});return s?s.l:k;});
+
+  var html=
+    '<div class="card-vis">'+
+      '<div class="vis-badge '+(TIPO_B[v.tipo]||'b-hs')+'">'+(TIPO_L[v.tipo]||v.tipo)+'</div>'+
+      '<div class="vis-num">Nº '+(e?e.numero:'—')+(e&&e.municipio?' · '+e.municipio:'')+'</div>'+
+      '<div class="vis-nome">'+(e?e.nome:'—')+'</div>'+
+      '<div class="vis-end">'+(e&&e.endereco?e.endereco:'')+'</div>'+
+      (e&&e.lat&&e.lng?
+        '<div class="vis-coord">📍 '+e.lat+', '+e.lng+
+        ' <button class="btn btn-maps btn-sm" onclick="maps(\''+e.lat+'\',\''+e.lng+'\')">Maps</button></div>':
+        '<div class="vis-coord" style="color:#FF9500">'+'<span>📍 Sem coordenadas</span> '+'<button class="btn btn-s btn-sm" style="font-size:11px;padding:5px 10px" onclick="capturarGPSVistoria(\''+v.edificacaoId+'\')">📍 Capturar GPS agora</button>'+'<div id="gps-status-vist" style="font-size:11px;margin-top:4px"></div>'+'</div>')+
+      (e&&(e.area||e.areaVist)?'<div class="inr2"><span class="ink2">📐 Área Total</span><span class="inv2">'+(e.area||'—')+' m²</span></div>':'')+
+      (e&&e.areaVist?'<div class="inr2"><span class="ink2">📐 Área Vistoriada</span><span class="inv2">'+e.areaVist+' m²</span></div>':'')+
+      '<div class="sep-vis"></div>'+
+      '<div class="inr2"><span class="ink2">👤 Proprietário</span><span class="inv2">'+(e&&e.prop&&e.prop.nome?e.prop.nome:'—')+'</span></div>'+
+      (e&&e.prop&&e.prop.tel?'<div class="inr2"><span class="ink2">📞 Telefone</span><span class="inv2">'+e.prop.tel+'</span></div>':'')+
+      inqHTML+
+      projHTML+
+      sitHTML+
+      (e&&e.laudoAlarme?'<div class="inr2"><span class="ink2">Laudo Alarme</span><span class="inv2">'+e.laudoAlarme+'</span></div>':'')+
+      (e&&e.laudoHidrante?'<div class="inr2"><span class="ink2">Laudo Hidrante</span><span class="inv2">'+e.laudoHidrante+'</span></div>':'')+
+      (e&&e.vencFunc?'<div class="inr2"><span class="ink2">Venc. Funcionamento</span><span class="inv2">'+new Date(e.vencFunc+'T12:00:00').toLocaleDateString("pt-BR")+' '+statusVencFunc(e.vencFunc)+'</span></div>':'')+
+      (e&&e.obs?'<div class="sep-vis"></div><div class="sec2">Observações da Edificação</div><div style="font-size:12px;color:var(--sub);padding:4px 0;line-height:1.5">'+e.obs+'</div>':'')+
+      '<div class="sep-vis"></div>'+
+      '<div class="sec2">Preventivos da edificação</div>'+
+      '<div style="flex-wrap:wrap;display:flex;gap:4px;margin-bottom:8px">'+(prevAtivosNomes.length?prevAtivosNomes.map(function(n){return '<span class="tag">'+n+'</span>';}).join(''):'<span class="tag">Nenhum marcado</span>')+'</div>'+
+    '</div>'+
+    '<div class="cb">'+
+      '<div class="ct cv"><div class="ct-n" id="cnt-conf">'+conf+'</div><div class="ct-l">Conformes</div></div>'+
+      '<div class="ct cr"><div class="ct-n" id="cnt-nc">'+nc+'</div><div class="ct-l">Não conf.</div></div>'+
+      '<div class="ct cc"><div class="ct-n" id="cnt-pend">'+pend+'</div><div class="ct-l">Pendentes</div></div>'+
+    '</div>';
+
+  Object.keys(clFiltrado).forEach(function(grp){
+    html+='<div class="sec">'+grp+'</div>';
+    clFiltrado[grp].forEach(function(item){
+      var st=(clState[item.id]&&clState[item.id].status)||'';
+      var obs=(clState[item.id]&&clState[item.id].obs)||'';
+      var cc=st==='ok'?'ok':st==='nao'?'nao':'';
+      html+=
+        '<div class="ci '+cc+'" id="ci-'+item.id+'">'+
+          '<div class="ci-obj">'+item.obj+'</div>'+
+          '<div class="ci-crit">'+item.c+'</div>'+
+          (st==='nao'?'<div class="ci-causa">'+item.ca+'</div>':'')+
+          '<div class="ci-btns">'+
+            '<button class="cb2 '+(st==='ok'?'ok':'')+'" onclick="setSt(\''+item.id+'\',\'ok\')">✓ Conforme</button>'+
+            '<button class="cb2 '+(st==='nao'?'nao':'')+'" onclick="setSt(\''+item.id+'\',\'nao\')">✕ Não conf.</button>'+
+            '<button class="cb2 '+(st==='na'?'na':'')+'" onclick="setSt(\''+item.id+'\',\'na\')">N/A</button>'+
+          '</div>'+
+          '<textarea class="obs-in '+(st==='nao'?'on':'')+'" id="obs-'+item.id+'" placeholder="Observação específica (opcional)..." onchange="saveObs(\''+item.id+'\')">'+obs+'</textarea>'+
+          (function(){
+            if(!e||!e.pavimentos||!e.pavimentos.length) return '';
+            var pavSel=(clState[item.id]&&clState[item.id].pav!=null)?clState[item.id].pav:'';
+            var opts='<option value="">Nenhum pavimento específico</option>';
+            e.pavimentos.forEach(function(pav,i){
+              opts+='<option value="'+i+'"'+(String(pavSel)===String(i)?' selected':'')+'>Pavimento '+(i+1)+'</option>';
+            });
+            return '<select class="nc-pav-sel '+(st==='nao'?'on':'')+'" id="pav-'+item.id+'" onchange="savePavNC(\''+item.id+'\',this.value)">'+opts+'</select>';
+          })()+
+        '</div>';
+    });
+  });
+
+  // Bloco de pavimentos para o vistoriador
+  if(e && e.pavimentos && e.pavimentos.length) {
+    html += '<div class="sec">Conferência por Pavimento</div>';
+    e.pavimentos.forEach(function(pav, i) {
+      var sistAtivos = Object.keys(pav.sist||{}).filter(function(k){return pav.sist[k].ativo;});
+      var obsKey = 'pav_obs_'+i;
+      var obsVal = (clState[obsKey]&&clState[obsKey].obs)||'';
+      html +=
+        '<div class="vpav-block">'+
+          '<div class="vpav-header" onclick="togVPav('+i+')">'+
+            '<div class="vpav-num">'+(i===0&&e.terreoCfg==='sim'?'T':(e.terreoCfg==='sim'?i:i+1))+'</div>'+
+            '<div class="vpav-info">'+
+              '<div class="vpav-title">'+pav.label+'</div>'+
+              '<div class="vpav-sub">'+sistAtivos.length+' sistema(s) previsto(s)</div>'+
+            '</div>'+
+            '<span style="font-size:18px;color:var(--cinza)">›</span>'+
+          '</div>'+
+          '<div class="vpav-body" id="vpav-body-'+i+'">'+
+            (sistAtivos.length
+              ? sistAtivos.map(function(sid){
+                  var s=SIST.find(function(x){return x.id===sid;});
+                  var qtd=pav.sist[sid].qty;
+                  return '<div class="vpav-sist"><span class="vpav-sist-nome">'+(s?s.l:sid)+'</span><span class="vpav-sist-qtd">Prev: '+qtd+'</span></div>';
+                }).join('')
+              : '<div style="font-size:12px;color:var(--sub)">Nenhum preventivo previsto para este pavimento.</div>')+
+            '<textarea class="vpav-obs" id="vpav-obs-'+i+'" placeholder="Anotações do vistoriador para este pavimento..." onchange="savePavObs('+i+')">'+(obsVal)+'</textarea>'+
+          '</div>'+
+        '</div>';
+    });
+  }
+
+  html+=
+      '<div class="sec">Verificação de Quantitativos</div>'+
+    '<div class="qtv-block">'+
+      '<div class="qtv-titulo">Itens principais</div>'+
+      '<div class="qtv-sub">Informe a quantidade real encontrada. Se ≥ 50% do previsto e construção antes de 2013, aprovado com Auto de Infração (F). Se ≥ 50% e 2013 em diante, indeferido.</div>'+
+      (function(){
+        var ext_prev = Object.keys(e&&e.preventivos||{}).filter(function(k){return k==='ext'&&e.preventivos[k].ativo;}).map(function(k){return e.preventivos[k].qty;})[0]||0;
+        var ilu_prev = Object.keys(e&&e.preventivos||{}).filter(function(k){return k==='ilu'&&e.preventivos[k].ativo;}).map(function(k){return e.preventivos[k].qty;})[0]||0;
+        var sal_prev = Object.keys(e&&e.preventivos||{}).filter(function(k){return k==='sal'&&e.preventivos[k].ativo;}).map(function(k){return e.preventivos[k].qty;})[0]||0;
+        var qtv_ext = (clState['qtv_ext']&&clState['qtv_ext'].val)||'';
+        var qtv_ilu = (clState['qtv_ilu']&&clState['qtv_ilu'].val)||'';
+        var qtv_sal = (clState['qtv_sal']&&clState['qtv_sal'].val)||'';
+        function stRow(val,prev){
+          if(!prev||val==='') return '';
+          var p=parseInt(val); if(isNaN(p)) return '';
+          if(p<prev*0.5) return '<span class="qtv-status qtv-nao">< 50% — Indeferido</span>';
+          return '<span class="qtv-status qtv-warn">≥ 50% — Ver ano</span>';
+        }
+        return (ext_prev?
+          '<div class="qtv-row">'+
+            '<span class="qtv-label">🧯 Extintores</span>'+
+            '<span class="qtv-prev">Prev: '+ext_prev+'</span>'+
+            '<input class="qtv-input" type="number" id="qtv-ext" value="'+qtv_ext+'" min="0" placeholder="0" onchange="saveQtv(\'ext\',this.value)">'+
+            stRow(qtv_ext,ext_prev)+
+          '</div>':'')+(ilu_prev?
+          '<div class="qtv-row">'+
+            '<span class="qtv-label">💡 Iluminação Emergência</span>'+
+            '<span class="qtv-prev">Prev: '+ilu_prev+'</span>'+
+            '<input class="qtv-input" type="number" id="qtv-ilu" value="'+qtv_ilu+'" min="0" placeholder="0" onchange="saveQtv(\'ilu\',this.value)">'+
+            stRow(qtv_ilu,ilu_prev)+
+          '</div>':'')+(sal_prev?
+          '<div class="qtv-row">'+
+            '<span class="qtv-label">🚪 Sinalização de Abandono</span>'+
+            '<span class="qtv-prev">Prev: '+sal_prev+'</span>'+
+            '<input class="qtv-input" type="number" id="qtv-sal" value="'+qtv_sal+'" min="0" placeholder="0" onchange="saveQtv(\'sal\',this.value)">'+
+            stRow(qtv_sal,sal_prev)+
+          '</div>':'');
+      })()+
+      '<div class="ano-block" id="ano-block">'+
+        '<label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px">Ano de construção da edificação</label>'+
+        '<select class="fs" id="qtv-ano" onchange="saveQtvAno(this.value)" style="font-size:13px">'+
+          '<option value="">Selecione...</option>'+
+          '<option value="antes2013"'+(function(){return (clState['qtv_ano']&&clState['qtv_ano'].val)==='antes2013'?' selected':'';})()+'>Antes de 2013</option>'+
+          '<option value="apos2013"'+(function(){return (clState['qtv_ano']&&clState['qtv_ano'].val)==='apos2013'?' selected':'';})()+'>2013 em diante</option>'+
+        '</select>'+
+        '<div id="qtv-resultado" style="margin-top:8px;font-size:12px;font-weight:700"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="sec">Observações Gerais</div>'+
+    '<textarea class="ft" id="obs-gerais" placeholder="Observações gerais da vistoria...">'+(v.obs||'')+'</textarea>'+
+    '<button class="btn btn-p" onclick="concluirVist()" style="margin-top:10px">✅ Concluir Vistoria</button>'+
+    '<button class="btn btn-s" onclick="voltarRota()" style="margin-top:8px">← Voltar</button>';
+
+  document.getElementById('exec-content').innerHTML=html;
+  var e2=S.edificacoes.find(function(x){return x.id===vistAtiva.edificacaoId;});
+  setBack(function(){voltarRota();},'Vistoriando','Nº '+(e2?e2.numero:'—')+' — '+(e2?e2.nome:''));
+}
+
+function setSitHS(val) {
+  if(!vistAtiva) return;
+  vistAtiva.situacaoHS = val;
+  save();
+  // Re-renderizar apenas a parte da situação sem recarregar tudo
+  var sitHTML =
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+    '<button class="sit-btn '+(val==='tem'?'sit-ok':'')+'" onclick="setSitHS(\'tem\')">✅ Possui</button>'+
+    '<button class="sit-btn '+(val==='nao'?'sit-nao':'')+'" onclick="setSitHS(\'nao\')">❌ Não possui</button>'+
+    '<button class="sit-btn '+(val==='pend'?'sit-pend':'')+'" onclick="setSitHS(\'pend\')">⏳ Em andamento</button>'+
+    '</div>'+
+    (val==='nao'?'<div class="alerta-hs">Será gerado Auto de Infração com prazo de 90 dias para regularização. Caso não conclua as obras no prazo, será necessário solicitar prorrogação de prazo.</div>':'')+
+    (val==='pend'?'<div class="alerta-pend">Processo em andamento. Verificar pendências e prazos vigentes.</div>':'');
+  var cont = document.getElementById('sit-container');
+  if(cont) cont.innerHTML = sitHTML;
+  // Atualizar botões
+  document.querySelectorAll('.sit-btn').forEach(function(b){b.className='sit-btn';});
+  var mapa = {'tem':'sit-ok','nao':'sit-nao','pend':'sit-pend'};
+  var btns = document.querySelectorAll('.sit-btn');
+  var vals = ['tem','nao','pend'];
+  btns.forEach(function(b,i){ if(vals[i]===val) b.classList.add(mapa[val]); });
+}
+
+
+function togVPav(i) {
+  var body = document.getElementById('vpav-body-'+i);
+  if(body) body.classList.toggle('on');
+}
+function savePavObs(i) {
+  var val = (document.getElementById('vpav-obs-'+i)||{}).value||'';
+  var key = 'pav_obs_'+i;
+  if(!clState[key]) clState[key] = {};
+  clState[key].obs = val;
+  if(vistAtiva) { vistAtiva.checklist = JSON.parse(JSON.stringify(clState)); save(); }
+}
+function setSt(id,st){if(!clState[id])clState[id]={};clState[id].status=st;if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}var ci=document.getElementById('ci-'+id);if(!ci)return;ci.className='ci '+(st==='ok'?'ok':st==='nao'?'nao':'');var cEl=ci.querySelector('.ci-causa');if(st==='nao'&&!cEl){var cl2=getCL(vistAtiva.tipo);var allItems=Object.values(cl2).reduce(function(a,b){return a.concat(b);}, []);var item=allItems.find(function(x){return x.id===id;});if(item){var d=document.createElement('div');d.className='ci-causa';d.textContent=item.ca;ci.querySelector('.ci-crit').after(d);}}else if(st!=='nao'&&cEl){cEl.remove();}var btns=ci.querySelectorAll('.cb2');btns.forEach(function(b){b.className='cb2';});if(st==='ok'){if(btns[0])btns[0].classList.add('ok');}else if(st==='nao'){if(btns[1])btns[1].classList.add('nao');}else if(st==='na'){if(btns[2])btns[2].classList.add('na');}var obs=document.getElementById('obs-'+id);if(obs)obs.className='obs-in '+(st==='nao'?'on':'');
+var pavSel=document.getElementById('pav-'+id);if(pavSel)pavSel.className='nc-pav-sel '+(st==='nao'?'on':'');
+if(st!=='nao'&&clState[id]){delete clState[id].pav;if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}}
+atualizarCtrs();}
+
+function saveQtv(sid, val) {
+  if(!clState['qtv_'+sid]) clState['qtv_'+sid]={};
+  clState['qtv_'+sid].val = val;
+  if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}
+  avaliarQtv();
+}
+function saveQtvAno(val) {
+  if(!clState['qtv_ano']) clState['qtv_ano']={};
+  clState['qtv_ano'].val = val;
+  if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}
+  mostrarResultadoQtv(val);
+}
+function avaliarQtv() {
+  var e = vistAtiva ? S.edificacoes.find(function(x){return x.id===vistAtiva.edificacaoId;}) : null;
+  if(!e) return;
+  var sists = ['ext','ilu','sal'];
+  var algumAbaixo50 = false;
+  var algumAcima50 = false;
+  sists.forEach(function(sid){
+    var prev = e.preventivos&&e.preventivos[sid]&&e.preventivos[sid].ativo ? e.preventivos[sid].qty : 0;
+    if(!prev) return;
+    var val = parseInt((clState['qtv_'+sid]&&clState['qtv_'+sid].val)||'');
+    if(isNaN(val)) return;
+    if(val < prev * 0.5) algumAbaixo50 = true;
+    else algumAcima50 = true;
+  });
+  var bloco = document.getElementById('ano-block');
+  if(bloco) {
+    if(algumAcima50 && !algumAbaixo50) {
+      bloco.classList.add('on');
+      var anoSalvo = clState['qtv_ano'] ? clState['qtv_ano'].val : '';
+      if(anoSalvo) mostrarResultadoQtv(anoSalvo);
+    } else if(algumAbaixo50) {
+      bloco.classList.remove('on');
+      var res = document.getElementById('qtv-resultado');
+      if(res) res.innerHTML='';
+    } else {
+      bloco.classList.remove('on');
+    }
+  }
+}
+function mostrarResultadoQtv(ano) {
+  var res = document.getElementById('qtv-resultado');
+  if(!res) return;
+  if(!ano) { res.innerHTML=''; return; }
+  if(ano==='antes2013') {
+    res.innerHTML='<span style="color:#E65100">⚠️ Aprovado com Auto de Infração (F) — Construção anterior a 2013.</span>';
+  } else {
+    res.innerHTML='<span style="color:var(--verm)">❌ Indeferido — Construção a partir de 2013 exige atendimento pleno.</span>';
+  }
+}
+
+function savePavNC(id, val) {
+  if(!clState[id]) clState[id]={};
+  clState[id].pav = val==='' ? null : parseInt(val);
+  if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}
+}
+function saveObs(id){var val=(document.getElementById('obs-'+id)||{}).value||'';if(!clState[id])clState[id]={};clState[id].obs=val;if(vistAtiva){vistAtiva.checklist=JSON.parse(JSON.stringify(clState));save();}}
+function atualizarCtrs(){if(!vistAtiva)return;var e=S.edificacoes.find(function(x){return x.id===vistAtiva.edificacaoId;});var cl=getCL(vistAtiva.tipo);var gruposAtivos=getGruposAtivos(e,vistAtiva.tipo);var todos=[];Object.keys(cl).forEach(function(grp){if(gruposAtivos.indexOf(grp)>=0)todos=todos.concat(cl[grp]);});var conf=todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='ok';}).length;var nc=todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='nao';}).length;var pend=todos.length-conf-nc-todos.filter(function(i){return clState[i.id]&&clState[i.id].status==='na';}).length;var ec=document.getElementById('cnt-conf');if(ec)ec.textContent=conf;var en=document.getElementById('cnt-nc');if(en)en.textContent=nc;var ep=document.getElementById('cnt-pend');if(ep)ep.textContent=pend;}
+function concluirVist(){if(!vistAtiva)return;vistAtiva.checklist=JSON.parse(JSON.stringify(clState));vistAtiva.obs=(document.getElementById('obs-gerais')||{}).value||'';vistAtiva.concluida=true;vistAtiva.concluidaEm=new Date().toISOString();save();alert('Vistoria concluida! Va em Relatorios para gerar o documento.');voltarRota();}
+function voltarRota(){if(rotaAtiva)renderExecRota();else navTo('vistorias');}
+function executarVistoria(vid){rotaAtiva=null;var v=S.vistorias.find(function(x){return x.id===vid;});if(!v)return;navTo('exec');vistAtiva=v;clState=JSON.parse(JSON.stringify(v.checklist||{}));renderChecklist();var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});setBack(function(){navTo('vistorias');},'Vistoriando','N.'+(e?e.numero:'---')+' - '+(e?e.nome:''));}
+function setTipoRel(tipo, btn) {
+  tipoRel = tipo;
+  document.querySelectorAll('#tabs-rel .tab').forEach(function(t){t.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('rel-box').style.display = 'none';
+  renderRel();
+}
+function renderRel(){
+  document.getElementById('rel-box').style.display='none';
+  var c=document.getElementById('lista-rel');
+  var vs=S.vistorias.filter(function(v){return v.concluida;});
+  if(!vs.length){
+    c.innerHTML='<div class="emp"><div class="emp-i">📄</div><div class="emp-t">Nenhuma vistoria concluída</div><div class="emp-s">Conclua uma vistoria para gerar relatório</div></div>';
+    return;
+  }
+  var fn = tipoRel==='nc' ? 'gerarRelNC' : 'gerarRel';
+  c.innerHTML=vs.map(function(v){
+    var e=S.edificacoes.find(function(x){return x.id===v.edificacaoId;});
+    var dt=v.concluidaEm?new Date(v.concluidaEm).toLocaleDateString('pt-BR'):'---';
+    // Contar não conformidades
+    var cl=getCL(v.tipo);
+    var todos=Object.values(cl).reduce(function(a,b){return a.concat(b);}, []);
+    var nc=todos.filter(function(i){return v.checklist[i.id]&&v.checklist[i.id].status==='nao';}).length;
+    var conf=todos.filter(function(i){return v.checklist[i.id]&&v.checklist[i.id].status==='ok';}).length;
+    var resultado = nc===0
+      ? '<span style="color:var(--verde);font-weight:700;font-size:11px">✅ Deferido</span>'
+      : '<span style="color:var(--verm);font-weight:700;font-size:11px">⚠️ '+nc+' não conf.</span>';
+    return '<div class="card" style="cursor:pointer" onclick="'+fn+'(\''+v.id+'\')">'+
+      '<div style="font-size:10px;font-weight:700;color:var(--sub)">Nº '+(e?e.numero:'---')+(e&&e.municipio?' · '+e.municipio:'')+'</div>'+
+      '<div class="card-row" style="margin-top:2px">'+
+        '<div><div class="card-t">'+(e?e.nome:'---')+'</div>'+
+        '<div class="card-s">'+dt+' · '+(TIPO_L[v.tipo]||v.tipo)+'</div></div>'+
+        resultado+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function gerarRel(vid){
+  var v=S.vistorias.find(function(x){return x.id===vid;});
+  var e=S.edificacoes.find(function(x){return x.id===(v?v.edificacaoId:'');});
+  if(!v||!e)return;
+  var cl=getCL(v.tipo);
+  var gruposAtivos=getGruposAtivos(e,v.tipo);
+  var clFiltrado={};
+  Object.keys(cl).forEach(function(grp){if(gruposAtivos.indexOf(grp)>=0)clFiltrado[grp]=cl[grp];});
+  var dt=v.concluidaEm?new Date(v.concluidaEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):new Date().toLocaleDateString('pt-BR');
+  var todos=Object.values(clFiltrado).reduce(function(a,b){return a.concat(b);}, []);
+  var conf=todos.filter(function(i){return v.checklist[i.id]&&v.checklist[i.id].status==='ok';}).length;
+  var naoApl=todos.filter(function(i){return v.checklist[i.id]&&v.checklist[i.id].status==='na';}).length;
+  var ncOrd=[];
+  Object.keys(clFiltrado).forEach(function(grp){
+    clFiltrado[grp].forEach(function(item){
+      if(v.checklist[item.id]&&v.checklist[item.id].status==='nao')ncOrd.push({grp:grp,item:item});
+    });
+  });
+  var pend=todos.length-conf-ncOrd.length-naoApl;
+  var prev=Object.keys(e.preventivos||{}).filter(function(k){return e.preventivos[k].ativo;}).map(function(k){
+    var p=e.preventivos[k];var s=SIST.find(function(x){return x.id===k;});
+    return '  - '+(s?s.l:k)+' ('+(s?s.n:'')+') Qtd: '+p.qty;
+  }).join('\n');
+  var prevObs=Object.keys(e.preventivos||{}).filter(function(k){return e.preventivos[k].ativo&&e.preventivos[k].obs;}).map(function(k){
+    var s=SIST.find(function(x){return x.id===k;});
+    return '  - '+(s?s.l:k)+': '+e.preventivos[k].obs;
+  }).join('\n');
+  var projs=(e.projetos||[]).map(function(p){return '  - Proj. n. '+p.num+' ('+p.tipo+') — HS: '+p.hs;}).join('\n');
+  var inqs=(e.inquilinos||[]).map(function(i){return '  - '+i.nome+' | Tel: '+i.tel+(i.bloco?' | '+i.bloco:'');}).join('\n');
+  var rota=S.rotas.find(function(r){return(r.vistorias||[]).indexOf(vid)>=0;});
+  var sitHS=v.situacaoHS||'';
+  var sitMap={'tem':'POSSUI habite-se/atestado vigente','nao':'NAO POSSUI habite-se/atestado','pend':'Em processo de regularizacao'};
+  // Quantitativos
+  var sidsQtv=['ext','ilu','sal'];
+  var nomesQtv={'ext':'Extintores','ilu':'Iluminacao de Emergencia','sal':'Sinalizacao de Abandono'};
+  var qtvLinhas=[];
+  sidsQtv.forEach(function(sid){
+    var prev_q=e.preventivos&&e.preventivos[sid]&&e.preventivos[sid].ativo?e.preventivos[sid].qty:0;
+    var real=v.checklist['qtv_'+sid]?v.checklist['qtv_'+sid].val:'';
+    if(prev_q&&real!=='') qtvLinhas.push('  '+nomesQtv[sid]+': previsto '+prev_q+', encontrado '+real+(parseInt(real)<prev_q*0.5?' (ABAIXO DE 50%)':''));
+  });
+  var anoQtv=v.checklist['qtv_ano']?v.checklist['qtv_ano'].val:'';
+  var txt='';
+  txt+='VISTORIA — '+(TIPO_R[v.tipo]||v.tipo.toUpperCase())+'\n';
+  txt+='Data: '+dt+'\n';
+  txt+='Vistoriador: '+(rota&&rota.vistoriador?rota.vistoriador:'Nao informado')+'\n\n';
+  txt+='IDENTIFICACAO DO IMOVEL\n\n';
+  txt+='Numero/RE: '+e.numero+'\n';
+  txt+='Municipio: '+(e.municipio||'---')+'\n';
+  txt+='Edificacao: '+e.nome+'\n';
+  txt+='Endereco: '+(e.endereco||'---')+'\n';
+  if(e.area) txt+='Area Total: '+e.area+' m2\n';
+  if(e.lat&&e.lng) txt+='Coordenadas: '+e.lat+', '+e.lng+'\n';
+  txt+='\nProprietario: '+((e.prop&&e.prop.nome)||'---')+'\n';
+  txt+='Telefone: '+((e.prop&&e.prop.tel)||'---')+'\n';
+  if(inqs) txt+='\nInquilinos:\n'+inqs+'\n';
+  if(projs) txt+='\nProjetos/Habite-se:\n'+projs+'\n';
+  if(e.laudoAlarme) txt+='\nLaudo Alarme: '+e.laudoAlarme+'\n';
+  if(e.laudoHidrante) txt+='Laudo Hidrante: '+e.laudoHidrante+'\n';
+  if(sitHS) txt+='\nSituacao Habite-se: '+(sitMap[sitHS]||sitHS)+'\n';
+  if(e.obs) txt+='\nObservacoes da Edificacao:\n'+e.obs+'\n';
+  txt+='\nSISTEMAS PREVENTIVOS\n\n'+(prev||'  (nenhum)')+'\n';
+  if(prevObs) txt+='\nObservacoes por sistema:\n'+prevObs+'\n';
+  // Pavimentos
+  if(e.pavimentos&&e.pavimentos.length){
+    txt+='\nPREVENTIVOS POR PAVIMENTO\n\n';
+    e.pavimentos.forEach(function(pav,i){
+      var ats=Object.keys(pav.sist||{}).filter(function(k){return pav.sist[k].ativo;});
+      txt+='['+pav.label+']\n';
+      ats.forEach(function(sid){var s=SIST.find(function(x){return x.id===sid;});txt+='  - '+(s?s.l:sid)+': '+pav.sist[sid].qty+' un.\n';});
+      var pavObs=v.checklist['pav_obs_'+i]?v.checklist['pav_obs_'+i].obs:'';
+      if(pavObs) txt+='  Anotacoes: '+pavObs+'\n';
+      txt+='\n';
+    });
+  }
+  // Quantitativos
+  if(qtvLinhas.length){
+    txt+='QUANTITATIVOS VERIFICADOS\n\n';
+    qtvLinhas.forEach(function(l){txt+=l+'\n';});
+    if(anoQtv) txt+='  Ano de construcao: '+(anoQtv==='antes2013'?'Anterior a 2013 — Aprovado com Auto de Infracao (F)':'2013 em diante — Indeferido')+'\n';
+    txt+='\n';
+  }
+  txt+='\nRESULTADO\n\n';
+  txt+='Total de itens: '+todos.length+'\nConformes: '+conf+'\nNao conformes: '+ncOrd.length+'\nNao aplicavel: '+naoApl+'\nNao avaliados: '+pend+'\n\n';
+  txt+='RESULTADO: '+(ncOrd.length===0?'DEFERIDO':'INDEFERIDO — '+ncOrd.length+' nao conformidade(s)')+'\n\n';
+  if(ncOrd.length>0){
+    txt+='NAO CONFORMIDADES\n\n';
+    var ga='';
+    ncOrd.forEach(function(x,i){
+      if(x.grp!==ga){txt+='['+x.grp+']\n';ga=x.grp;}
+      txt+=(i+1)+'. '+x.item.c+'\n   Causa: '+x.item.ca+'\n';
+      var obs=v.checklist[x.item.id]?v.checklist[x.item.id].obs:'';
+      if(obs)txt+='   Local/Obs.: '+obs+'\n';
+      txt+='\n';
+    });
+  }
+  if(sitHS==='nao'){
+    txt+='AUTO DE INFRACAO\n\n';
+    txt+='Em razao da ausencia de Habite-se/Atestado, foi lavrado Auto de Infracao\n';
+    txt+='concedendo prazo de 90 dias para regularizacao. Caso nao seja possivel\n';
+    txt+='concluir as obras no prazo, protocolar Requerimento de Prorrogacao antes\n';
+    txt+='do vencimento ('+dt+' + 90 dias).\n\n';
+  }
+  if(v.obs) txt+='OBSERVACOES GERAIS\n\n'+v.obs+'\n\n';
+  txt+='Gerado em: '+new Date().toLocaleString('pt-BR');
+  var tSec=document.getElementById('rel-titulo-sec');if(tSec)tSec.textContent='Relatório Completo';
+  document.getElementById('rel-texto').textContent=txt;
+  document.getElementById('rel-box').style.display='block';
+  document.getElementById('rel-box').scrollIntoView({behavior:'smooth'});
+}
+function gerarRelNC(vid){
+  var v=S.vistorias.find(function(x){return x.id===vid;});
+  var e=S.edificacoes.find(function(x){return x.id===(v?v.edificacaoId:'');});
+  if(!v||!e)return;
+  var cl=getCL(v.tipo);
+  var gruposAtivos=getGruposAtivos(e,v.tipo);
+  var clFiltrado={};
+  Object.keys(cl).forEach(function(grp){if(gruposAtivos.indexOf(grp)>=0)clFiltrado[grp]=cl[grp];});
+  var dt=v.concluidaEm?new Date(v.concluidaEm).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):new Date().toLocaleDateString('pt-BR');
+
+  // Simplificar texto do critério
+  function simplificar(txt){
+    return txt
+      .replace(/\s*\(Art\.\s*\d+[^\)]*\)/g,'')
+      .replace(/\s*\(Anexo\s*[^\)]+\)/g,'')
+      .replace(/\s*\(NBR\s*[\d]+\)/g,'')
+      .replace(/\s*—\s*IN\s*\d+/g,'')
+      .replace(/\s*\(IN\s*\d+[^\)]*\)/g,'')
+      .replace(/\s*conforme\s*(o\s*)?(Art\.\s*\d+[^,\.]*)/g,'')
+      .replace(/\s*conforme\s*(a\s*)?IN\s*\d+/g,'')
+      .replace(/\s*com\s*DRT/gi,'')
+      .replace(/\s+/g,' ').trim();
+  }
+
+  // Contar total de NCs
+  var totalNC=0;
+  Object.keys(clFiltrado).forEach(function(grp){
+    clFiltrado[grp].forEach(function(item){
+      if(v.checklist[item.id]&&v.checklist[item.id].status==='nao') totalNC++;
+    });
+  });
+
+  // Organizar por pavimento usando as anotações dos pavimentos
+  // Cada NC tem um campo 'obs' com o local — tentar detectar pavimento
+  // Estratégia: montar blocos por pavimento usando os dados de e.pavimentos
+  // e cruzar com as obs das NCs (que o vistoriador preencheu com o local)
+  // + bloco "Geral" para NCs sem pavimento identificado
+
+  // Pavimentos cadastrados
+  var pavimentos = e.pavimentos || [];
+
+  // Para cada pavimento, coletar NCs cujo obs menciona aquele pavimento
+  // Mas como o vistoriador escreve livremente, a abordagem mais robusta é:
+  // mostrar as anotações dos pavimentos (vpav_obs) + as NCs com local preenchido por pavimento
+  // Vamos montar assim:
+  // - Bloco por pavimento (1, 2, 3...) com:
+  //   a) NCs que têm local preenchido contendo referência ao pavimento
+  //   b) Anotações do vistoriador para aquele pavimento
+  // - Bloco "Geral" com NCs sem local ou sem pavimento identificado
+
+  // Montar índice de termos de cada pavimento para busca
+  function nomePav(i){ return 'Pavimento '+(i+1); }
+  function termoPav(i, pav){
+    // termos que podem aparecer no campo obs indicando este pavimento
+    var t = [String(i+1)];
+    if(pav&&pav.label) t.push(pav.label.toLowerCase());
+    if(i===0) t.push('terreo','térreo','pav 1','pav. 1','1o','1º');
+    else t.push((i)+'º','('+i+')','pav '+i,'pav. '+i);
+    return t;
+  }
+
+  // Distribuir NCs por pavimento usando o seletor salvo
+  var ncPorPav = [];
+  for(var i=0;i<pavimentos.length;i++) ncPorPav.push([]);
+  var ncGeral = [];
+
+  Object.keys(clFiltrado).forEach(function(grp){
+    clFiltrado[grp].forEach(function(item){
+      if(v.checklist[item.id]&&v.checklist[item.id].status==='nao'){
+        var crit=simplificar(item.c);
+        var obs=v.checklist[item.id].obs||'';
+        var pav=v.checklist[item.id].pav;
+        var nc={crit:crit,obs:obs};
+        if(pav!=null&&pav>=0&&pav<pavimentos.length){
+          ncPorPav[pav].push(nc);
+        } else {
+          ncGeral.push(nc);
+        }
+      }
+    });
+  });
+
+  // Anotações do vistoriador por pavimento
+  var pavObsVist=[];
+  pavimentos.forEach(function(pav,i){
+    var obs=v.checklist['pav_obs_'+i]?v.checklist['pav_obs_'+i].obs:'';
+    pavObsVist.push(obs);
+  });
+
+  // Quantitativos
+  var sidsQtv=['ext','ilu','sal'];
+  var nomesQtv={'ext':'Extintores','ilu':'Iluminacao de Emergencia','sal':'Sinalizacao de Abandono'};
+  var qtvLinhas=[];
+  sidsQtv.forEach(function(sid){
+    var prev_q=e.preventivos&&e.preventivos[sid]&&e.preventivos[sid].ativo?e.preventivos[sid].qty:0;
+    var real=v.checklist['qtv_'+sid]?v.checklist['qtv_'+sid].val:'';
+    if(prev_q&&real!==''){
+      var abaixo=parseInt(real)<prev_q*0.5;
+      qtvLinhas.push('  '+nomesQtv[sid]+': previsto '+prev_q+', encontrado '+real+(abaixo?' (menos de 50% do exigido)':''));
+    }
+  });
+  var anoQtv=v.checklist['qtv_ano']?v.checklist['qtv_ano'].val:'';
+  var sitHS=v.situacaoHS||'';
+  var projs=(e.projetos||[]).map(function(p){return '  Projeto n. '+p.num+' ('+p.tipo+') — Habite-se: '+p.hs;}).join('\n');
+  var rota=S.rotas.find(function(r){return(r.vistorias||[]).indexOf(vid)>=0;});
+
+  var txt='';
+  txt+='RELATORIO DE IRREGULARIDADES — VISTORIA\n';
+  txt+='Data: '+dt+'\n';
+  txt+='Vistoriador: '+(rota&&rota.vistoriador?rota.vistoriador:'Nao informado')+'\n\n';
+  txt+='IDENTIFICACAO DO IMOVEL\n\n';
+  txt+='Numero/RE: '+e.numero+'\n';
+  txt+='Municipio: '+(e.municipio||'---')+'\n';
+  txt+='Edificacao: '+e.nome+'\n';
+  txt+='Endereco: '+(e.endereco||'---')+'\n';
+  if(e.area) txt+='Area Total: '+e.area+' m2\n';
+  txt+='\nProprietario: '+((e.prop&&e.prop.nome)||'---')+'\n';
+  txt+='Telefone: '+((e.prop&&e.prop.tel)||'---')+'\n';
+  if(projs) txt+='\nProjetos/Habite-se:\n'+projs+'\n';
+  txt+='\n';
+
+  if(totalNC===0){
+    txt+='RESULTADO: EDIFICACAO EM CONFORMIDADE\n';
+    txt+='Nenhuma irregularidade identificada na vistoria.\n\n';
+  } else {
+    txt+='RESULTADO: '+totalNC+' IRREGULARIDADE(S) IDENTIFICADA(S)\n\n';
+
+    // Quantitativos
+    if(qtvLinhas.length){
+      txt+='QUANTITATIVOS VERIFICADOS\n\n';
+      qtvLinhas.forEach(function(l){txt+=l+'\n';});
+      if(anoQtv){
+        if(anoQtv==='antes2013') txt+='  Construcao anterior a 2013: aprovado mediante Auto de Infracao.\n';
+        else txt+='  Construcao a partir de 2013: exige atendimento completo.\n';
+      }
+      txt+='\n';
+    }
+
+    txt+='IRREGULARIDADES POR PAVIMENTO\n\n';
+
+    // Blocos por pavimento
+    var temConteudoPav = false;
+    pavimentos.forEach(function(pav,i){
+      var ncs = ncPorPav[i]||[];
+      var obsVist = pavObsVist[i]||'';
+      if(!ncs.length && !obsVist) return;
+      temConteudoPav = true;
+      txt+='PAVIMENTO '+(i+1)+'\n';
+      ncs.forEach(function(nc){
+        txt+='  - '+nc.crit+'\n';
+        if(nc.obs) txt+='    Local: '+nc.obs+'\n';
+      });
+      if(obsVist) txt+='  Obs. do vistoriador: '+obsVist+'\n';
+      txt+='\n';
+    });
+
+    // Bloco geral
+    if(ncGeral.length){
+      txt+='GERAL (sem pavimento especifico)\n';
+      ncGeral.forEach(function(nc){
+        txt+='  - '+nc.crit+'\n';
+        if(nc.obs) txt+='    Local: '+nc.obs+'\n';
+      });
+      txt+='\n';
+    }
+
+    if(!temConteudoPav && !ncGeral.length && totalNC>0){
+      // Sem pavimentos cadastrados — listar NCs do geral
+      txt+='IRREGULARIDADES IDENTIFICADAS\n\n';
+      ncGeral.forEach(function(nc){
+        txt+='  - '+nc.crit+'\n';
+        if(nc.obs) txt+='    Local: '+nc.obs+'\n';
+      });
+      txt+='\n';
+    }
+
+    // Auto de infração
+    if(sitHS==='nao'){
+      txt+='SITUACAO DO HABITE-SE / ATESTADO\n\n';
+      txt+='A edificacao nao possui Habite-se ou Atestado de Conformidade vigente.\n';
+      txt+='Foi concedido prazo de 90 dias para regularizacao.\n';
+      txt+='Caso nao seja possivel concluir no prazo, solicitar prorrogacao\n';
+      txt+='antes do vencimento.\n\n';
+    }
+
+    if(v.obs) txt+='OBSERVACOES GERAIS\n\n'+v.obs+'\n\n';
+  }
+
+  txt+='Gerado em: '+new Date().toLocaleString('pt-BR');
+
+  // Mensagem WhatsApp
+  var nomeProp=(e.prop&&e.prop.nome)?e.prop.nome:'responsavel';
+  var wppMsg='Prezado(a) '+nomeProp+
+    ', segue relatorio de vistoria referente ao imovel '+e.nome+
+    ' (N. '+e.numero+'), realizada em '+dt+'. '+
+    (totalNC>0
+      ? 'Foram identificadas '+totalNC+' irregularidade(s) a regularizar, conforme relatorio em anexo.'
+      : 'Nenhuma irregularidade foi encontrada. Edificacao em conformidade.')+
+    ' Em caso de duvidas, estamos a disposicao. CBMSC — '+
+    (rota&&rota.vistoriador?rota.vistoriador:'Vistoriador')+'.';
+
+  var tSec=document.getElementById('rel-titulo-sec');
+  if(tSec)tSec.textContent=totalNC===0?'Rel. Simplificado — Em conformidade':'Rel. Simplificado — '+totalNC+' irregularidade(s)';
+  document.getElementById('rel-texto').textContent=txt;
+  var relBox=document.getElementById('rel-box');
+  relBox.style.display='block';
+  var wppOld=document.getElementById('wpp-bloco');
+  if(wppOld)wppOld.remove();
+  var wppDiv=document.createElement('div');
+  wppDiv.id='wpp-bloco';
+  wppDiv.className='wpp-block';
+  wppDiv.innerHTML=
+    '<div class="wpp-titulo">💬 Mensagem para WhatsApp</div>'+
+    '<textarea class="wpp-texto" id="wpp-texto">'+wppMsg+'</textarea>'+
+    '<button class="btn btn-s" style="margin-top:8px;background:#E8F5E9;color:#2E7D32;border-color:#A5D6A7" onclick="copiarWpp()">📋 Copiar mensagem</button>';
+  relBox.appendChild(wppDiv);
+  relBox.scrollIntoView({behavior:'smooth'});
+}
+function copiar(){var t=document.getElementById('rel-texto').textContent;if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('Copiado!');}).catch(function(){fb(t);});}else{fb(t);}}
+function fb(t){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('Copiado!');}
+load();renderHome();
+document.getElementById('btnNovaEdif').onclick=function(){abrirModalEdif(null);};
+document.getElementById('btnNovaVist').onclick=function(){abrirModalVist();};
+document.getElementById('btnNovaRota').onclick=function(){abrirModalRota();};
+document.getElementById('btnAddInq').onclick=function(){addInq(null);};
+document.getElementById('btnAddProj').onclick=function(){addProj(null);};
+document.getElementById('btnSalvarEdif').onclick=function(){salvarEdif();};
+document.getElementById('btnSalvarVist').onclick=function(){salvarVist();};
+document.getElementById('btnSalvarRota').onclick=function(){salvarRota();};
+document.getElementById('btnEditarEdif').onclick=function(){editarEdif();};
+document.getElementById('btnExcluirEdif').onclick=function(){excluirEdif();};
+document.getElementById('srch-edif-vist').oninput=function(){renderEdifSelectVist(this.value);};
+document.getElementById('btnAddMun').onclick=function(){adicionarMunicipio();};
+document.getElementById('mun-novo').onkeydown=function(e){if(e.key==='Enter')adicionarMunicipio();};
+document.getElementById('e-mun').onchange=function(){onMunChange(this);};
+document.getElementById('srch-vist-rota').oninput=function(){renderVistSelectRota(this.value);};
+
+</script>
+</body>
+</html>
