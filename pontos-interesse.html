@@ -1059,23 +1059,8 @@ function iniciarTrilha(){
   }, {enableHighAccuracy:true, maximumAge:5000});
 }
 function pararTrilha(){
+  // Para o GPS — o override acima cuida do restante
   if(trilhaWatchId!=null){ navigator.geolocation.clearWatch(trilhaWatchId); trilhaWatchId=null; }
-  document.getElementById('btnTrilhaStart').style.display='inline-block';
-  document.getElementById('btnTrilhaStop').style.display='none';
-  if(trilhaBuffer.length<2){
-    document.getElementById('trilhaStatus').textContent = 'Trilha muito curta, não foi salva.';
-    trilhaBuffer=[];
-    return;
-  }
-  const t = db.trips.find(x=>x.id===currentTripId);
-  if(t){
-    if(!t.trilhas) t.trilhas=[];
-    t.trilhas.push({id:uid(), pontos:trilhaBuffer, criadoEm:Date.now()});
-    saveDb();
-  }
-  document.getElementById('trilhaStatus').textContent = 'Trilha salva com '+trilhaBuffer.length+' pontos.';
-  trilhaBuffer=[];
-  renderMap();
 }
 
 /* ======================= ROTA ======================= */
@@ -1911,7 +1896,7 @@ pararTrilha = function(){
   _trilhaBufferTemp = trilhaBuffer ? trilhaBuffer.slice() : [];
   _trilhaPontosTemp = _trilhaPontosSession ? _trilhaPontosSession.slice() : [];
   trilhaBuffer = [];
-  if(_trilhaBufferTemp.length < 2 && _trilhaPontosTemp.length === 0){
+  if(_trilhaBufferTemp.length === 0 && _trilhaPontosTemp.length === 0){
     document.getElementById('trilhaStatus').textContent = 'Trilha muito curta, não foi salva.';
     _trilhaPontosSession = [];
     renderTrilhaPontos();
