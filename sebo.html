@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Sebo — Controle de Estoque</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%233b2a1a'/%3E%3Cpath d='M14 16h16v34l-16 4z' fill='%23c9a86a'/%3E%3Cpath d='M32 16h18v38l-18-4z' fill='%23e2c088'/%3E%3Cline x1='32' y1='16' x2='32' y2='54' stroke='%233b2a1a' stroke-width='2'/%3E%3Cline x1='18' y1='24' x2='27' y2='24' stroke='%233b2a1a' stroke-width='1.5'/%3E%3Cline x1='18' y1='30' x2='27' y2='30' stroke='%233b2a1a' stroke-width='1.5'/%3E%3Ccircle cx='45' cy='40' r='6' fill='none' stroke='%233b2a1a' stroke-width='2.5'/%3E%3Cline x1='49.5' y1='44.5' x2='55' y2='50' stroke='%233b2a1a' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f6f1e7; --paper:#fffdf8; --ink:#2b2015; --brown:#6b4a2b; --brown-d:#3b2a1a;
+    --accent:#a8722f; --accent-2:#7a9b6a; --danger:#b3412c; --muted:#8a7c68; --line:#e4d9c4;
+    --shadow:0 2px 8px rgba(43,32,21,.12);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:76px;}
+  header{background:var(--brown-d);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20;box-shadow:var(--shadow);}
+  header svg{width:30px;height:30px;flex-shrink:0;}
+  header h1{font-size:17px;margin:0;font-weight:700;}
+  header .sub{font-size:11px;opacity:.75;margin-top:1px;}
+  main{padding:14px;max-width:720px;margin:0 auto;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .card h2{margin:0 0 10px;font-size:15px;color:var(--brown-d);}
+  .row{display:flex;gap:8px;flex-wrap:wrap;}
+  .row > *{flex:1;min-width:120px;}
+  label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px;font-weight:600;}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--ink);font-family:inherit;}
+  textarea{resize:vertical;min-height:60px;}
+  button{cursor:pointer;border:none;border-radius:8px;padding:10px 14px;font-size:13.5px;font-weight:600;font-family:inherit;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-secondary{background:#fff;color:var(--brown-d);border:1px solid var(--brown);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--brown);text-decoration:underline;padding:6px;font-weight:500;}
+  .btn-block{width:100%;margin-top:10px;}
+  .btn-sm{padding:6px 10px;font-size:12px;}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--line);color:var(--brown-d);font-weight:600;}
+  .pill.warn{background:#f4ddb0;color:#7a4f00;}
+  .pill.bad{background:#f2c9c0;color:var(--danger);}
+  .pill.good{background:#d6e8cd;color:#3f6b30;}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:30;box-shadow:0 -2px 8px rgba(0,0,0,.06);}
+  .tabbar button{flex:1;background:none;border:none;padding:9px 2px 8px;font-size:10.5px;color:var(--muted);border-radius:0;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .tabbar button.active{color:var(--accent);}
+  .tabbar svg{width:20px;height:20px;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .item-card{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;align-items:center;}
+  .item-card img,.item-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;background:var(--line);flex-shrink:0;}
+  .item-thumb{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:9px;text-align:center;}
+  .item-info{flex:1;min-width:0;}
+  .item-info .t{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-info .s{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-actions{display:flex;flex-direction:column;gap:4px;}
+  .searchbar{display:flex;gap:8px;margin-bottom:10px;}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:13.5px;}
+  .modal-bg{position:fixed;inset:0;background:rgba(43,32,21,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
+  .modal{background:var(--paper);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px;}
+  .modal h2{margin-top:0;}
+  .close-x{float:right;background:none;color:var(--muted);font-size:20px;padding:0 4px;}
+  .photo-box{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .photo-box img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
+  .toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--brown-d);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:60;box-shadow:var(--shadow);opacity:0;transition:opacity .25s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--line);}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;}
+  .stat b{display:block;font-size:19px;color:var(--brown-d);}
+  .stat span{font-size:10.5px;color:var(--muted);}
+  .section-title{font-size:13px;font-weight:700;color:var(--brown-d);margin:16px 0 8px;}
+  .file-hidden{display:none;}
+  .helptext{font-size:11px;color:var(--muted);margin-top:4px;}
+  .grouptag{background:var(--accent-2);color:#fff;}
+</style>
+</head>
+<body>
+
+<header>
+  <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="#3b2a1a"/><path d="M14 16h16v34l-16 4z" fill="#c9a86a"/><path d="M32 16h18v38l-18-4z" fill="#e2c088"/><line x1="32" y1="16" x2="32" y2="54" stroke="#3b2a1a" stroke-width="2"/><line x1="18" y1="24" x2="27" y2="24" stroke="#3b2a1a" stroke-width="1.5"/><line x1="18" y1="30" x2="27" y2="30" stroke="#3b2a1a" stroke-width="1.5"/><circle cx="45" cy="40" r="6" fill="none" stroke="#3b2a1a" stroke-width="2.5"/><line x1="49.5" y1="44.5" x2="55" y2="50" stroke="#3b2a1a" stroke-width="2.5" stroke-linecap="round"/></svg>
+  <div>
+    <h1>Controle do Sebo</h1>
+    <div class="sub" id="headerSub">carregando...</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- VIEW: LIVROS -->
+  <div class="view active" id="view-livros">
+    <div class="searchbar">
+      <input type="text" id="buscaLivros" placeholder="Buscar livro/revista...">
+      <button class="btn-primary" onclick="abrirFormLivro()">+ Novo</button>
+    </div>
+    <div id="listaLivros"></div>
+  </div>
+
+  <!-- VIEW: COLECIONAVEIS -->
+  <div class="view" id="view-colecionaveis">
+    <div class="searchbar">
+      <input type="text" id="buscaColecionaveis" placeholder="Buscar colecionável...">
+      <button class="btn-primary" onclick="abrirFormColecionavel()">+ Novo</button>
+    </div>
+    <div id="listaColecionaveis"></div>
+  </div>
+
+  <!-- VIEW: ESTOQUE -->
+  <div class="view" id="view-estoque">
+    <div class="card">
+      <h2>Registrar movimento</h2>
+      <label>Item</label>
+      <select id="movItem"></select>
+      <div class="row">
+        <div>
+          <label>Tipo</label>
+          <select id="movTipo">
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída (venda)</option>
+          </select>
+        </div>
+        <div>
+          <label>Quantidade</label>
+          <input type="number" id="movQtd" min="1" value="1">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Valor unitário (R$)</label>
+          <input type="number" id="movValor" min="0" step="0.01">
+        </div>
+        <div>
+          <label>Data</label>
+          <input type="date" id="movData">
+        </div>
+      </div>
+      <label>Observação</label>
+      <input type="text" id="movObs" placeholder="opcional">
+      <button class="btn-primary btn-block" onclick="registrarMovimento()">Registrar</button>
+    </div>
+    <div class="section-title">Últimos movimentos</div>
+    <div id="listaMovimentos"></div>
+  </div>
+
+  <!-- VIEW: PAINEL -->
+  <div class="view" id="view-painel">
+    <div class="stat-grid">
+      <div class="stat"><b id="statTotalItens">0</b><span>itens cadastrados</span></div>
+      <div class="stat"><b id="statTotalUnidades">0</b><span>unidades em estoque</span></div>
+      <div class="stat"><b id="statVendas30">0</b><span>saídas (30 dias)</span></div>
+      <div class="stat"><b id="statParados">0</b><span>parados há +90 dias</span></div>
+    </div>
+
+    <div class="card">
+      <h2>🔥 Mais vendidos</h2>
+      <div id="painelMaisVendidos" class="empty">sem dados ainda</div>
+    </div>
+    <div class="card">
+      <h2>🐌 Parados (sem venda há mais tempo)</h2>
+      <div id="painelParados" class="empty">sem dados ainda</div>
+    </div>
+    <div class="card">
+      <h2>💡 Sugestões</h2>
+      <div id="painelSugestoes" class="empty">sem dados ainda</div>
+    </div>
+  </div>
+
+  <!-- VIEW: CONFIG -->
+  <div class="view" id="view-config">
+    <div class="card">
+      <h2>📦 Backup (JSON)</h2>
+      <p class="helptext">Guarda tudo — itens, fotos e movimentos. Use para não perder dados.</p>
+      <button class="btn-primary btn-block" onclick="exportarJSON()">Exportar backup (.json)</button>
+      <button class="btn-secondary btn-block" onclick="document.getElementById('inputJSON').click()">Importar backup (.json)</button>
+      <input type="file" id="inputJSON" class="file-hidden" accept=".json" onchange="importarJSON(event)">
+    </div>
+
+    <div class="card">
+      <h2>📊 Excel (.xlsx)</h2>
+      <p class="helptext">Gere a planilha modelo, mande para quem for digitar, e depois importe de volta o arquivo preenchido — funciona com o Excel padrão, sem passo extra.</p>
+      <button class="btn-secondary btn-block" onclick="exportarModeloExcel()">Baixar planilha modelo (.xlsx)</button>
+      <button class="btn-primary btn-block" onclick="document.getElementById('inputExcel').click()">Importar planilha preenchida (.xlsx)</button>
+      <input type="file" id="inputExcel" class="file-hidden" accept=".xlsx" onchange="importarExcel(event)">
+    </div>
+
+    <div class="card">
+      <h2>⚙️ Parâmetros</h2>
+      <label>Considerar "parado" após quantos dias sem venda?</label>
+      <input type="number" id="cfgDiasParado" min="1" onchange="salvarConfig()">
+      <label>Estoque mínimo padrão (alerta de compra)</label>
+      <input type="number" id="cfgEstoqueMin" min="0" onchange="salvarConfig()">
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Zona de risco</h2>
+      <button class="btn-danger btn-block" onclick="limparTudo()">Apagar todos os dados do app</button>
+    </div>
+  </div>
+
+</main>
+
+<div class="tabbar">
+  <button class="tab-btn active" data-view="livros" onclick="mudarAba('livros')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Livros
+  </button>
+  <button class="tab-btn" data-view="colecionaveis" onclick="mudarAba('colecionaveis')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    Colecionáveis
+  </button>
+  <button class="tab-btn" data-view="estoque" onclick="mudarAba('estoque')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
+    Estoque
+  </button>
+  <button class="tab-btn" data-view="painel" onclick="mudarAba('painel')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+    Painel
+  </button>
+  <button class="tab-btn" data-view="config" onclick="mudarAba('config')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Config
+  </button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="xlsxlib.js"></script>
+<script>
+/* ============ DADOS ============ */
+const STORAGE_KEY = 'sebo_estoque_v1';
+let DB = { livros: [], colecionaveis: [], movimentos: [], config: { diasParado: 90, estoqueMin: 2 } };
+
+function carregar(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{ DB = Object.assign({livros:[],colecionaveis:[],movimentos:[],config:{diasParado:90,estoqueMin:2}}, JSON.parse(raw)); }
+    catch(e){ console.error('erro ao carregar', e); }
+  }
+  document.getElementById('cfgDiasParado').value = DB.config.diasParado;
+  document.getElementById('cfgEstoqueMin').value = DB.config.estoqueMin;
+}
+function salvar(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  atualizarHeader();
+}
+function salvarConfig(){
+  DB.config.diasParado = parseInt(document.getElementById('cfgDiasParado').value)||90;
+  DB.config.estoqueMin = parseInt(document.getElementById('cfgEstoqueMin').value)||2;
+  salvar();
+  toast('Configuração salva');
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function hoje(){ return new Date().toISOString().slice(0,10); }
+function atualizarHeader(){
+  const totalItens = DB.livros.length + DB.colecionaveis.length;
+  document.getElementById('headerSub').textContent = totalItens + ' itens cadastrados';
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ NAVEGAÇÃO ============ */
+function mudarAba(nome){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+nome).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===nome));
+  if(nome==='livros') renderLivros();
+  if(nome==='colecionaveis') renderColecionaveis();
+  if(nome==='estoque'){ renderSelectItens(); renderMovimentos(); document.getElementById('movData').value = hoje(); }
+  if(nome==='painel') renderPainel();
+}
+
+/* ============ FOTO (base64) ============ */
+function lerFotoComoBase64(inputEl, callback){
+  const file = inputEl.files[0];
+  if(!file){ callback(null); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 480;
+      let w = img.width, h = img.height;
+      if(w>h && w>MAX){ h = h*MAX/w; w = MAX; } else if(h>MAX){ w = w*MAX/h; h = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============ LIVROS ============ */
+function abrirFormLivro(item){
+  const editando = !!item;
+  item = item || { id: uid(), tipo:'livro', quantidade:0, criadoEm: hoje() };
+  const html = `
+    <button class="close-x" onclick="fecharModal()">✕</button>
+    <h2>${editando?'Editar':'Novo'} livro/revista</h2>
+    <div class="photo-box">
+      <img id="fotoPreview" src="${item.foto||''}" style="${item.foto?'':'display:none'}">
+      <div>
+        <button class="btn-secondary btn-sm" onclick="document.getElementById('fotoInput').click()">📷 Foto</button>
+        <input type="file" id="fotoInput" accept="image/*" class="file-hidden" onchange="lerFotoComoBase64(this, src=>{ if(src){document.getElementById('fotoPreview').src=src; document.getElementById('fotoPreview').style.display='block'; window._fotoTemp=src;} })">
+      </div>
+    </div>
+    <label>Título *</label><input id="f_titulo" value="${esc(item.titulo)}">
+    <div class="row">
+      <div><label>Autor</label><input id="f_autor" value="${esc(item.autor)}"></div>
+      <div><label>Editora</label><input id="f_editora" value="${esc(item.editora)}"></div>
+    </div>
+    <div class="row">
+      <div><label>Edição</label><input id="f_edicao" value="${esc(item.edicao)}"></div>
+      <div><label>Ano</label><input id="f_ano" type="number" value="${esc(item.ano)}"></div>
+    </div>
+    <div class="row">
+      <div><label>ISBN</label><input id="f_isbn" value="${esc(item.isbn)}"></div>
+      <div><label>Categoria/Gênero</label><input id="f_categoria" value="${esc(item.categoria)}"></div>
+    </div>
+    <label>Estado de conservação</label>
+    <select id="f_estado">
+      ${['Novo','Ótimo','Bom','Regular','Desgastado'].map(o=>`<option ${item.estado===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+    <label>Resumo</label><textarea id="f_resumo">${esc(item.resumo)}</textarea>
+    <div class="row">
+      <div><label>Localização (prateleira/caixa)</label><input id="f_localizacao" value="${esc(item.localizacao)}"></div>
+      <div><label>Quantidade</label><input id="f_quantidade" type="number" min="0" value="${item.quantidade||0}"></div>
+    </div>
+    <div class="row">
+      <div><label>Preço de custo (R$)</label><input id="f_precoCusto" type="number" step="0.01" value="${esc(item.precoCusto)}"></div>
+      <div><label>Preço de venda (R$)</label><input id="f_precoVenda" type="number" step="0.01" value="${esc(item.precoVenda)}"></div>
+    </div>
+    <button class="btn-primary btn-block" onclick="salvarLivro('${item.id}', ${editando})">Salvar</button>
+    ${editando?`<button class="btn-danger btn-block" onclick="excluirItem('livros','${item.id}')">Excluir</button>`:''}
+  `;
+  abrirModal(html);
+  window._fotoTemp = item.foto || null;
+}
+function salvarLivro(id, editando){
+  const item = {
+    id, tipo:'livro',
+    titulo: val('f_titulo'), autor: val('f_autor'), editora: val('f_editora'),
+    edicao: val('f_edicao'), ano: val('f_ano'), isbn: val('f_isbn'),
+    categoria: val('f_categoria'), estado: val('f_estado'), resumo: val('f_resumo'),
+    localizacao: val('f_localizacao'), quantidade: parseInt(val('f_quantidade'))||0,
+    precoCusto: parseFloat(val('f_precoCusto'))||0, precoVenda: parseFloat(val('f_precoVenda'))||0,
+    foto: window._fotoTemp || null, criadoEm: editando? (DB.livros.find(i=>i.id===id)||{}).criadoEm : hoje()
+  };
+  if(!item.titulo){ toast('Título é obrigatório'); return; }
+  const idx = DB.livros.findIndex(i=>i.id===id);
+  if(idx>=0) DB.livros[idx] = item; else DB.livros.push(item);
+  salvar(); fecharModal(); renderLivros();
+  toast('Livro salvo');
+}
+function renderLivros(){
+  const q = (document.getElementById('buscaLivros').value||'').toLowerCase();
+  const lista = DB.livros.filter(i => !q || (i.titulo+' '+i.autor+' '+i.editora).toLowerCase().includes(q));
+  const el = document.getElementById('listaLivros');
+  if(lista.length===0){ el.innerHTML = '<div class="empty">Nenhum livro cadastrado ainda.</div>'; return; }
+  el.innerHTML = lista.map(i => `
+    <div class="item-card" onclick="abrirFormLivro(${attrItem(i)})">
+      ${i.foto?`<img src="${i.foto}">`:`<div class="item-thumb">sem foto</div>`}
+      <div class="item-info">
+        <div class="t">${esc(i.titulo)}</div>
+        <div class="s">${esc(i.autor)||'—'} · ${esc(i.editora)||'—'}</div>
+        <span class="pill ${i.quantidade<=0?'bad':(i.quantidade<=DB.config.estoqueMin?'warn':'good')}">${i.quantidade||0} un.</span>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('buscaLivros')?.addEventListener?.('input', renderLivros);
+
+/* ============ COLECIONÁVEIS ============ */
+function abrirFormColecionavel(item){
+  const editando = !!item;
+  item = item || { id: uid(), tipo:'colecionavel', quantidade:0, criadoEm: hoje() };
+  const html = `
+    <button class="close-x" onclick="fecharModal()">✕</button>
+    <h2>${editando?'Editar':'Novo'} colecionável</h2>
+    <div class="photo-box">
+      <img id="fotoPreview" src="${item.foto||''}" style="${item.foto?'':'display:none'}">
+      <div>
+        <button class="btn-secondary btn-sm" onclick="document.getElementById('fotoInput').click()">📷 Foto</button>
+        <input type="file" id="fotoInput" accept="image/*" class="file-hidden" onchange="lerFotoComoBase64(this, src=>{ if(src){document.getElementById('fotoPreview').src=src; document.getElementById('fotoPreview').style.display='block'; window._fotoTemp=src;} })">
+      </div>
+    </div>
+    <label>Nome *</label><input id="f_nome" value="${esc(item.nome)}">
+    <div class="row">
+      <div><label>Categoria</label><input id="f_categoria" value="${esc(item.categoria)}" placeholder="cards, action figure, HQ..."></div>
+      <div><label>Fabricante/Editora</label><input id="f_fabricante" value="${esc(item.fabricante)}"></div>
+    </div>
+    <div class="row">
+      <div><label>Ano</label><input id="f_ano" type="number" value="${esc(item.ano)}"></div>
+      <div><label>Estado de conservação</label>
+        <select id="f_estado">
+          ${['Novo/Lacrado','Ótimo','Bom','Regular','Desgastado'].map(o=>`<option ${item.estado===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label>Itens relacionados</label>
+    <input id="f_relacionados" value="${esc(item.relacionados)}" placeholder="ex: faz parte da coleção X, combina com Y">
+    <div class="row">
+      <div><label>Localização</label><input id="f_localizacao" value="${esc(item.localizacao)}"></div>
+      <div><label>Quantidade</label><input id="f_quantidade" type="number" min="0" value="${item.quantidade||0}"></div>
+    </div>
+    <div class="row">
+      <div><label>Preço de custo (R$)</label><input id="f_precoCusto" type="number" step="0.01" value="${esc(item.precoCusto)}"></div>
+      <div><label>Preço de venda (R$)</label><input id="f_precoVenda" type="number" step="0.01" value="${esc(item.precoVenda)}"></div>
+    </div>
+    <button class="btn-primary btn-block" onclick="salvarColecionavel('${item.id}', ${editando})">Salvar</button>
+    ${editando?`<button class="btn-danger btn-block" onclick="excluirItem('colecionaveis','${item.id}')">Excluir</button>`:''}
+  `;
+  abrirModal(html);
+  window._fotoTemp = item.foto || null;
+}
+function salvarColecionavel(id, editando){
+  const item = {
+    id, tipo:'colecionavel',
+    nome: val('f_nome'), categoria: val('f_categoria'), fabricante: val('f_fabricante'),
+    ano: val('f_ano'), estado: val('f_estado'), relacionados: val('f_relacionados'),
+    localizacao: val('f_localizacao'), quantidade: parseInt(val('f_quantidade'))||0,
+    precoCusto: parseFloat(val('f_precoCusto'))||0, precoVenda: parseFloat(val('f_precoVenda'))||0,
+    foto: window._fotoTemp || null, criadoEm: editando? (DB.colecionaveis.find(i=>i.id===id)||{}).criadoEm : hoje()
+  };
+  if(!item.nome){ toast('Nome é obrigatório'); return; }
+  const idx = DB.colecionaveis.findIndex(i=>i.id===id);
+  if(idx>=0) DB.colecionaveis[idx] = item; else DB.colecionaveis.push(item);
+  salvar(); fecharModal(); renderColecionaveis();
+  toast('Colecionável salvo');
+}
+function renderColecionaveis(){
+  const q = (document.getElementById('buscaColecionaveis').value||'').toLowerCase();
+  const lista = DB.colecionaveis.filter(i => !q || (i.nome+' '+i.categoria+' '+i.fabricante).toLowerCase().includes(q));
+  const el = document.getElementById('listaColecionaveis');
+  if(lista.length===0){ el.innerHTML = '<div class="empty">Nenhum colecionável cadastrado ainda.</div>'; return; }
+  el.innerHTML = lista.map(i => `
+    <div class="item-card" onclick="abrirFormColecionavel(${attrItem(i)})">
+      ${i.foto?`<img src="${i.foto}">`:`<div class="item-thumb">sem foto</div>`}
+      <div class="item-info">
+        <div class="t">${esc(i.nome)}</div>
+        <div class="s">${esc(i.categoria)||'—'} · ${esc(i.fabricante)||'—'}</div>
+        <span class="pill ${i.quantidade<=0?'bad':(i.quantidade<=DB.config.estoqueMin?'warn':'good')}">${i.quantidade||0} un.</span>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('buscaColecionaveis')?.addEventListener?.('input', renderColecionaveis);
+
+/* helper para reabrir item ao clicar no card (guarda o objeto num atributo temporário via closure) */
+window._itemCache = {};
+function attrItem(i){ window._itemCache[i.id] = i; return `window._itemCache['${i.id}']`; }
+
+function excluirItem(colecao, id){
+  if(!confirm('Excluir este item? Os movimentos de estoque relacionados serão mantidos no histórico.')) return;
+  DB[colecao] = DB[colecao].filter(i=>i.id!==id);
+  salvar(); fecharModal();
+  if(colecao==='livros') renderLivros(); else renderColecionaveis();
+  toast('Item excluído');
+}
+
+/* ============ MODAL ============ */
+function abrirModal(html){
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg'; bg.id = 'modalBg';
+  bg.innerHTML = `<div class="modal">${html}</div>`;
+  bg.addEventListener('click', e=>{ if(e.target===bg) fecharModal(); });
+  document.body.appendChild(bg);
+}
+function fecharModal(){
+  const bg = document.getElementById('modalBg');
+  if(bg) bg.remove();
+}
+function val(id){ return document.getElementById(id).value.trim(); }
+function esc(v){ return v===undefined||v===null ? '' : String(v).replace(/"/g,'&quot;'); }
+
+/* ============ ESTOQUE / MOVIMENTOS ============ */
+function todosItens(){
+  return [
+    ...DB.livros.map(i=>({...i, colecao:'livros', label: i.titulo})),
+    ...DB.colecionaveis.map(i=>({...i, colecao:'colecionaveis', label: i.nome}))
+  ];
+}
+function renderSelectItens(){
+  const sel = document.getElementById('movItem');
+  const itens = todosItens();
+  sel.innerHTML = itens.map(i=>`<option value="${i.colecao}|${i.id}">${(i.colecao==='livros'?'📕 ':'🎲 ')+esc(i.label)}</option>`).join('') || '<option value="">nenhum item cadastrado</option>';
+}
+function registrarMovimento(){
+  const selVal = document.getElementById('movItem').value;
+  if(!selVal){ toast('Cadastre um item primeiro'); return; }
+  const [colecao, id] = selVal.split('|');
+  const tipo = document.getElementById('movTipo').value;
+  const qtd = parseInt(document.getElementById('movQtd').value)||0;
+  const valor = parseFloat(document.getElementById('movValor').value)||0;
+  const data = document.getElementById('movData').value || hoje();
+  const obs = document.getElementById('movObs').value.trim();
+  if(qtd<=0){ toast('Quantidade inválida'); return; }
+
+  const item = DB[colecao].find(i=>i.id===id);
+  if(!item){ toast('Item não encontrado'); return; }
+  if(tipo==='saida' && item.quantidade < qtd){
+    if(!confirm('Estoque atual é menor que a quantidade de saída. Continuar mesmo assim?')) return;
+  }
+  item.quantidade = (item.quantidade||0) + (tipo==='entrada'? qtd : -qtd);
+
+  DB.movimentos.unshift({
+    id: uid(), itemId: id, colecao, itemNome: item.titulo||item.nome,
+    tipo, quantidade: qtd, valorUnitario: valor, data, obs
+  });
+  salvar();
+  document.getElementById('movQtd').value = 1;
+  document.getElementById('movValor').value = '';
+  document.getElementById('movObs').value = '';
+  renderMovimentos(); renderSelectItens();
+  toast(tipo==='entrada'?'Entrada registrada':'Saída registrada');
+}
+function renderMovimentos(){
+  const el = document.getElementById('listaMovimentos');
+  const lista = DB.movimentos.slice(0,40);
+  if(lista.length===0){ el.innerHTML = '<div class="empty">Nenhum movimento registrado ainda.</div>'; return; }
+  el.innerHTML = `<table><tr><th>Data</th><th>Item</th><th>Tipo</th><th>Qtd</th><th>Valor</th></tr>` +
+    lista.map(m=>`<tr>
+      <td>${formatarData(m.data)}</td>
+      <td>${esc(m.itemNome)}</td>
+      <td><span class="pill ${m.tipo==='entrada'?'good':'grouptag'}">${m.tipo==='entrada'?'Entrada':'Saída'}</span></td>
+      <td>${m.quantidade}</td>
+      <td>${m.valorUnitario? 'R$ '+(m.valorUnitario*m.quantidade).toFixed(2) : '—'}</td>
+    </tr>`).join('') + `</table>`;
+}
+function formatarData(d){
+  if(!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+/* ============ PAINEL / ANÁLISES ============ */
+function diasDesde(dataStr){
+  return Math.floor((new Date() - new Date(dataStr+'T00:00:00')) / 86400000);
+}
+function renderPainel(){
+  const itens = todosItens();
+  document.getElementById('statTotalItens').textContent = itens.length;
+  document.getElementById('statTotalUnidades').textContent = itens.reduce((s,i)=>s+(i.quantidade||0),0);
+
+  const limite30 = new Date(); limite30.setDate(limite30.getDate()-30);
+  const saidas30 = DB.movimentos.filter(m=>m.tipo==='saida' && new Date(m.data) >= limite30);
+  document.getElementById('statVendas30').textContent = saidas30.reduce((s,m)=>s+m.quantidade,0);
+
+  // ranking de vendas por item (todo o histórico)
+  const vendasPorItem = {};
+  DB.movimentos.filter(m=>m.tipo==='saida').forEach(m=>{
+    const key = m.colecao+'|'+m.itemId;
+    vendasPorItem[key] = (vendasPorItem[key]||0) + m.quantidade;
+  });
+  const ranking = Object.entries(vendasPorItem).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const elMV = document.getElementById('painelMaisVendidos');
+  if(ranking.length===0){ elMV.innerHTML = '<div class="empty">Nenhuma venda registrada ainda.</div>'; }
+  else {
+    elMV.innerHTML = ranking.map(([key,qtd])=>{
+      const [colecao,id] = key.split('|');
+      const item = DB[colecao].find(i=>i.id===id);
+      const nome = item ? (item.titulo||item.nome) : '(item removido)';
+      return `<div class="item-card"><div class="item-info"><div class="t">${esc(nome)}</div><div class="s">${qtd} unidade(s) vendida(s)</div></div></div>`;
+    }).join('');
+  }
+
+  // última data de saída por item
+  const ultimaSaida = {};
+  DB.movimentos.filter(m=>m.tipo==='saida').forEach(m=>{
+    const key = m.colecao+'|'+m.itemId;
+    if(!ultimaSaida[key] || m.data > ultimaSaida[key]) ultimaSaida[key] = m.data;
+  });
+  const parados = itens.filter(i=>{
+    if((i.quantidade||0) <= 0) return false;
+    const key = i.colecao+'|'+i.id;
+    const ultima = ultimaSaida[key];
+    if(!ultima) return diasDesde(i.criadoEm||hoje()) >= DB.config.diasParado;
+    return diasDesde(ultima) >= DB.config.diasParado;
+  }).sort((a,b)=>(a.quantidade<b.quantidade?1:-1));
+  document.getElementById('statParados').textContent = parados.length;
+  const elP = document.getElementById('painelParados');
+  if(parados.length===0){ elP.innerHTML = `<div class="empty">Nenhum item parado (limite: ${DB.config.diasParado} dias).</div>`; }
+  else {
+    elP.innerHTML = parados.slice(0,10).map(i=>{
+      const key = i.colecao+'|'+i.id;
+      const ultima = ultimaSaida[key];
+      const dias = ultima ? diasDesde(ultima) : diasDesde(i.criadoEm||hoje());
+      return `<div class="item-card"><div class="item-info"><div class="t">${esc(i.label)}</div><div class="s">${i.quantidade} un. · sem venda há ${dias} dias</div></div></div>`;
+    }).join('');
+  }
+
+  // sugestões
+  const sugestoes = [];
+  const baixoEstoque = itens.filter(i=>(i.quantidade||0) <= DB.config.estoqueMin && (vendasPorItem[i.colecao+'|'+i.id]||0) > 0);
+  if(baixoEstoque.length) sugestoes.push(`📦 <b>${baixoEstoque.length} item(ns)</b> com boa saída e estoque baixo — vale a pena repor: ${baixoEstoque.slice(0,5).map(i=>esc(i.label)).join(', ')}${baixoEstoque.length>5?'...':''}`);
+  if(parados.length) sugestoes.push(`🏷️ <b>${parados.length} item(ns)</b> parado(s) há mais de ${DB.config.diasParado} dias — candidatos a promoção ou desconto.`);
+  const semVendaNunca = itens.filter(i=>(i.quantidade||0)>0 && !(vendasPorItem[i.colecao+'|'+i.id]));
+  if(semVendaNunca.length) sugestoes.push(`❓ <b>${semVendaNunca.length} item(ns)</b> em estoque nunca tiveram saída registrada.`);
+  document.getElementById('painelSugestoes').innerHTML = sugestoes.length ? sugestoes.map(s=>`<p style="margin:6px 0;font-size:13px;">${s}</p>`).join('') : '<div class="empty">Sem sugestões por enquanto — cadastre itens e registre movimentos.</div>';
+}
+
+/* ============ BACKUP JSON ============ */
+function exportarJSON(){
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  baixarBlob(blob, `backup-sebo-${hoje()}.json`);
+  toast('Backup exportado');
+}
+function importarJSON(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const novo = JSON.parse(e.target.result);
+      if(!novo.livros || !novo.colecionaveis){ toast('Arquivo inválido'); return; }
+      if(confirm('Importar vai SUBSTITUIR todos os dados atuais. Continuar?')){
+        DB = Object.assign({livros:[],colecionaveis:[],movimentos:[],config:{diasParado:90,estoqueMin:2}}, novo);
+        salvar();
+        document.getElementById('cfgDiasParado').value = DB.config.diasParado;
+        document.getElementById('cfgEstoqueMin').value = DB.config.estoqueMin;
+        toast('Backup importado com sucesso');
+        renderLivros(); renderColecionaveis();
+      }
+    }catch(err){ toast('Erro ao ler o arquivo'); console.error(err); }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+/* ============ EXCEL (.xlsx) ============ */
+const COLUNAS_LIVROS = ['Titulo','Autor','Editora','Edicao','Ano','ISBN','Categoria','Estado','Resumo','Localizacao','Quantidade','PrecoCusto','PrecoVenda'];
+const COLUNAS_COLECIONAVEIS = ['Nome','Categoria','Fabricante','Ano','Estado','Relacionados','Localizacao','Quantidade','PrecoCusto','PrecoVenda'];
+
+function exportarModeloExcel(){
+  const sheets = {
+    'Livros': [COLUNAS_LIVROS, ['Dom Casmurro','Machado de Assis','Garnier','1ª edição',1899,'','Romance','Bom','Resumo breve do livro...','Caixa 3',2,10,25]],
+    'Colecionaveis': [COLUNAS_COLECIONAVEIS, ['Action Figure Exemplo','Anime','Fabricante X',2015,'Novo/Lacrado','','Prateleira A',1,50,90]]
+  };
+  const bytes = MiniXLSX.write(sheets);
+  const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  baixarBlob(blob, 'modelo-sebo.xlsx');
+  toast('Modelo Excel baixado');
+}
+function exportarEstoqueAtualExcel(){
+  const linhasLivros = [COLUNAS_LIVROS, ...DB.livros.map(i=>[i.titulo,i.autor,i.editora,i.edicao,i.ano,i.isbn,i.categoria,i.estado,i.resumo,i.localizacao,i.quantidade,i.precoCusto,i.precoVenda])];
+  const linhasCol = [COLUNAS_COLECIONAVEIS, ...DB.colecionaveis.map(i=>[i.nome,i.categoria,i.fabricante,i.ano,i.estado,i.relacionados,i.localizacao,i.quantidade,i.precoCusto,i.precoVenda])];
+  const bytes = MiniXLSX.write({ 'Livros': linhasLivros, 'Colecionaveis': linhasCol });
+  const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  baixarBlob(blob, `estoque-sebo-${hoje()}.xlsx`);
+}
+function importarExcel(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const sheets = MiniXLSX.read(e.target.result);
+      let countLivros = 0, countCol = 0;
+      if(sheets['Livros']) countLivros = importarLinhasLivros(sheets['Livros']);
+      if(sheets['Colecionaveis']) countCol = importarLinhasColecionaveis(sheets['Colecionaveis']);
+      if(countLivros===0 && countCol===0){ toast('Nenhuma linha reconhecida na planilha'); return; }
+      salvar(); renderLivros(); renderColecionaveis();
+      toast(`Importado: ${countLivros} livro(s), ${countCol} colecionável(is)`);
+    }catch(err){ toast('Erro ao ler o Excel: '+err.message); console.error(err); }
+  };
+  reader.readAsArrayBuffer(file);
+  evt.target.value = '';
+}
+function mapaCabecalho(headerRow){
+  const map = {};
+  headerRow.forEach((h,idx)=>{ if(h) map[String(h).trim().toLowerCase()] = idx; });
+  return map;
+}
+function pega(row, map, nomeColuna){
+  const idx = map[nomeColuna.toLowerCase()];
+  return idx===undefined ? '' : (row[idx]===undefined||row[idx]===null ? '' : row[idx]);
+}
+function importarLinhasLivros(rows){
+  if(rows.length<2) return 0;
+  const map = mapaCabecalho(rows[0]);
+  let count = 0;
+  for(let r=1; r<rows.length; r++){
+    const row = rows[r];
+    if(!row || row.every(c=>c==='' || c===undefined)) continue;
+    const titulo = pega(row,map,'Titulo');
+    if(!titulo) continue;
+    DB.livros.push({
+      id: uid(), tipo:'livro', titulo,
+      autor: pega(row,map,'Autor'), editora: pega(row,map,'Editora'), edicao: pega(row,map,'Edicao'),
+      ano: pega(row,map,'Ano'), isbn: pega(row,map,'ISBN'), categoria: pega(row,map,'Categoria'),
+      estado: pega(row,map,'Estado')||'Bom', resumo: pega(row,map,'Resumo'), localizacao: pega(row,map,'Localizacao'),
+      quantidade: parseInt(pega(row,map,'Quantidade'))||0,
+      precoCusto: parseFloat(pega(row,map,'PrecoCusto'))||0, precoVenda: parseFloat(pega(row,map,'PrecoVenda'))||0,
+      foto: null, criadoEm: hoje()
+    });
+    count++;
+  }
+  return count;
+}
+function importarLinhasColecionaveis(rows){
+  if(rows.length<2) return 0;
+  const map = mapaCabecalho(rows[0]);
+  let count = 0;
+  for(let r=1; r<rows.length; r++){
+    const row = rows[r];
+    if(!row || row.every(c=>c==='' || c===undefined)) continue;
+    const nome = pega(row,map,'Nome');
+    if(!nome) continue;
+    DB.colecionaveis.push({
+      id: uid(), tipo:'colecionavel', nome,
+      categoria: pega(row,map,'Categoria'), fabricante: pega(row,map,'Fabricante'), ano: pega(row,map,'Ano'),
+      estado: pega(row,map,'Estado')||'Bom', relacionados: pega(row,map,'Relacionados'), localizacao: pega(row,map,'Localizacao'),
+      quantidade: parseInt(pega(row,map,'Quantidade'))||0,
+      precoCusto: parseFloat(pega(row,map,'PrecoCusto'))||0, precoVenda: parseFloat(pega(row,map,'PrecoVenda'))||0,
+      foto: null, criadoEm: hoje()
+    });
+    count++;
+  }
+  return count;
+}
+function baixarBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+}
+
+/* ============ RESET ============ */
+function limparTudo(){
+  if(!confirm('Isso vai apagar TODOS os itens e movimentos deste dispositivo. Recomendado exportar um backup antes. Continuar?')) return;
+  if(!confirm('Tem certeza mesmo? Essa ação não pode ser desfeita.')) return;
+  DB = { livros: [], colecionaveis: [], movimentos: [], config: { diasParado:90, estoqueMin:2 } };
+  salvar();
+  renderLivros(); renderColecionaveis();
+  toast('Todos os dados foram apagados');
+}
+
+/* ============ INIT ============ */
+carregar();
+renderLivros();
+atualizarHeader();
+</script>
+</body>
+</html>
