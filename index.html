@@ -382,6 +382,7 @@ textarea.fc{resize:vertical;min-height:60px;}
     <button class="tab on" onclick="showTab('hoje',this)">💊 Hoje</button>
     <button class="tab" onclick="showTab('hist',this)">📋 Histórico</button>
     <button class="tab" onclick="showTab('meds',this)">🔬 Medicações</button>
+    <button class="tab" onclick="showTab('exam',this)">🧪 Exames</button>
     <button class="tab" onclick="showTab('cons',this)">🩺 Consulta</button>
     <button class="tab" onclick="showTab('bsca',this)">🔍 Buscar</button>
   </div>
@@ -404,6 +405,7 @@ textarea.fc{resize:vertical;min-height:60px;}
     <button class="fchip" onclick="setFiltro('medicacao',this)">💊 Medicação</button>
     <button class="fchip" onclick="setFiltro('consulta',this)">🩺 Consulta</button>
     <button class="fchip" onclick="setFiltro('exame',this)">🔬 Exame</button>
+    <button class="fchip" onclick="setFiltro('exame',this)">🔬 Exame</button>
     <button class="fchip" onclick="setFiltro('alimentacao',this)">🍽️ Alimentação</button>
     <button class="fchip" onclick="setFiltro('outro',this)">📝 Outro</button>
   </div>
@@ -420,6 +422,12 @@ textarea.fc{resize:vertical;min-height:60px;}
   <div id="medsOut"></div>
 </div>
 <!-- PRÉ-CONSULTA -->
+<div class="scr" id="scr-exam">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;">
+    <span style="font-size:.8rem;font-weight:800;color:var(--t2);">Exames</span>
+  </div>
+  <div id="examOut"></div>
+</div>
 <div class="scr" id="scr-cons">
   <!-- LISTA DE CONSULTAS -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;">
@@ -1069,7 +1077,7 @@ function selPerfil(id){
   var hj=new Date().toISOString().slice(0,10);var hr=new Date().toTimeString().slice(0,5);
   set('eData',hj);set('eHora',hr);set('mD1',hj);set('mH1',hr);
   showTab('hoje',document.querySelector('.tab'));
-  renderHoje();renderBkp();renderEst();renderConsLista();setupAcTodos();renderNotifBanner();if(('Notification' in window && Notification.permission==='granted')&&!_swReg)registrarSW();
+  renderHoje();renderBkp();renderEst();renderConsLista();renderExamLista();setupAcTodos();renderNotifBanner();if(('Notification' in window && Notification.permission==='granted')&&!_swReg)registrarSW();
 }
 function voltarPerfis(){pid=null;mostrarPerfis();}
 function abrirNP(){set('npNm','');set('npAv','👤');initNasc('npN','');setFase('npFase','adulto');abrirModal('ovNP');}
@@ -1089,6 +1097,7 @@ function showTab(nm,btn){
   if(nm==='hist'){renderStats();renderTl();}
   if(nm==='meds')renderMeds();
   if(nm==='cons')renderConsLista();
+  if(nm==='exam'){renderExamLista();}
 }
 function fabAct(){abrirNovoEv();}
 
@@ -1367,7 +1376,7 @@ function salvarEv(){
 
 function renderTl(lst,cid){var id=cid||'tlOut';var el=document.getElementById(id);if(!el)return;var ev=lst!==undefined?lst:(fil==='todos'?getEv().slice():getEv().filter(function(e){return e.tipo===fil;}));ev.sort(function(a,b){return b.data.localeCompare(a.data);});if(!ev.length){el.innerHTML='<div class="empty"><div class="ei">🌸</div><h3>'+(lst!==undefined?'Nenhum resultado':'Nenhum evento ainda')+'</h3><p>'+(lst!==undefined?'Tente outros termos.':'Toque em + para adicionar.')+'</p></div>';return;}var html='',ld='';ev.forEach(function(e){var d=e.data.slice(0,10);if(d!==ld){html+='<div class="slabel">'+fD(d)+'</div>';ld=d;}html+=renderItem(e);});el.innerHTML=html;}
 function renderItem(e){var res=e.sintomas||e.medicacao||e.obs||'';var prev=res.length>58?res.slice(0,58)+'…':res;var nF=e.fotos&&e.fotos.length?'<span class="bdg bdg-p">📷 '+e.fotos.length+'</span>':'';var nU=e.atualizacoes&&e.atualizacoes.length?'<span class="bdg bdg-r">📋 '+e.atualizacoes.length+'</span>':'';var stB='';if(e.tipo==='doenca'){stB=!e.encerradaEm?'<div style="margin-top:3px;"><span class="stAb">🔴 Em curso</span></div>':'<div style="margin-top:3px;"><span class="stEnc">✅ '+calcDias(e.data.slice(0,10),e.encerradaEm)+' dias</span></div>';}var bcl={doenca:'bdg-r',medicacao:'bdg-o',consulta:'bdg-b',exame:'bdg-g',alimentacao:'bdg-p',outro:'bdg-p'}[e.tipo]||'bdg-p';return '<div class="tli" onclick="abrirDet(\''+e.id+'\')"><div class="tlDot '+e.tipo+'"></div><div class="tlC '+e.tipo+'"><div class="tlR"><span class="tlN">'+(IC[e.tipo]||'📝')+' '+esc(e.nome)+'</span><span class="tlH">'+(e.hora||'')+'</span></div>'+stB+(prev?'<div class="tlD">'+esc(prev)+'</div>':'')+(e.por?'<div class="audit">Por <b>'+esc(e.por)+'</b>'+(e.editPor?' · Ed: <b>'+esc(e.editPor)+'</b>':'')+'</div>':'')+'<div class="tlT"><span class="bdg '+bcl+'">'+(LB[e.tipo]||e.tipo)+'</span>'+nU+nF+'</div></div></div>';}
-function renderStats(){var el=document.getElementById('statsOut');var evs=getEv();if(!evs.length){el.innerHTML='';return;}var d=0,m=0,c=0;evs.forEach(function(e){if(e.tipo==='doenca')d++;else if(e.tipo==='medicacao')m++;else if(e.tipo==='consulta')c++;});el.innerHTML='<div class="scard"><div class="snum" style="color:var(--red)">'+d+'</div><div class="slbl">Doenças</div></div><div class="scard"><div class="snum" style="color:var(--ora)">'+m+'</div><div class="slbl">Medicações</div></div><div class="scard"><div class="snum" style="color:var(--blu)">'+c+'</div><div class="slbl">Consultas</div></div>';}
+function renderStats(){var el=document.getElementById('statsOut');var evs=getEv();if(!evs.length){el.innerHTML='';return;}var d=0,m=0,c=0,ex=0;evs.forEach(function(e){if(e.tipo==='doenca')d++;else if(e.tipo==='medicacao')m++;else if(e.tipo==='consulta')c++;else if(e.tipo==='exame')ex++;});el.innerHTML='<div class="scard"><div class="snum" style="color:var(--red)">'+d+'</div><div class="slbl">Doenças</div></div><div class="scard"><div class="snum" style="color:var(--ora)">'+m+'</div><div class="slbl">Medicações</div></div><div class="scard"><div class="snum" style="color:var(--blu)">'+c+'</div><div class="slbl">Consultas</div></div><div class="scard"><div class="snum" style="color:var(--grn)">'+ex+'</div><div class="slbl">Exames</div></div>';}
 function setFiltro(f,btn){fil=f;document.querySelectorAll('.fchip').forEach(function(c){c.classList.remove('on');});btn.classList.add('on');renderTl();}
 
 function abrirDet(id){var e=getEv().find(function(x){return x.id===id;});if(!e)return;var p=getP();var alH='';if(p&&p.alergias&&p.alergias.length)alH='<div class="alB"><div class="alI">⚠️</div><div class="alT"><b>Alergias</b>'+esc(p.alergias.join(' · '))+'</div></div>';var cps=[];
@@ -1425,7 +1434,28 @@ var svH='';if(e.sv){var sv=e.sv;var it=[sv.t?'🌡️ '+sv.t+'°C':'',sv.fc?'❤
       var eid=e.id;editExH='<button class="btn bG" style="margin-bottom:9px;" onclick="editarResultadoExame(this.dataset.id)" data-id="'+eid+'">🔬 Inserir Resultado</button>';
     }
     var ftH='';if(e.fotos&&e.fotos.length)ftH='<div class="ds"><div class="dl">Fotos</div><div class="pgrid">'+e.fotos.map(function(f){return '<div class="pthumb" onclick="abrirFoto(\''+f.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"><img src="'+f+'" loading="lazy"></div>';}).join('')+'</div></div>';var dH='';if(e.tipo==='doenca'){var ab=!e.encerradaEm;var dias=calcDias(e.data.slice(0,10),ab?new Date().toISOString().slice(0,10):e.encerradaEm);var stH=ab?'<span class="stAb">🔴 Em curso · '+dias+' dia'+(dias!==1?'s':'')+'</span>':'<span class="stEnc">✅ Encerrada · '+dias+' dia'+(dias!==1?'s':'')+'</span>';var upds=e.atualizacoes||[];var uH=!upds.length?'<div style="font-size:.76rem;color:var(--t3);font-style:italic;padding:4px 0">Nenhuma atualização.</div>':'<div class="updL">'+upds.map(function(u,i){return '<div class="upd"><button class="updX" onclick="delUpd(\''+e.id+'\','+i+')">✕</button><div class="updD">📅 '+fD(u.data)+(u.hora?' · '+u.hora:'')+(u.por?' · <b>'+esc(u.por)+'</b>':'')+'</div>'+(u.sint||u.sintomas?'<div class="updT"><b>Sintomas:</b> '+esc(u.sint||u.sintomas)+'</div>':'')+(u.med||u.medicacao?'<div class="updT"><b>Medicação:</b> '+esc(u.med||u.medicacao)+'</div>':'')+'</div>';}).join('')+'</div>';var addH=ab?'<div class="addUpd"><div class="addUH">➕ Nova Atualização</div><div class="dr" style="margin-bottom:8px;"><div class="fg" style="margin-bottom:0"><label>Data</label><input type="date" class="fc" id="updD"></div><div class="fg" style="margin-bottom:0"><label>Hora</label><input type="time" class="fc" id="updH"></div></div><div class="fg"><label>Sintomas / Evolução</label><textarea class="fc" id="updS" style="min-height:46px;" placeholder="Como está hoje…"></textarea></div><div class="fg"><label>Medicação aplicada</label><input type="text" class="fc" id="updM" placeholder="Conforme prescrição"></div><button class="btn bP" style="margin-top:3px;" onclick="salvarUpd(\''+e.id+'\')">Salvar ✓</button></div>':'';var btnSt=ab?'<button class="btn bG" style="margin-bottom:9px;" onclick="encrarDoenca(\''+e.id+'\')">✅ Encerrar</button>':'<button class="btn bO" style="margin-bottom:9px;" onclick="reabrirDoenca(\''+e.id+'\')">🔄 Reabrir</button>';dH='<div class="ds"><div class="dl">Status</div><div style="margin-top:2px;">'+stH+'</div></div><div class="ds"><div class="dl">Atualizações</div>'+uH+addH+'</div>'+btnSt;}var bcl={doenca:'bdg-r',medicacao:'bdg-o',consulta:'bdg-b',exame:'bdg-g',alimentacao:'bdg-p',outro:'bdg-p'}[e.tipo]||'bdg-p';var auH=e.por?'<div class="ds"><div class="dl">Registro</div><div class="dv"><div class="audit" style="margin:0">Por <b>'+esc(e.por)+'</b></div>'+(e.editPor?'<div class="audit" style="margin:0">Ed. por <b>'+esc(e.editPor)+'</b></div>':'')+'</div></div>':'';document.getElementById('detOut').innerHTML=alH+bebeH+editExH+'<div style="display:flex;align-items:center;gap:7px;margin-bottom:11px;"><div style="width:32px;height:32px;border-radius:7px;background:var(--pp);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">'+(IC[e.tipo]||'📝')+'</div><div><div style="font-size:.95rem;font-weight:800;">'+esc(e.nome)+'</div><div style="font-size:.7rem;color:var(--t3);">'+fDT(e.data)+'</div></div><span class="bdg '+bcl+'" style="margin-left:auto;">'+(LB[e.tipo]||e.tipo)+'</span></div>'+svH+cps.map(function(f){return '<div class="ds"><div class="dl">'+f[0]+'</div><div class="dv">'+(f[1].indexOf('__HTML__')===0?f[1].slice(8):esc(f[1]))+'</div></div>';}).join('')+dH+ftH+auH;document.getElementById('btnDel').onclick=function(){delEv(id);};if(e.tipo==='doenca'&&!e.encEm){setTimeout(function(){var ud=document.getElementById('updD'),uh=document.getElementById('updH');if(ud)ud.value=new Date().toISOString().slice(0,10);if(uh)uh.value=new Date().toTimeString().slice(0,5);},30);}abrirModal('ovDet');}
-function delEv(id){if(!confirm('Excluir?'))return;EV[pid]=getEv().filter(function(e){return e.id!==id;});salvar();renderTl();renderStats();fModal('ovDet');}
+function delEv(id){
+  if(!confirm('Excluir este evento?'))return;
+  var ev = getEv().find(function(e){return e.id===id;});
+  // Se for consulta, excluir também exames, retorno e medicações vinculados
+  if(ev && ev.tipo==='consulta'){
+    var vinculados = EV[pid].filter(function(e){
+      return e.consId===id || e.consOrigemId===id;
+    }).length;
+    if(vinculados>0){
+      if(!confirm('Esta consulta tem '+vinculados+' item(ns) vinculado(s) (exames, medicações, retorno).\nExcluir tudo junto?'))return;
+      // Remover medicações da aba MD vinculadas
+      if(MD[pid]) MD[pid]=MD[pid].filter(function(m){return m.consOrigemId!==id;});
+      // Remover eventos vinculados
+      EV[pid]=EV[pid].filter(function(e){return e.consId!==id && e.consOrigemId!==id && e.id!==id;});
+    } else {
+      EV[pid]=getEv().filter(function(e){return e.id!==id;});
+    }
+  } else {
+    EV[pid]=getEv().filter(function(e){return e.id!==id;});
+  }
+  salvar();renderTl();renderStats();renderMeds();renderConsLista();renderExamLista();fModal('ovDet');
+}
 function salvarUpd(id){var e=getEv().find(function(x){return x.id===id;});if(!e)return;var s=get('updS').trim(),m=get('updM').trim();if(!s&&!m){alert('Preencha pelo menos um campo.');return;}if(!e.atualizacoes)e.atualizacoes=[];e.atualizacoes.push({data:get('updD'),hora:get('updH'),sint:s,med:m,por:audit()});salvar();abrirDet(id);}
 function delUpd(id,i){var e=getEv().find(function(x){return x.id===id;});if(!e)return;if(!confirm('Excluir atualização?'))return;e.atualizacoes.splice(i,1);salvar();abrirDet(id);}
 function encrarDoenca(id){var e=getEv().find(function(x){return x.id===id;});if(!e)return;e.encerradaEm=new Date().toISOString().slice(0,10);e.encPor=audit();salvar();renderTl();abrirDet(id);}
@@ -1646,9 +1676,78 @@ function salvarConsulta(){
       evs[i].cRetObs=retObs;
       evs[i].editPor=audit();
     }
+
+    // Remover exames e medicações antigas vinculadas a esta consulta
+    EV[pid]=EV[pid].filter(function(e){
+      if(e.consId===cEditId) return false; // exames vinculados
+      if(e.consOrigemId===cEditId && e.tipo==='consulta' && e.retornoData) return false; // retorno
+      if(e.consOrigemId===cEditId && e.tipo==='medicacao') return false; // medicações
+      return true;
+    });
+    // Remover medicações antigas da aba MD
+    if(MD[pid]) MD[pid]=MD[pid].filter(function(m){return m.consOrigemId!==cEditId;});
+
+    // Recriar exames
+    cExs.forEach(function(ex){
+      EV[pid].push({
+        id:gId(),tipo:'exame',nome:ex.nome,
+        data:dt+'T'+hr,hora:hr,
+        sintomas:'Solicitado em consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+        medicacao:'',medico:mdc,obs:'',
+        pendente:true,resultado:'',consId:cEditId,
+        fotos:[],atualizacoes:[],por:audit()
+      });
+    });
+
+    // Recriar retorno
+    if(retD){
+      EV[pid].push({
+        id:gId(),tipo:'consulta',
+        nome:'Retorno'+(mdc?' — '+mdc:''),
+        data:retD+'T'+(retH||'08:00'),hora:retH||'',
+        sintomas:retObs||('Retorno da consulta de '+fD(dt)),
+        medicacao:'',medico:mdc,obs:'',
+        cDiag:'',cMeds:[],cExs:[],cRetD:'',cRetH:'',cRetObs:'',
+        fotos:[],atualizacoes:[],por:audit(),
+        retornoData:true,consOrigemId:cEditId
+      });
+    }
+
+    // Recriar medicações
+    cMeds.forEach(function(m){
+      EV[pid].push({
+        id:gId(),tipo:'medicacao',nome:m.nome,
+        data:dt+'T'+hr,hora:hr,
+        sintomas:'Prescrito em consulta de '+fD(dt)+(mdc?' com '+mdc:''),
+        medicacao:m.nome+(m.dose?' — '+m.dose:''),
+        medico:mdc,obs:m.obs||'',
+        fotos:[],atualizacoes:[],por:audit(),consOrigemId:cEditId
+      });
+      var periH=m.periH||8;var durD=m.durD||5;
+      var d1=m.d1||dt;var h1=m.h1||hr;
+      var slots=calcSlots(d1,h1,periH,durD);
+      if(!MD[pid])MD[pid]=[];
+      MD[pid].push({
+        id:gId(),nome:m.nome,mdcNm:mdc,
+        dose:m.dose||'',via:m.via||'Oral',
+        periH:periH,durD:durD,cont:durD==='c',
+        primD:d1+'T'+h1,slots:slots,inter:[],
+        obs:m.obs||('Prescrito em consulta de '+fD(dt)),
+        ativo:true,status:'ativo',
+        qtd:m.qtd||0,unid:m.unid||'comprimidos',
+        diasAv:7,qtdU:0,por:audit(),consOrigemId:cEditId
+      });
+    });
+
     salvar();
     fModal('ovCons');
-    renderConsLista();renderTl();renderStats();renderMeds();renderHoje();
+    renderConsLista();renderTl();renderStats();renderMeds();renderHoje();renderEst();renderExamLista();
+    agendarTodosAlarmes();
+    var partes=[];
+    if(cMeds.length) partes.push(cMeds.length+' medicação(ões)');
+    if(cExs.length) partes.push(cExs.length+' exame(s)');
+    if(retD) partes.push('retorno em '+fD(retD));
+    if(partes.length) alert('✅ Consulta atualizada!\n'+partes.join(', '));
     return;
   }
 
@@ -1775,6 +1874,10 @@ function renderConsLista(){
       +'<div style="display:flex;gap:0;border-top:1px solid var(--bdr);">'
       +'<button style="flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--blu);cursor:pointer;" onclick="editarConsulta(this.dataset.id)" data-id="'+id+'">✏️ Editar</button>'
       +'<button style="flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--t2);cursor:pointer;border-left:1px solid var(--bdr);" onclick="abrirDet(this.dataset.id)" data-id="'+id+'">Ver detalhes →</button>'
+      +'</div>'
+      +'<div style="border-top:1px solid var(--bdr);display:flex;gap:0;">'
+      +'<button style="flex:1;background:none;border:none;padding:7px;font-size:.72rem;font-weight:700;color:var(--pri);cursor:pointer;" onclick="relatorioConsulta(this.dataset.id,false)" data-id="'+id+'">📋 Relatório desde última</button>'
+      +'<button style="flex:1;background:none;border:none;padding:7px;font-size:.72rem;font-weight:700;color:var(--t3);cursor:pointer;border-left:1px solid var(--bdr);" onclick="relatorioConsulta(this.dataset.id,true)" data-id="'+id+'">📋 Completo</button>'
       +'</div></div>';
   }).join('');
 }
@@ -1786,6 +1889,112 @@ function editarResultadoExame(id){
   if(res===null)return;
   e.resultado=res.trim();e.pendente=false;e.editPor=audit();
   salvar();fModal('ovDet');abrirDet(id);
+}
+
+function renderExamLista(){
+  var el=document.getElementById('examOut');if(!el)return;
+  var evs=getEv().filter(function(e){return e.tipo==='exame';})
+    .sort(function(a,b){return b.data.localeCompare(a.data);});
+  if(!evs.length){
+    el.innerHTML='<div class="empty"><div class="ei">🔬</div><h3>Nenhum exame</h3><p>Exames solicitados nas consultas aparecem aqui.</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  evs.forEach(function(e){
+    var pend=!e.resultado;
+    var card=document.createElement('div');
+    card.style.cssText='background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:10px;border-left:4px solid '+(pend?'var(--ora)':'var(--grn)')+';overflow:hidden;';
+    var body=document.createElement('div');
+    body.style.padding='11px 12px';
+    var inner='<div style="display:flex;align-items:center;gap:6px;">'
+      +'<span style="font-size:1rem;">🔬</span>'
+      +'<div style="font-size:.88rem;font-weight:800;">'+esc(e.nome)+'</div>'
+      +(pend?'<span class="bdg" style="background:var(--orap);color:var(--ora);margin-left:auto;">⏳ Pendente</span>':'<span class="bdg" style="background:var(--grnp);color:var(--grn);margin-left:auto;">✅ Resultado</span>')
+      +'</div>'
+      +'<div style="font-size:.72rem;color:var(--t3);margin-top:2px;">'+fDT(e.data)+(e.medico?' · '+esc(e.medico):'')+'</div>';
+    if(e.sintomas)inner+='<div style="font-size:.74rem;color:var(--t2);margin-top:4px;">'+esc(e.sintomas)+'</div>';
+    if(e.resultado)inner+='<div style="font-size:.78rem;font-weight:700;color:var(--grn);margin-top:6px;background:var(--grnp);padding:5px 8px;border-radius:6px;">📋 '+esc(e.resultado)+'</div>';
+    body.innerHTML=inner;
+    card.appendChild(body);
+    var btns=document.createElement('div');
+    btns.style.cssText='border-top:1px solid var(--bdr);display:flex;';
+    if(pend){
+      var btnR=document.createElement('button');
+      btnR.style.cssText='flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--grn);cursor:pointer;';
+      btnR.textContent='🔬 Inserir Resultado';
+      btnR.onclick=(function(id){return function(){editarResultadoExame(id);};})(e.id);
+      btns.appendChild(btnR);
+    }
+    var btnD=document.createElement('button');
+    btnD.style.cssText='flex:1;background:none;border:none;padding:8px;font-size:.75rem;font-weight:700;color:var(--t2);cursor:pointer;';
+    btnD.textContent='Ver detalhes →';
+    btnD.onclick=(function(id){return function(){abrirDet(id);};})(e.id);
+    btns.appendChild(btnD);
+    card.appendChild(btns);
+    el.appendChild(card);
+  });
+}
+
+function relatorioConsulta(consId, completo){
+  var evs = getEv();
+  var consulta = evs.find(function(e){return e.id===consId;});
+  if(!consulta) return;
+  var mdc = consulta.medico || '';
+  // Find previous consultation with same doctor
+  var consultasMdc = evs.filter(function(e){
+    return e.tipo==='consulta' && e.medico===mdc && e.id!==consId && e.data < consulta.data;
+  }).sort(function(a,b){return b.data.localeCompare(a.data);});
+  var dataInicio = consultasMdc.length ? consultasMdc[0].data.slice(0,10) : null;
+  // Get events since last consultation
+  var evsFiltro = evs.filter(function(e){
+    if(completo) return true;
+    if(!dataInicio) return true;
+    return e.data >= dataInicio && e.id !== consId;
+  });
+  var p = getP(); if(!p) return;
+  var linhas = [];
+  linhas.push('RELATÓRIO MÉDICO — '+p.nome);
+  linhas.push('Gerado em: '+new Date().toLocaleDateString('pt-BR'));
+  if(mdc) linhas.push('Médico: '+mdc);
+  if(dataInicio) linhas.push('Período: desde '+fD(dataInicio)+' (última consulta com este médico)');
+  linhas.push('');
+  // Group by type
+  var doencas = evsFiltro.filter(function(e){return e.tipo==='doenca';});
+  var meds = evsFiltro.filter(function(e){return e.tipo==='medicacao';});
+  var exames = evsFiltro.filter(function(e){return e.tipo==='exame';});
+  var consults = evsFiltro.filter(function(e){return e.tipo==='consulta';});
+  if(doencas.length){
+    linhas.push('DOENÇAS/SINTOMAS ('+doencas.length+'):');
+    doencas.forEach(function(e){linhas.push('• '+fD(e.data.slice(0,10))+' — '+e.nome+(e.sintomas?' — '+e.sintomas:''));});
+    linhas.push('');
+  }
+  if(meds.length){
+    linhas.push('MEDICAÇÕES ('+meds.length+'):');
+    meds.forEach(function(e){linhas.push('• '+e.nome+(e.medicacao?' — '+e.medicacao:''));});
+    linhas.push('');
+  }
+  if(exames.length){
+    linhas.push('EXAMES ('+exames.length+'):');
+    exames.forEach(function(e){linhas.push('• '+e.nome+(e.resultado?' — Resultado: '+e.resultado:' — Pendente')+(e.pendente?' ⏳':''));});
+    linhas.push('');
+  }
+  if(consults.length){
+    linhas.push('CONSULTAS ANTERIORES ('+consults.length+'):');
+    consults.forEach(function(e){linhas.push('• '+fD(e.data.slice(0,10))+(e.medico?' — '+e.medico:'')+(e.cDiag?' — '+e.cDiag:''));});
+    linhas.push('');
+  }
+  // Alergias e medicações ativas
+  if(p.alerg&&p.alerg.length){linhas.push('ALERGIAS: '+p.alerg.join(', '));linhas.push('');}
+  var rel = linhas.join('\n');
+  // Share via WhatsApp or copy
+  if(navigator.share){
+    navigator.share({title:'Relatório Médico — '+p.nome, text:rel});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(rel).then(function(){alert('✅ Relatório copiado!\n\nCole no WhatsApp ou onde precisar.');});
+  } else {
+    var w=window.open('','_blank');
+    w.document.write('<pre style="font-family:monospace;padding:20px;">'+rel+'</pre>');
+  }
 }
 
 function exportarGeral(){
