@@ -676,6 +676,9 @@ function renderPoiList(){
 function openPoiModal(id){
   editingPoiId=id;
   const p = db.points.find(x=>x.id===id);
+  if(!p){ toast('Ponto não encontrado'); return; }
+  const modal = document.getElementById('modalPoi');
+  if(!modal){ toast('Modal não disponível'); return; }
   document.getElementById('modalPoiTitle').textContent = p.detalhado? 'Editar ponto' : 'Completar ponto';
   document.getElementById('poiNome').value = p.nome==='Ponto sem nome' ? '' : p.nome;
   document.getElementById('poiDescricao').value = p.descricao||'';
@@ -1018,10 +1021,24 @@ document.getElementById('poiCanvas').addEventListener('click', function(ev){
   if(hit){
     const c=catById(hit.p.catId);
     info.style.display='block';
-    info.innerHTML = `<strong>${c.icone} ${escapeHtml(hit.p.nome)}</strong><p style="margin:4px 0 8px;">${escapeHtml(hit.p.descricao||'')}</p>`;
+    info.innerHTML='';
+    const title=document.createElement('strong');
+    title.textContent=c.icone+' '+hit.p.nome;
+    info.appendChild(title);
+    if(hit.p.descricao){
+      const desc=document.createElement('p');
+      desc.style.cssText='margin:4px 0 8px;';
+      desc.textContent=hit.p.descricao;
+      info.appendChild(desc);
+    }
     const btn=document.createElement('button');
-    btn.textContent='Editar / ver detalhes'; btn.className='btn-block';
-    btn.onclick=()=>openPoiModal(hit.p.id);
+    btn.textContent='Editar / ver detalhes';
+    btn.className='btn-block';
+    const pid=hit.p.id;
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openPoiModal(pid);
+    });
     info.appendChild(btn);
   } else {
     info.style.display='none';
@@ -1684,6 +1701,7 @@ function renderTrilhaPontos(){
     el.innerHTML = '<div style="text-align:center;padding:12px;color:#64748b;font-size:.82rem;">Nenhum ponto marcado ainda — toque em "Marcar posição atual" durante a trilha.</div>';
     return;
   }
+  el.innerHTML='';
   const h = document.createElement('div');
   h.style.cssText='font-size:.78rem;font-weight:800;color:#334155;margin-bottom:8px;';
   h.textContent='📍 Pontos desta trilha ('+_trilhaPontosSession.length+') — toque em ✏️ para editar';
@@ -1808,6 +1826,9 @@ function marcarPontoNaTrilha(){
     saveDb();
     _trilhaPontosSession.push({id:p.id, nome:nome, lat:pos.lat, lng:pos.lng});
     renderTrilhaPontos();
+    // Atualizar mapa se estiver aberto
+    if(_lmap) renderLeafletPOIs();
+    renderMap();
     toast('✅ '+nome+' salvo!');
     if(btn){ btn.textContent = '📍 MARCAR PONTO'; btn.disabled = false; }
   }).catch(function(){
@@ -1937,6 +1958,8 @@ function salvarTrilhaComNome(){
     db.trilhasLivres.push(trilhaObj);
   }
   saveDb();
+  // Force re-init db.trilhasLivres reference after save
+  if(!db.trilhasLivres) db.trilhasLivres=[];
   closeModal('modalNomeTrilha');
   document.getElementById('trilhaStatus').textContent = 'Trilha "'+nome+'" salva!';
   _trilhaPontosSession = [];
@@ -1945,6 +1968,8 @@ function salvarTrilhaComNome(){
   renderTrilhaPontos();
   renderTrilhasSalvas();
   toast('Trilha "'+nome+'" salva ✅');
+  // Force refresh of trilha screen
+  setTimeout(function(){ renderTrilhaScreen(); }, 100);
 }
 
 function descartarTrilha(){
