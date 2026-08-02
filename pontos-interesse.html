@@ -2,2072 +2,815 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Rastro — Pontos de Interesse</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232B211A'/%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23C99A3E' stroke-width='4'/%3E%3Cpath d='M50 20 L58 50 L50 80 L42 50 Z' fill='%23A8562E'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23EDE4D3'/%3E%3C/svg%3E">
-<style>
-  :root{
-    --bg:#EDE4D3;
-    --card:#F7F1E4;
-    --ink:#2B211A;
-    --ink-soft:#5A4E40;
-    --clay:#A8562E;
-    --clay-dark:#8A4423;
-    --moss:#5C6B3F;
-    --gold:#C99A3E;
-    --line:#D8CBB0;
-    --danger:#8B3A3A;
-    --radius:14px;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    -webkit-tap-highlight-color:transparent;
-    padding-bottom:76px;
-  }
-  h1,h2,h3{font-family:Georgia,"Times New Roman",serif; margin:0 0 8px;}
-  h1{font-size:1.3rem; letter-spacing:.3px;}
-  h2{font-size:1.05rem; color:var(--clay-dark);}
-  p{margin:0 0 8px; color:var(--ink-soft); font-size:.92rem;}
-  header.app-header{
-    background:var(--ink);
-    color:var(--bg);
-    padding:16px 16px 14px;
-    display:flex; align-items:center; gap:10px;
-    position:sticky; top:0; z-index:20;
-  }
-  header.app-header svg{flex-shrink:0;}
-  header.app-header .title small{display:block; font-size:.72rem; color:var(--gold); font-weight:600; letter-spacing:.5px; text-transform:uppercase;}
-  header.app-header .title strong{font-family:Georgia,serif; font-size:1.15rem;}
-  .trip-banner{
-    background:var(--clay); color:#fff; padding:8px 16px; font-size:.82rem;
-    display:flex; justify-content:space-between; align-items:center; gap:8px;
-  }
-  .trip-banner button{background:rgba(255,255,255,.18); color:#fff; border:none; border-radius:8px; padding:5px 10px; font-size:.78rem;}
-  main{padding:14px; max-width:640px; margin:0 auto;}
-  .screen{display:none;}
-  .screen.active{display:block;}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px; margin-bottom:12px;}
-  button{
-    font-family:inherit; cursor:pointer; border:none; border-radius:10px;
-    padding:11px 14px; font-size:.92rem; font-weight:600; color:#fff; background:var(--clay);
-  }
-  button.secondary{background:var(--moss);}
-  button.ghost{background:transparent; color:var(--clay-dark); border:1.5px solid var(--clay); padding:9px 12px;}
-  button.danger{background:var(--danger);}
-  button.icon-btn{background:var(--card); color:var(--ink); border:1px solid var(--line); padding:8px 10px; font-size:1.1rem;}
-  button:disabled{opacity:.45; cursor:not-allowed;}
-  .btn-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .btn-block{width:100%;}
-  input[type=text], input[type=date], textarea, select{
-    width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:10px;
-    background:#fff; color:var(--ink); font-size:.95rem; font-family:inherit; margin-bottom:10px;
-  }
-  textarea{min-height:70px; resize:vertical;}
-  label.field-label{display:block; font-size:.78rem; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.4px; margin-bottom:5px;}
-  .empty-state{text-align:center; padding:34px 14px; color:var(--ink-soft);}
-  .empty-state .glyph{font-size:2.2rem; display:block; margin-bottom:8px;}
-
-  /* bottom nav */
-  nav.tabbar{
-    position:fixed; bottom:0; left:0; right:0; z-index:30;
-    background:var(--ink); display:flex; padding:6px 4px calc(env(safe-area-inset-bottom) + 6px);
-    border-top:1px solid #000;
-  }
-  nav.tabbar button{
-    flex:1; background:transparent; color:#B9AB92; font-weight:600; font-size:.68rem;
-    display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px; border-radius:10px;
-  }
-  nav.tabbar button.active{color:#fff; background:rgba(255,255,255,.08);}
-  nav.tabbar button .ic{font-size:1.15rem;}
-
-  /* category grid */
-  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:10px;}
-  .cat-chip{
-    background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:10px 4px;
-    display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.68rem; color:var(--ink-soft); font-weight:600;
-  }
-  .cat-chip .ic{font-size:1.4rem;}
-  .cat-chip.selected{border-color:var(--clay); background:#FBEEE3; color:var(--clay-dark);}
-
-  /* POI list */
-  .poi-item{
-    display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--line);
-  }
-  .poi-item:last-child{border-bottom:none;}
-  .poi-item .ic{font-size:1.5rem; width:34px; text-align:center; flex-shrink:0;}
-  .poi-item .info{flex:1; min-width:0;}
-  .poi-item .info .nome{font-weight:700; font-size:.92rem;}
-  .poi-item .info .meta{font-size:.75rem; color:var(--ink-soft);}
-  .poi-item .badge-pend{font-size:.65rem; background:var(--gold); color:#3a2a0a; padding:2px 6px; border-radius:6px; font-weight:700; margin-left:4px;}
-  .poi-item .check{width:24px; height:24px; border:2px solid var(--clay); border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.8rem; color:#fff;}
-  .poi-item .check.on{background:var(--clay);}
-  .filter-row{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px;}
-  .filter-chip{flex-shrink:0; background:#fff; border:1px solid var(--line); border-radius:20px; padding:6px 12px; font-size:.75rem; font-weight:600; color:var(--ink-soft);}
-  .filter-chip.active{background:var(--ink); color:#fff; border-color:var(--ink);}
-
-  /* map */
-  .map-wrap{background:#E4D9C0; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
-  canvas#poiCanvas{display:block; width:100%; touch-action:none;}
-  .map-legend{font-size:.72rem; color:var(--ink-soft); padding:8px 12px; display:flex; justify-content:space-between;}
-
-  /* route list */
-  .route-item{display:flex; align-items:center; gap:8px; padding:8px 4px; border-bottom:1px solid var(--line);}
-  .route-item .num{width:22px; height:22px; border-radius:50%; background:var(--moss); color:#fff; font-size:.72rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .route-item .info{flex:1; font-size:.88rem; font-weight:600;}
-  .route-item .up-down{display:flex; gap:3px;}
-  .route-item .up-down button{padding:4px 7px; font-size:.75rem;}
-
-  .toggle-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0;}
-  .switch{width:42px; height:24px; border-radius:14px; background:var(--line); position:relative; flex-shrink:0; border:none;}
-  .switch.on{background:var(--moss);}
-  .switch::after{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s;}
-  .switch.on::after{left:21px;}
-
-  .trip-card{display:flex; justify-content:space-between; align-items:center; gap:8px;}
-  .trip-card .info strong{display:block; font-size:.95rem;}
-  .trip-card .info span{font-size:.75rem; color:var(--ink-soft);}
-
-  .modal-bg{position:fixed; inset:0; background:rgba(43,33,26,.55); z-index:50; display:none; align-items:flex-end; justify-content:center;}
-  .modal-bg.active{display:flex;}
-  .modal{background:var(--bg); width:100%; max-width:640px; max-height:88vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);}
-  .modal .close-row{display:flex; justify-content:flex-end; margin-bottom:4px;}
-  .modal .close-row button{background:transparent; color:var(--ink-soft); font-size:1.3rem; padding:2px 8px;}
-  .photo-preview{width:100%; max-height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px; display:none;}
-  .toast{position:fixed; bottom:88px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff; padding:10px 18px; border-radius:20px; font-size:.85rem; z-index:60; opacity:0; pointer-events:none; transition:opacity .2s;}
-  .toast.show{opacity:1;}
-  .section-gap{margin-top:18px;}
-  .fab{
-    position:fixed; right:16px; bottom:86px; z-index:25;
-    width:56px; height:56px; border-radius:50%; background:var(--clay); color:#fff;
-    font-size:1.6rem; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.25);
-  }
-</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-#leafletMap{width:100%;height:62vh;border-radius:12px;margin-top:8px;display:none;}
-.city-lbl{background:none!important;border:none!important;box-shadow:none!important;
-  color:#1e293b;font-size:10px;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#FAFAF8;--card:#fff;--bdr:#E8E4DC;--t1:#1C1B19;--t2:#6B6560;--t3:#A09A94;
+  --pri:#2D6A4F;--pri-l:#D8F3DC;--acc:#E76F51;--acc-l:#FFE8E1;
+  --blu:#2563EB;--blu-l:#EFF6FF;--red:#DC2626;--red-l:#FEF2F2;
+  --nav-h:64px;--head-h:56px;
+}
+body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;height:100dvh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* HEADER */
+#appHeader{height:var(--head-h);background:#1C1B19;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+#appHeader .logo{font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:1px;}
+#appHeader .sub{font-size:.72rem;color:#A09A94;margin-top:1px;}
+#tripBanner{background:#2D6A4F;color:#fff;font-size:.78rem;font-weight:700;text-align:center;padding:5px 16px;display:none;cursor:pointer;}
+
+/* NAV */
+#nav{height:var(--nav-h);background:#fff;border-top:1px solid var(--bdr);display:flex;align-items:center;flex-shrink:0;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;color:var(--t3);font-size:.65rem;font-weight:600;cursor:pointer;padding:6px 0;height:100%;}
+.nav-btn .ic{font-size:1.4rem;}
+.nav-btn.on{color:var(--pri);}
+
+/* SCREENS */
+#screens{flex:1;overflow:hidden;position:relative;}
+.scr{position:absolute;inset:0;overflow-y:auto;display:none;padding-bottom:calc(var(--nav-h) + 12px);}
+.scr.on{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;border:1px solid var(--bdr);margin:12px 14px;overflow:hidden;}
+.card-pad{padding:14px;}
+.sec-title{font-size:.7rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;padding:16px 14px 6px;}
+
+/* EMPTY STATE */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center;color:var(--t3);}
+.empty .ic{font-size:3rem;margin-bottom:12px;}
+.empty h3{font-size:1rem;font-weight:800;color:var(--t2);margin-bottom:6px;}
+.empty p{font-size:.82rem;line-height:1.5;}
+
+/* BTN */
+.btn{border:none;border-radius:12px;padding:13px 18px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;}
+.btn-pri{background:var(--pri);color:#fff;}
+.btn-acc{background:var(--acc);color:#fff;}
+.btn-ghost{background:var(--bg);color:var(--t2);border:1.5px solid var(--bdr);}
+.btn-sm{padding:7px 12px;font-size:.78rem;border-radius:8px;width:auto;}
+
+/* FAB */
+#fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:16px;width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;border:none;font-size:1.6rem;cursor:pointer;box-shadow:0 4px 16px rgba(231,111,81,.4);display:flex;align-items:center;justify-content:center;z-index:90;}
+
+/* BADGE */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:.7rem;font-weight:700;}
+.bdg-g{background:var(--pri-l);color:var(--pri);}
+.bdg-o{background:var(--acc-l);color:var(--acc);}
+.bdg-b{background:var(--blu-l);color:var(--blu);}
+
+/* CHIP */
+.chip{display:inline-flex;align-items:center;padding:5px 11px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--card);font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+.chip.on{background:var(--pri);border-color:var(--pri);color:#fff;}
+
+/* MAPA */
+#mapaLeaflet{width:100%;height:calc(100dvh - var(--head-h) - var(--nav-h) - 90px);min-height:300px;}
+.tile-chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--bdr);background:var(--card);font-size:.78rem;font-weight:700;cursor:pointer;}
+.tile-chip.on{background:#1C1B19;color:#fff;border-color:#1C1B19;}
+.lbl-city{background:none!important;border:none!important;box-shadow:none!important;font-size:9px;font-weight:700;color:#1C1B19;white-space:nowrap;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(28,27,25,.6);z-index:200;display:none;align-items:flex-end;}
+.overlay.on{display:flex;}
+.sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:92dvh;overflow-y:auto;padding:0 0 40px;}
+.sheet-handle{width:40px;height:4px;background:var(--bdr);border-radius:2px;margin:10px auto 0;}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;}
+.sheet-head h2{font-size:1rem;font-weight:800;}
+.close-btn{width:28px;height:28px;border-radius:50%;background:var(--bg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+.sheet-body{padding:0 16px 10px;}
+
+/* INPUTS */
+.inp{width:100%;padding:11px 13px;border:1.5px solid var(--bdr);border-radius:11px;font-size:.92rem;font-family:inherit;background:var(--card);color:var(--t1);outline:none;}
+.inp:focus{border-color:var(--pri);}
+.lbl{font-size:.72rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.fg{margin-bottom:14px;}
+
+/* TRILHA ATIVA */
+#trilhaAtiva{background:linear-gradient(135deg,#2D6A4F,#1B4332);border-radius:14px;margin:12px 14px;padding:16px;color:#fff;display:none;}
+#trilhaAtiva .tit{font-size:.88rem;font-weight:800;margin-bottom:4px;}
+#trilhaAtiva .sub{font-size:.72rem;opacity:.8;}
+#trilhaTimer2{font-size:2rem;font-weight:900;letter-spacing:2px;margin:10px 0;}
+#btnMarcarPonto{background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff;border-radius:12px;padding:14px;font-size:1rem;font-weight:900;cursor:pointer;width:100%;margin-bottom:8px;transition:.15s;}
+#btnMarcarPonto:active{background:rgba(255,255,255,.35);}
+#btnEncerrar{background:#E76F51;border:none;color:#fff;border-radius:12px;padding:11px;font-size:.85rem;font-weight:700;cursor:pointer;width:100%;}
+.ponto-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--bdr);}
+.ponto-row:last-child{border-bottom:none;}
+.ponto-num{width:24px;height:24px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;}
+.ponto-info{flex:1;min-width:0;}
+.ponto-info .nome{font-size:.88rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ponto-info .coords{font-size:.7rem;color:var(--t3);}
+.edit-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+
+/* VIAGEM CARD */
+.viagem-card{background:var(--card);border-radius:14px;border:1px solid var(--bdr);margin:0 14px 10px;overflow:hidden;cursor:pointer;active:opacity:.9;}
+.viagem-card .vc-head{padding:13px 14px 8px;display:flex;align-items:flex-start;gap:10px;}
+.viagem-card .vc-nome{font-size:.95rem;font-weight:800;flex:1;}
+.viagem-card .vc-meta{font-size:.72rem;color:var(--t3);margin-top:2px;}
+.viagem-card .vc-foot{padding:8px 14px;border-top:1px solid var(--bdr);display:flex;gap:6px;flex-wrap:wrap;}
+
+/* CAT GRID */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.cat-item{padding:8px 4px;border-radius:9px;border:1.5px solid var(--bdr);background:var(--bg);cursor:pointer;text-align:center;font-size:.7rem;font-weight:700;color:var(--t2);}
+.cat-item .cat-ic{font-size:1.3rem;display:block;margin-bottom:3px;}
+.cat-item.on{background:var(--pri);border-color:var(--pri);color:#fff;}
+
+/* POI card */
+.poi-card{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bdr);}
+.poi-card:last-child{border-bottom:none;}
+.poi-ic{font-size:1.4rem;flex-shrink:0;}
+.poi-info{flex:1;min-width:0;}
+.poi-info .pnome{font-size:.88rem;font-weight:700;}
+.poi-info .pmeta{font-size:.71rem;color:var(--t3);margin-top:1px;}
 </style>
 </head>
 <body>
 
-<header class="app-header">
-  <svg width="34" height="34" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#2B211A"/><circle cx="50" cy="50" r="34" fill="none" stroke="#C99A3E" stroke-width="4"/><path d="M50 20 L58 50 L50 80 L42 50 Z" fill="#A8562E"/><circle cx="50" cy="50" r="6" fill="#EDE4D3"/></svg>
-  <div class="title">
-    <small>Offline &middot; sem internet</small>
-    <strong>Rastro</strong>
+<!-- HEADER -->
+<div id="appHeader">
+  <div>
+    <div class="logo">🧭 RASTRO</div>
+    <div class="sub">Seu diário de viagens</div>
   </div>
-</header>
-
-<div class="trip-banner" id="tripBanner" style="display:none;">
-  <span id="tripBannerText"></span>
-  <button onclick="showScreen('viagem')">Abrir</button>
+</div>
+<div id="tripBanner" onclick="abrirViagemAtiva()">
+  🟢 <span id="tripBannerNome">Viagem em andamento</span> — toque para continuar
 </div>
 
-<main>
+<!-- SCREENS -->
+<div id="screens">
 
-  <!-- VIAGENS -->
-  <section class="screen" id="screen-viagens">
-    <h1>Viagens</h1>
-    <p>Crie uma viagem para agrupar os pontos, montar a rota e compartilhar depois.</p>
-    <div id="tripsList"></div>
-    <button class="btn-block section-gap" onclick="openNewTripModal()">＋ Nova viagem</button>
-    <div class="section-gap">
-      <button class="ghost btn-block" onclick="showScreen('pontos'); filterTrip=null; renderPoiList();">📦 Ver acervo geral de pontos</button>
+  <!-- ══ PONTOS ══ -->
+  <div class="scr on" id="scr-pontos">
+    <div style="padding:12px 14px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;">
+      <div class="chip on" data-cat="" onclick="filtrarCat(this)">Todos</div>
     </div>
-  </section>
-
-  <!-- VIAGEM ATIVA (detalhe) -->
-  <section class="screen" id="screen-viagem">
-    <h1 id="viagemTitulo">Viagem</h1>
-    <p id="viagemSub"></p>
-    <div class="card">
-      <div class="btn-row">
-        <button onclick="quickMarkPoint()">📍 Marcar ponto agora</button>
-        <button class="secondary" onclick="showScreen('pontos'); filterTrip=currentTripId; renderPoiList();">📋 Ver pontos da viagem</button>
+    <div class="card" id="pontosCard">
+      <div class="empty" id="pontosEmpty">
+        <div class="ic">📍</div>
+        <h3>Nenhum ponto ainda</h3>
+        <p>Inicie uma viagem na aba Trilha e marque pontos durante o percurso.</p>
       </div>
-      <div style="margin-top:8px;"><button class="secondary" style="width:100%;" onclick="abrirAcervo()">📦 Adicionar pontos do acervo</button></div>
+      <div id="pontosList"></div>
     </div>
-    <div class="card">
-      <div class="toggle-row">
+  </div>
+
+  <!-- ══ TRILHA ══ -->
+  <div class="scr" id="scr-trilha">
+    <!-- VIAGEM ATIVA -->
+    <div id="trilhaAtiva">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
-          <strong>Ponto de partida</strong>
-          <p id="origemInfo" style="margin:2px 0 0;">Nenhum definido</p>
+          <div class="tit" id="trilhaNomeAtivo">Viagem</div>
+          <div class="sub" id="trilhaPontosCount">0 pontos marcados</div>
         </div>
-        <button class="ghost" onclick="marcarOrigem()">Marcar</button>
+        <div id="trilhaTimer2">00:00</div>
+      </div>
+      <button id="btnMarcarPonto" onclick="marcarPonto()">📍 MARCAR PONTO</button>
+      <button id="btnEncerrar" onclick="encerrarViagem()">⏹ Encerrar viagem</button>
+    </div>
+    <!-- SEM VIAGEM ATIVA -->
+    <div id="semViagemAtiva">
+      <div class="empty" style="padding:30px 20px 10px;">
+        <div class="ic">🐾</div>
+        <h3>Nenhuma viagem em andamento</h3>
+        <p>Inicie uma nova viagem para começar a gravar seu percurso e marcar pontos.</p>
+      </div>
+      <div style="padding:0 14px 14px;">
+        <button class="btn btn-pri" onclick="iniciarViagem()">▶️ Iniciar Viagem</button>
       </div>
     </div>
-    <div class="btn-row section-gap">
-      <button class="secondary" onclick="showScreen('rota')">🧭 Montar rota</button>
-      <button class="ghost" onclick="exportTrip(currentTripId)">📤 Compartilhar viagem</button>
-    </div>
-    <div class="section-gap">
-      <button class="danger ghost btn-block" style="color:var(--danger); border-color:var(--danger);" onclick="deleteTrip(currentTripId)">Excluir viagem</button>
-    </div>
-  </section>
-
-  <!-- PONTOS (lista) -->
-  <section class="screen" id="screen-pontos">
-    <h1>Pontos de interesse</h1>
-    <div class="filter-row" id="catFilterRow"></div>
-    <div class="card" id="poiListCard">
-      <div id="poiList"></div>
-    </div>
-    <button class="ghost btn-block" onclick="exportAllPoints()">📤 Compartilhar todos os pontos</button>
-  </section>
-
-  <!-- MAPA -->
-  <section class="screen" id="screen-mapa">
-    <h1>Mapa</h1>
-    <div class="filter-row">
-      <button class="filter-chip active" id="tabBussola" onclick="setMapMode('bussola')">🧭 Bússola</button>
-      <button class="filter-chip" id="tabMapa" onclick="setMapMode('mapa')">🗺️ Mapa</button>
-    </div>
-    <p id="mapModeDesc">Posição relativa dos seus pontos a partir do ponto de referência.</p>
-    <div class="btn-row" id="refBtnRow" style="margin-bottom:6px;">
-      <button class="ghost" onclick="usarLocalAtualComoReferencia()">📡 Usar minha posição agora</button>
-    </div>
-    <div class="filter-row" id="raioRow"></div>
-    <div class="map-wrap">
-      
-    <canvas id="poiCanvas" width="600" height="600"></canvas>
-    <!-- CONTROLES LEAFLET -->
-    <div id="leafletControls" style="display:none;">
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;" id="zoomBtns">
-        <button class="ghost" onclick="leafletZoom(-27.5,-50.5,7)">🗺️ SC</button>
-        <button class="ghost" onclick="leafletZoom(-25.4,-49.3,8)">🌿 PR</button>
-        <button class="ghost" onclick="leafletZoom(-30.0,-51.2,8)">⛅ RS</button>
-        <button class="ghost" onclick="leafletZoom(-27.7,-49.3,11)">📍 Rancho Queimado</button>
+    <!-- PONTOS DA VIAGEM ATIVA -->
+    <div id="pontosAtivoCard" class="card" style="display:none;">
+      <div class="card-pad" style="padding-bottom:0;">
+        <div style="font-size:.78rem;font-weight:800;color:var(--t2);">Pontos marcados nesta viagem</div>
       </div>
-      <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;">
-        <span style="font-size:.75rem;font-weight:700;color:#334155;">Camada:</span>
-        <button class="filter-chip active" id="tileRua" onclick="setTile('rua')">🏙️ Ruas</button>
-        <button class="filter-chip" id="tileSat" onclick="setTile('satelite')">🛰️ Satélite</button>
-        <button class="filter-chip" id="tileRelevo" onclick="setTile('relevo')">🏔️ Relevo</button>
-      </div>
+      <div id="pontosAtivoList"></div>
     </div>
-    <div id="leafletMap"></div>
-    </div>
-    <div class="map-legend"><span id="mapRefLabel">Referência: —</span><span id="mapScaleLabel"></span></div>
-    
-    </div>
-    <div class="card section-gap" id="mapTapInfo" style="display:none;"></div>
-  </section>
+  </div>
 
-  <!-- ROTA -->
-  <section class="screen" id="screen-rota">
-    <h1>Montar rota</h1>
-    <p>Toque nos pontos da lista para adicionar/remover da rota, ou reordene com as setas.</p>
-    <div class="btn-row" style="margin-bottom:10px;">
-      <button class="secondary" onclick="otimizarRota()">✨ Otimizar ordem</button>
-      <button class="ghost" onclick="limparRota()">Limpar rota</button>
+  <!-- ══ MAPA ══ -->
+  <div class="scr" id="scr-mapa">
+    <div style="padding:10px 14px 6px;display:flex;gap:6px;flex-wrap:wrap;">
+      <div class="tile-chip on" id="tc-rua" onclick="setTile('rua')">🏙️ Ruas</div>
+      <div class="tile-chip" id="tc-satelite" onclick="setTile('satelite')">🛰️ Satélite</div>
+      <div class="tile-chip" id="tc-relevo" onclick="setTile('relevo')">🏔️ Relevo</div>
+      <div class="tile-chip" id="tc-gps" onclick="centralizarGps()" style="margin-left:auto;">📡 Minha posição</div>
     </div>
-    <div class="card">
-      <h2>Rota atual</h2>
-      <div id="routeOrderedList"></div>
-      <div style="margin:10px 0 6px;">
-        <strong style="font-size:.84rem;">Meio de transporte</strong>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;" id="modoGrid">
-          <div class="filter-chip active" data-modo="driving" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚗<br><span style="font-size:.72rem;">Carro</span></div>
-          <div class="filter-chip" data-modo="walking" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚶<br><span style="font-size:.72rem;">A pé</span></div>
-          <div class="filter-chip" data-modo="bicycling" onclick="selModoRota(this)" style="text-align:center;cursor:pointer;padding:8px 4px;">🚲<br><span style="font-size:.72rem;">Bicicleta</span></div>
+    <div style="padding:0 14px 6px;display:flex;gap:6px;flex-wrap:wrap;">
+      <div class="tile-chip" onclick="mapaFitAll()">📐 Ver tudo</div>
+      <div class="tile-chip" onclick="mapaZoom(-27.5,-50.5,7)">🗺️ SC</div>
+      <div class="tile-chip" onclick="mapaZoom(-27.67,-49.01,11)">📍 Rancho Q.</div>
+    </div>
+    <div id="mapaLeaflet"></div>
+  </div>
+
+  <!-- ══ ROTA ══ -->
+  <div class="scr" id="scr-rota">
+    <div class="sec-title">Montar Rota</div>
+    <div class="card card-pad">
+      <p style="font-size:.82rem;color:var(--t2);margin-bottom:10px;">Selecione pontos do seu acervo para montar uma rota.</p>
+      <div id="rotaOrdem" style="margin-bottom:10px;"></div>
+      <div style="font-size:.72rem;font-weight:700;color:var(--t2);margin-bottom:6px;">ADICIONAR PONTO À ROTA</div>
+      <div id="rotaAcervo" style="max-height:200px;overflow-y:auto;border:1px solid var(--bdr);border-radius:10px;"></div>
+    </div>
+    <div class="card card-pad">
+      <div class="fg">
+        <label class="lbl">Meio de transporte</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <button class="btn btn-pri btn-sm" data-modo="driving" onclick="selModo(this)">🚗 Carro</button>
+          <button class="btn btn-ghost btn-sm" data-modo="walking" onclick="selModo(this)">🚶 A pé</button>
+          <button class="btn btn-ghost btn-sm" data-modo="bicycling" onclick="selModo(this)">🚲 Bici</button>
         </div>
       </div>
-      <div class="toggle-row">
-        <div><strong>🔄 Retornar</strong><p style="margin:2px 0 0;">Voltar ao ponto de partida ao final</p></div>
-        <button class="switch" id="switchRetorno" onclick="toggleRetorno()"></button>
-      </div>
-      <div style="background:#f8fafc;border-radius:10px;padding:10px;margin:10px 0;">
-        <strong style="font-size:.84rem;">💾 Salvar rota</strong>
-        <input type="text" id="rotaNome" placeholder="Nome da rota…" style="width:100%;margin-top:6px;padding:7px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:.88rem;box-sizing:border-box;">
-        <button onclick="salvarRota()" style="width:100%;margin-top:6px;padding:9px;background:#334155;color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;">Salvar ✓</button>
-      </div>
-      <div id="rotasSalvas"></div>
-      <button class="btn-block" style="margin-top:8px;" onclick="navegarNoMaps()">🗺️ Navegar (Google Maps / Waze)</button>
-      <button class="ghost btn-block" style="margin-top:4px;" onclick="verRotaNoMapa()">🧭 Ver rota no mapa do app</button>
-      <button class="ghost btn-block" style="margin-top:4px;" onclick="exportRoute()">📤 Compartilhar rota</button>
+      <button class="btn btn-pri" style="margin-bottom:8px;" onclick="navegarMaps()">🗺️ Navegar no Google Maps</button>
+      <button class="btn btn-ghost" onclick="verRotaMapa()">🧭 Ver rota no mapa</button>
     </div>
-    <div class="card">
-      <h2>Adicionar pontos à rota</h2>
-      <div id="routeAddList"></div>
+  </div>
+
+  <!-- ══ DIÁRIO ══ -->
+  <div class="scr" id="scr-diario">
+    <div class="sec-title">Histórico de Viagens</div>
+    <div id="diarioEmpty" class="empty" style="padding:30px 20px;">
+      <div class="ic">📔</div>
+      <h3>Nenhuma viagem salva</h3>
+      <p>Suas viagens encerradas aparecem aqui com todos os detalhes.</p>
     </div>
-  </section>
+    <div id="diarioList"></div>
+  </div>
 
+</div>
 
-  <!-- TRILHA -->
-  <section class="screen" id="screen-trilha">
-    <h1>🐾 Trilha / Percurso</h1>
-    <!-- STATUS GRAVAÇÃO -->
-    <div id="trilhaStatusCard" style="background:#f0fdf4;border:2px solid #16a34a;border-radius:12px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <div id="trilhaIndicator" style="width:12px;height:12px;border-radius:50%;background:#86efac;"></div>
-        <div>
-          <div style="font-size:.88rem;font-weight:800;color:#15803d;">Gravação de trilha</div>
-          <div id="trilhaStatus" style="font-size:.75rem;color:#16a34a;">Inativo</div>
-        </div>
-        <div id="trilhaTimer" style="margin-left:auto;font-size:1.1rem;font-weight:800;color:#15803d;display:none;">00:00</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button id="btnTrilhaStart" onclick="iniciarTrilha()" style="flex:1;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:800;cursor:pointer;">▶️ Iniciar</button>
-        <button id="btnTrilhaStop" onclick="pararTrilha()" style="flex:1;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.95rem;font-weight:800;cursor:pointer;display:none;">⏹️ Parar e Salvar</button>
-      </div>
-    </div>
-
-    <!-- MARCAR PONTO DURANTE TRILHA — botão único, sem campo de texto -->
-    <div id="trilhaAddPonto" style="display:none;margin-bottom:12px;">
-      <button onclick="marcarPontoNaTrilha()" style="width:100%;background:#3b82f6;color:#fff;border:none;border-radius:14px;padding:18px;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,.4);letter-spacing:.5px;">
-        📍 MARCAR PONTO
-      </button>
-      <div style="text-align:center;font-size:.7rem;color:#64748b;margin-top:5px;">Salva automaticamente — edite depois com calma</div>
-    </div>
-
-    <!-- PONTOS MARCADOS NA TRILHA -->
-    <div id="trilhaPontosList">
-      <div class="empty-state" style="padding:20px;text-align:center;color:#94a3b8;">
-        <span style="font-size:2rem;">🐾</span>
-        <p>Inicie uma trilha para começar a gravar seu percurso.</p>
-        <p style="font-size:.75rem;">Você pode marcar pontos de interesse durante a gravação.</p>
-      </div>
-    </div>
-
-    <!-- TRILHAS SALVAS -->
-    <div style="margin-top:16px;">
-      <div style="font-size:.82rem;font-weight:800;color:#334155;margin-bottom:8px;">📁 Trilhas salvas</div>
-      <div id="trilhasSalvasList"></div>
-    </div>
-  </section>
-
-</main>
-
-<button class="fab" id="fabAdd" onclick="quickMarkPoint()" style="font-size:.85rem;font-weight:800;" title="Novo Ponto">＋ Ponto</button>
-
-<nav class="tabbar">
-  <button data-tab="viagens" onclick="showScreen('viagens')"><span class="ic">🚗</span>Viagens</button>
-  <button data-tab="pontos" onclick="showScreen('pontos')"><span class="ic">📋</span>Pontos</button>
-  <button data-tab="mapa" onclick="showScreen('mapa')"><span class="ic">🧭</span>Mapa</button>
-  <button data-tab="trilha" onclick="showScreen('trilha')"><span class="ic">🐾</span>Trilha</button>
-  <button data-tab="rota" onclick="showScreen('rota')"><span class="ic">🛣️</span>Rota</button>
-  <button data-tab="ajustes" onclick="showScreen('ajustes')"><span class="ic">⚙️</span>Ajustes</button>
+<!-- NAV -->
+<nav id="nav">
+  <button class="nav-btn on" data-s="pontos" onclick="irTela('pontos',this)"><span class="ic">📍</span>Pontos</button>
+  <button class="nav-btn" data-s="trilha" onclick="irTela('trilha',this)"><span class="ic">🐾</span>Trilha</button>
+  <button class="nav-btn" data-s="mapa" onclick="irTela('mapa',this)"><span class="ic">🗺️</span>Mapa</button>
+  <button class="nav-btn" data-s="rota" onclick="irTela('rota',this)"><span class="ic">🛣️</span>Rota</button>
+  <button class="nav-btn" data-s="diario" onclick="irTela('diario',this)"><span class="ic">📔</span>Diário</button>
 </nav>
 
-<!-- AJUSTES / BACKUP -->
-<section class="screen" id="screen-ajustes">
-  <div style="padding:0 0 90px;">
-    <h1 style="padding:14px 14px 0;">Ajustes e backup</h1>
-    <div class="card" style="margin:14px;">
-      <h2>Categorias personalizadas</h2>
-      <div id="customCatList"></div>
-      <button class="ghost btn-block" onclick="openNewCategoryModal()">＋ Criar novo tipo de ponto</button>
+<!-- FAB -->
+<button id="fab" onclick="fabAct()">＋</button>
+
+
+
+<!-- MODAL ENCERRAR VIAGEM -->
+<div class="overlay" id="ovEncerrar">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2>⏹ Encerrar Viagem</h2><button class="close-btn" onclick="fecharModal('ovEncerrar')">✕</button></div>
+    <div class="sheet-body">
+      <div class="fg"><label class="lbl">Nome da viagem</label><input type="text" class="inp" id="encNome" placeholder="Nome da viagem"></div>
+      <div class="fg"><label class="lbl">Observações finais</label><textarea class="inp" id="encObs" placeholder="Como foi? O que descobriu?" style="min-height:100px;resize:none;"></textarea></div>
+      <div id="encResumo" style="background:var(--pri-l);border-radius:10px;padding:12px;margin-bottom:14px;font-size:.82rem;color:var(--pri);font-weight:600;"></div>
+      <button class="btn btn-pri" onclick="salvarViagem()">💾 Salvar no Diário</button>
     </div>
-    <div class="card" style="margin:14px;">
-      <h2>Backup</h2>
-      <p>Exporte tudo (viagens, pontos e categorias) em um arquivo JSON para guardar no Drive/WhatsApp, ou importe um backup anterior.</p>
-      <div class="btn-row">
-        <button onclick="exportAll()">📤 Exportar tudo</button>
-        <button class="secondary" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PONTO -->
+<div class="overlay" id="ovPonto">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2 id="ovPontoTit">✏️ Editar Ponto</h2><button class="close-btn" onclick="fecharModal('ovPonto')">✕</button></div>
+    <div class="sheet-body">
+      <div class="fg"><label class="lbl">Nome</label><input type="text" class="inp" id="pNome" placeholder="Ex: Cachoeira do Vale, Mirante…"></div>
+      <div class="fg"><label class="lbl">Categoria</label><div class="cat-grid" id="pCatGrid"></div></div>
+      <div class="fg"><label class="lbl">Descrição</label><textarea class="inp" id="pDesc" placeholder="O que há aqui? Dicas, referências…" style="min-height:70px;resize:none;"></textarea></div>
+      <div class="fg">
+        <label class="lbl">Foto</label>
+        <div id="pFotoPreview" style="margin-bottom:8px;display:none;"><img id="pFotoImg" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover;"></div>
+        <label style="display:block;border:2px dashed var(--bdr);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:.82rem;color:var(--t3);">
+          📷 Adicionar foto
+          <input type="file" accept="image/*" onchange="selecionarFoto(this)" style="display:none;">
+        </label>
       </div>
-      <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importAll(event)">
+      <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:14px;">
+        <div style="font-size:.7rem;font-weight:700;color:var(--t3);margin-bottom:3px;">COORDENADAS GPS</div>
+        <div id="pGpsLabel" style="font-size:.82rem;color:var(--t2);">—</div>
+      </div>
+      <button class="btn btn-pri" onclick="salvarPonto()">Salvar ✓</button>
     </div>
   </div>
-</section>
+</div>
 
-<!-- MODAL: EDITAR/DETALHAR PONTO -->
-<div class="modal-bg" id="modalPoi">
-  <div class="modal">
-    <div class="close-row"><button onclick="closeModal('modalPoi')">✕</button></div>
-    <h2 id="modalPoiTitle">Ponto</h2>
-    <img id="modalPoiPhoto" class="photo-preview">
-    <label class="field-label">Nome</label>
-    <input type="text" id="poiNome" placeholder="Ex: Cachoeira do Sossego">
-    <label class="field-label">Categoria</label>
-    <div class="cat-grid" id="poiCatGrid"></div>
-    <label class="field-label">Descrição / observações</label>
-    <textarea id="poiDescricao" placeholder="Como chegar, o que tem, dica..."></textarea>
-    <label class="field-label">Foto do local</label>
-    <input type="file" accept="image/*" capture="environment" onchange="handlePhotoSelect(event)">
-    <p id="poiCoordsLabel" style="margin-top:8px;"></p>
-    <div class="btn-row section-gap">
-      <button class="btn-block" onclick="savePoi()">Salvar</button>
+<!-- MODAL DETALHE VIAGEM -->
+<div class="overlay" id="ovViagem">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h2>📔 Viagem</h2><button class="close-btn" onclick="fecharModal('ovViagem')">✕</button></div>
+    <div class="sheet-body">
+      <div class="fg"><label class="lbl">Nome</label><input type="text" class="inp" id="vNome"></div>
+      <div class="fg"><label class="lbl">Observações</label><textarea class="inp" id="vObs" style="min-height:80px;resize:none;"></textarea></div>
+      <div id="vResumo" style="background:var(--pri-l);border-radius:10px;padding:12px;margin-bottom:14px;font-size:.82rem;color:var(--pri);"></div>
+      <div id="vPontosTit" style="font-size:.78rem;font-weight:800;color:var(--t2);margin-bottom:8px;"></div>
+      <div id="vPontosList" class="card" style="margin:0 0 14px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-pri" style="flex:2;" onclick="salvarEdicaoViagem()">Salvar ✓</button>
+        <button class="btn btn-ghost" style="flex:1;" onclick="verViagemMapa()">🗺️ Mapa</button>
+      </div>
+      <button class="btn btn-ghost" style="margin-top:8px;color:var(--red);border-color:var(--red);" onclick="excluirViagem()">🗑️ Excluir viagem</button>
     </div>
-    <button class="ghost btn-block" style="margin-top:8px;" onclick="exportPoint(editingPoiId)">📤 Compartilhar este ponto</button>
-    <button class="ghost btn-block" style="margin-top:8px; color:var(--danger); border-color:var(--danger);" onclick="deleteCurrentPoi()">Excluir ponto</button>
   </div>
 </div>
-
-<!-- MODAL: NOVA VIAGEM -->
-<div class="modal-bg" id="modalTrip">
-  <div class="modal">
-    <div class="close-row"><button onclick="closeModal('modalTrip')">✕</button></div>
-    <h2>Nova viagem</h2>
-    <label class="field-label">Nome da viagem</label>
-    <input type="text" id="tripNome" placeholder="Ex: Serra do Rio do Rastro">
-    <label class="field-label">Data</label>
-    <input type="date" id="tripData">
-    <button class="btn-block" onclick="createTrip()">Criar e abrir</button>
-  </div>
-</div>
-
-<!-- MODAL: NOVA CATEGORIA -->
-<div class="modal-bg" id="modalCat">
-  <div class="modal">
-    <div class="close-row"><button onclick="closeModal('modalCat')">✕</button></div>
-    <h2>Novo tipo de ponto</h2>
-    <label class="field-label">Nome</label>
-    <input type="text" id="catNome" placeholder="Ex: Mirante">
-    <label class="field-label">Ícone</label>
-    <div class="cat-grid" id="iconPickerGrid"></div>
-    <input type="hidden" id="catIconePicked" value="📍">
-    <button class="btn-block" onclick="createCategory()">Criar categoria</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-/* ======================= DADOS ======================= */
-const DEFAULT_CATS = [
-  {id:'igreja', nome:'Igreja', icone:'⛪'},
-  {id:'praca', nome:'Praça', icone:'🌳'},
-  {id:'camping', nome:'Camping', icone:'⛺'},
-  {id:'churrasco', nome:'Churrasco', icone:'🔥'},
-  {id:'comida', nome:'Comida', icone:'🍽️'},
-  {id:'restaurante', nome:'Restaurante', icone:'🍴'},
-  {id:'rio', nome:'Rio/Cachoeira', icone:'🌊'},
-  {id:'posto', nome:'Posto', icone:'⛽'},
-  {id:'oficina', nome:'Oficina', icone:'🔧'},
-  {id:'pousada', nome:'Pousada', icone:'🏠'},
-  {id:'atencao', nome:'Atenção na estrada', icone:'🚧'},
-  {id:'outro', nome:'Outro', icone:'📍'},
+// ══ DB ═══════════════════════════════════════════════════════
+var DB_KEY='rastro_v1';
+var db={viagens:[],pontos:[]};
+var viagemAtiva=null; // {id, nome, obs, inicio, watchId, buffer, timer}
+var editandoPontoId=null, editandoViagemId=null, modoRota='driving', rotaPontos=[];
+var fotoTemp=null, catSel='outro', catFiltro='';
+
+var CATS=[
+  {id:'local',ic:'📍',nome:'Local'},
+  {id:'comida',ic:'🍽️',nome:'Comida'},
+  {id:'agua',ic:'💧',nome:'Água/Rio'},
+  {id:'vista',ic:'🏔️',nome:'Vista'},
+  {id:'ponte',ic:'🌉',nome:'Ponte'},
+  {id:'estrada',ic:'🛣️',nome:'Estrada'},
+  {id:'parada',ic:'⛽',nome:'Parada'},
+  {id:'outro',ic:'🗺️',nome:'Outro'},
 ];
-const ICON_CHOICES = ['📍','⭐','🏔️','🌅','🐄','🚜','🌉','🏕️','🎣','🥾','🛶','🏞️','🗿','🐎','🌵','🏁'];
 
-let db = {trips:[], points:[], customCats:[]};
-
-function loadDb(){
-  try{
-    const raw = localStorage.getItem('rastro_db_v1');
-    if(raw) db = JSON.parse(raw);
-  }catch(e){ console.error('Falha ao carregar dados', e); }
-  if(!db.trips) db.trips=[];
-  if(!db.points) db.points=[];
-  if(!db.customCats) db.customCats=[];
+function salvarDb(){try{localStorage.setItem(DB_KEY,JSON.stringify({viagens:db.viagens,pontos:db.pontos}));}catch(e){toast('Erro ao salvar');}}
+function carregarDb(){
+  try{var r=localStorage.getItem(DB_KEY);if(r){var d=JSON.parse(r);db.viagens=d.viagens||[];db.pontos=d.pontos||[];}}catch(e){}
 }
-function saveDb(){
-  try{
-    localStorage.setItem('rastro_db_v1', JSON.stringify(db));
-  }catch(e){
-    toast('Erro ao salvar. Espaço pode estar cheio.');
-    console.error(e);
-  }
-}
-function allCats(){ return DEFAULT_CATS.concat(db.customCats); }
-function catById(id){ return allCats().find(c=>c.id===id) || allCats()[allCats().length-1]; }
-function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function catById(id){return CATS.find(function(c){return c.id===id;})||CATS[7];}
+function fmtData(iso){if(!iso)return'';var d=new Date(iso);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDur(ms){var s=Math.floor(ms/1000),m=Math.floor(s/60),h=Math.floor(m/60);return h?h+'h '+String(m%60).padStart(2,'0')+'min':m+'min';}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-/* ======================= NAVEGAÇÃO ======================= */
-let currentTripId = null;
-let filterTrip = null; // null = acervo geral (todos), else tripId
-let currentCatFilter = 'todos';
-let editingPoiId = null;
-let selectedCatForModal = null;
-let pendingPhotoDataUrl = null;
-let mapRef = null; // {lat,lng,label}
-
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el = document.getElementById('screen-'+name);
-  if(el) el.classList.add('active');
-  document.querySelectorAll('nav.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
-  document.getElementById('fabAdd').style.display = (name==='ajustes') ? 'none':'flex';
-  if(name==='viagens') renderTripsList();
-  if(name==='viagem') renderTripDetail();
-  if(name==='pontos') renderPoiList();
-  if(name==='mapa'){
-    setMapMode(mapMode);
-    document.getElementById('btnTrilhaStart').style.display = trilhaWatchId!=null ? 'none':'inline-block';
-    document.getElementById('btnTrilhaStop').style.display = trilhaWatchId!=null ? 'inline-block':'none';
-  }
-  if(name==='rota'){ renderRoute(); renderRotasSalvas(); }
-  if(name==='trilha') renderTrilhaScreen();
-  if(name==='ajustes') renderCustomCats();
-  updateTripBanner();
-}
-
-function updateTripBanner(){
-  const banner = document.getElementById('tripBanner');
-  if(currentTripId){
-    const t = db.trips.find(x=>x.id===currentTripId);
-    if(t){
-      banner.style.display='flex';
-      document.getElementById('tripBannerText').textContent = '🚗 Viagem ativa: '+t.nome;
-      return;
-    }
-  }
-  banner.style.display='none';
-}
-
-/* ======================= TOAST / MODAL ======================= */
+// ══ TOAST ════════════════════════════════════════════════════
 function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
-}
-function openModal(id){ document.getElementById(id).classList.add('active'); }
-function closeModal(id){ document.getElementById(id).classList.remove('active'); }
-
-/* ======================= GEO ======================= */
-function getGps(){
-  return new Promise((resolve,reject)=>{
-    if(!navigator.geolocation){ reject(new Error('GPS indisponível')); return; }
-    navigator.geolocation.getCurrentPosition(
-      pos=>resolve({lat:pos.coords.latitude, lng:pos.coords.longitude}),
-      err=>reject(err),
-      {enableHighAccuracy:true, timeout:12000}
-    );
-  });
-}
-function haversine(lat1,lng1,lat2,lng2){
-  const R=6371000;
-  const toRad=d=>d*Math.PI/180;
-  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
-  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-function bearing(lat1,lng1,lat2,lng2){
-  const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
-  const y=Math.sin(toRad(lng2-lng1))*Math.cos(toRad(lat2));
-  const x=Math.cos(toRad(lat1))*Math.sin(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(toRad(lng2-lng1));
-  return (toDeg(Math.atan2(y,x))+360)%360;
-}
-function fmtDist(m){
-  if(m<1000) return Math.round(m)+' m';
-  return (m/1000).toFixed(1)+' km';
+  var t=document.getElementById('toastEl');
+  if(!t){t=document.createElement('div');t.id='toastEl';t.style.cssText='position:fixed;bottom:calc(var(--nav-h)+80px);left:50%;transform:translateX(-50%);background:#1C1B19;color:#fff;padding:10px 18px;border-radius:20px;font-size:.82rem;font-weight:700;z-index:999;transition:opacity .3s;white-space:nowrap;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(function(){t.style.opacity='0';},2200);
 }
 
-/* ======================= VIAGENS ======================= */
-function renderTripsList(){
-  const wrap = document.getElementById('tripsList');
-  if(db.trips.length===0){
-    wrap.innerHTML = '<div class="empty-state"><span class="glyph">🗺️</span>Nenhuma viagem ainda. Crie a primeira para começar a marcar pontos.</div>';
-    return;
-  }
-  wrap.innerHTML='';
-  db.trips.slice().reverse().forEach(t=>{
-    const n = db.points.filter(p=>p.tripId===t.id).length;
-    const div=document.createElement('div');
-    div.className='card trip-card';
-    div.innerHTML = `<div class="info"><strong>${escapeHtml(t.nome)}</strong><span>${t.data?formatDateBr(t.data):'sem data'} · ${n} ponto(s)</span></div>`;
-    const btn=document.createElement('button');
-    btn.textContent='Abrir'; btn.className='ghost';
-    btn.onclick=()=>{ currentTripId=t.id; showScreen('viagem'); };
-    div.appendChild(btn);
-    wrap.appendChild(div);
-  });
+// ══ NAVEGAÇÃO ════════════════════════════════════════════════
+function irTela(nome, btn){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('scr-'+nome).classList.add('on');
+  if(btn) btn.classList.add('on');
+  // FAB
+  var fab=document.getElementById('fab');
+  if(nome==='pontos'){fab.style.display='flex';fab.textContent='＋';}
+  else if(nome==='trilha'){fab.style.display='none';}
+  else if(nome==='mapa'){fab.style.display='none';}
+  else if(nome==='rota'){fab.style.display='none';}
+  else if(nome==='diario'){fab.style.display='none';}
+  // Render
+  if(nome==='pontos') renderPontos();
+  if(nome==='trilha') renderTrilha();
+  if(nome==='mapa'){initMapa();setTimeout(function(){if(_map)_map.invalidateSize();renderMapaPontos();renderMapaTrilha();},150);}
+  if(nome==='rota') renderRota();
+  if(nome==='diario') renderDiario();
 }
-function formatDateBr(iso){
-  const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`;
-}
-function openNewTripModal(){
-  document.getElementById('tripNome').value='';
-  document.getElementById('tripData').value = new Date().toISOString().slice(0,10);
-  openModal('modalTrip');
-}
-function createTrip(){
-  const nome=document.getElementById('tripNome').value.trim();
-  if(!nome){ toast('Dê um nome para a viagem'); return; }
-  const t={id:uid(), nome, data:document.getElementById('tripData').value, origemLat:null, origemLng:null, retorno:false, rota:[]};
-  db.trips.push(t); saveDb();
-  closeModal('modalTrip');
-  currentTripId=t.id;
-  showScreen('viagem');
-}
-function renderTripDetail(){
-  const t = db.trips.find(x=>x.id===currentTripId);
-  if(!t){ showScreen('viagens'); return; }
-  document.getElementById('viagemTitulo').textContent = t.nome;
-  const n = db.points.filter(p=>p.tripId===t.id).length;
-  document.getElementById('viagemSub').textContent = (t.data?formatDateBr(t.data)+' · ':'') + n + ' ponto(s) cadastrado(s)';
-  document.getElementById('origemInfo').textContent = t.origemLat!=null ? `${t.origemLat.toFixed(5)}, ${t.origemLng.toFixed(5)}` : 'Nenhum definido';
-}
-async function marcarOrigem(){
-  const t = db.trips.find(x=>x.id===currentTripId);
-  if(!t) return;
-  try{
-    toast('Obtendo posição...');
-    const pos = await getGps();
-    t.origemLat=pos.lat; t.origemLng=pos.lng;
-    saveDb(); renderTripDetail();
-    toast('Ponto de partida marcado');
-  }catch(e){ toast('Não foi possível obter o GPS'); }
-}
-function deleteTrip(id){
-  if(!confirm('Excluir esta viagem? Os pontos cadastrados nela permanecerão no acervo geral.')) return;
-  db.trips = db.trips.filter(t=>t.id!==id);
-  db.points.forEach(p=>{ if(p.tripId===id) p.tripId=null; });
-  saveDb();
-  currentTripId=null;
-  showScreen('viagens');
-}
-function exportTrip(tripId){
-  const t = db.trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const pts = db.points.filter(p=>p.tripId===tripId);
-  downloadJson({trip:t, points:pts, customCats:db.customCats}, 'viagem-'+t.nome.replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'.json');
+function fabAct(){
+  var tela=document.querySelector('.scr.on');
+  if(tela&&tela.id==='scr-pontos') abrirEditarPonto(null);
 }
 
-/* ======================= PONTOS ======================= */
-async function quickMarkPoint(){
-  try{
-    toast('Obtendo posição GPS...');
-    const pos = await getGps();
-    const p = {
-      id: uid(), nome:'Ponto sem nome', catId:'outro',
-      lat:pos.lat, lng:pos.lng, tripId: currentTripId,
-      descricao:'', foto:null, detalhado:false, criadoEm:Date.now()
-    };
-    db.points.push(p); saveDb();
-    toast('Ponto marcado! Toque para completar depois.');
-    openPoiModal(p.id);
-  }catch(e){
-    toast('Não foi possível obter o GPS');
-  }
-}
-function renderCatFilterRow(){
-  const wrap=document.getElementById('catFilterRow');
-  wrap.innerHTML='';
-  const all=document.createElement('button');
-  all.className='filter-chip'+(currentCatFilter==='todos'?' active':'');
-  all.textContent='Todos'; all.onclick=()=>{currentCatFilter='todos'; renderPoiList();};
-  wrap.appendChild(all);
-  allCats().forEach(c=>{
-    const b=document.createElement('button');
-    b.className='filter-chip'+(currentCatFilter===c.id?' active':'');
-    b.textContent=c.icone+' '+c.nome;
-    b.onclick=()=>{currentCatFilter=c.id; renderPoiList();};
-    wrap.appendChild(b);
+// ══ MODAIS ═══════════════════════════════════════════════════
+function abrirModal(id){document.getElementById(id).classList.add('on');}
+function fecharModal(id){document.getElementById(id).classList.remove('on');}
+// Fechar ao clicar fora
+document.querySelectorAll('.overlay').forEach(function(o){
+  o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('on');});
+});
+
+// ══ PONTOS ═══════════════════════════════════════════════════
+function renderPontos(){
+  // Chips de categoria
+  var chipRow=document.querySelector('#scr-pontos [style*="overflow-x"]');
+  chipRow.innerHTML='<div class="chip '+(catFiltro===''?'on':'')+'" data-cat="" onclick="filtrarCat(this)">Todos</div>';
+  CATS.forEach(function(c){
+    var el=document.createElement('div');
+    el.className='chip'+(catFiltro===c.id?' on':'');
+    el.dataset.cat=c.id;el.textContent=c.ic+' '+c.nome;
+    el.onclick=function(){filtrarCat(this);};
+    chipRow.appendChild(el);
+  });
+  // Lista
+  var lista=db.pontos.filter(function(p){return !catFiltro||p.cat===catFiltro;});
+  var listEl=document.getElementById('pontosList');
+  var emEl=document.getElementById('pontosEmpty');
+  if(!lista.length){emEl.style.display='flex';listEl.style.display='none';return;}
+  emEl.style.display='none';listEl.style.display='block';
+  listEl.innerHTML='';
+  lista.slice().reverse().forEach(function(p){
+    var c=catById(p.cat);
+    var row=document.createElement('div');row.className='poi-card';
+    var foto=p.foto?'<img src="'+p.foto+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;">':'<div class="poi-ic">'+c.ic+'</div>';
+    row.innerHTML=foto+'<div class="poi-info"><div class="pnome">'+escH(p.nome||'Sem nome')+'</div><div class="pmeta">'+c.ic+' '+c.nome+(p.viagemNome?' · '+escH(p.viagemNome):'')+(p.lat?' · '+p.lat.toFixed(4)+', '+p.lng.toFixed(4):'')+'</div></div>';
+    var btn=document.createElement('button');btn.className='edit-btn';btn.textContent='✏️';
+    btn.addEventListener('click',(function(id){return function(){abrirEditarPonto(id);};})(p.id));
+    row.appendChild(btn);
+    listEl.appendChild(row);
   });
 }
-function renderPoiList(){
-  renderCatFilterRow();
-  const wrap=document.getElementById('poiList');
-  let pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
-  if(currentCatFilter!=='todos') pts = pts.filter(p=>p.catId===currentCatFilter);
-  if(pts.length===0){
-    wrap.innerHTML='<div class="empty-state"><span class="glyph">📍</span>Nenhum ponto por aqui ainda.</div>';
-    return;
-  }
-  wrap.innerHTML='';
-  pts.slice().reverse().forEach(p=>{
-    const c=catById(p.catId);
-    const div=document.createElement('div');
-    div.className='poi-item';
-    div.innerHTML = `<div class="ic">${c.icone}</div>
-      <div class="info"><div class="nome">${escapeHtml(p.nome)}${!p.detalhado?'<span class="badge-pend">completar</span>':''}</div>
-      <div class="meta">${c.nome}</div></div>`;
-    div.onclick=()=>openPoiModal(p.id);
-    wrap.appendChild(div);
-  });
+function filtrarCat(el){
+  catFiltro=el.dataset.cat;
+  renderPontos();
 }
-function openPoiModal(id){
-  editingPoiId=id;
-  const p = db.points.find(x=>x.id===id);
-  if(!p){ toast('Ponto não encontrado'); return; }
-  const modal = document.getElementById('modalPoi');
-  if(!modal){ toast('Modal não disponível'); return; }
-  document.getElementById('modalPoiTitle').textContent = p.detalhado? 'Editar ponto' : 'Completar ponto';
-  document.getElementById('poiNome').value = p.nome==='Ponto sem nome' ? '' : p.nome;
-  document.getElementById('poiDescricao').value = p.descricao||'';
-  document.getElementById('poiCoordsLabel').textContent = (p.lat&&p.lng) ? 'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5) : 'Sem GPS — insira as coordenadas abaixo';
-  document.getElementById('poiLatInput').value = p.lat || '';
-  document.getElementById('poiLngInput').value = p.lng || '';
-  const img=document.getElementById('modalPoiPhoto');
-  if(p.foto){ img.src=p.foto; img.style.display='block'; } else { img.style.display='none'; }
-  pendingPhotoDataUrl = p.foto || null;
-  selectedCatForModal = p.catId;
+function abrirEditarPonto(id){
+  editandoPontoId=id;
+  var p=id?db.pontos.find(function(x){return x.id===id;}):null;
+  document.getElementById('ovPontoTit').textContent=p?'✏️ Editar Ponto':'📍 Novo Ponto';
+  document.getElementById('pNome').value=p?(p.nome==='Ponto sem nome'?'':p.nome||''):'';
+  document.getElementById('pDesc').value=p?p.desc||'':'';
+  fotoTemp=p?p.foto||null:null;
+  catSel=p?p.cat||'outro':'outro';
+  var prev=document.getElementById('pFotoPreview');
+  if(fotoTemp){prev.style.display='block';document.getElementById('pFotoImg').src=fotoTemp;}
+  else{prev.style.display='none';}
+  document.getElementById('pGpsLabel').textContent=p&&p.lat?'📍 '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'📍 Sem GPS';
   renderCatGrid();
-  openModal('modalPoi');
+  abrirModal('ovPonto');
 }
 function renderCatGrid(){
-  const grid=document.getElementById('poiCatGrid');
-  grid.innerHTML='';
-  allCats().forEach(c=>{
-    const d=document.createElement('div');
-    d.className='cat-chip'+(selectedCatForModal===c.id?' selected':'');
-    d.innerHTML=`<span class="ic">${c.icone}</span>${c.nome}`;
-    d.onclick=()=>{ selectedCatForModal=c.id; renderCatGrid(); };
-    grid.appendChild(d);
+  var el=document.getElementById('pCatGrid');el.innerHTML='';
+  CATS.forEach(function(c){
+    var d=document.createElement('div');d.className='cat-item'+(catSel===c.id?' on':'');
+    d.innerHTML='<span class="cat-ic">'+c.ic+'</span>'+c.nome;
+    d.addEventListener('click',(function(cid){return function(){catSel=cid;renderCatGrid();};})(c.id));
+    el.appendChild(d);
   });
 }
-function handlePhotoSelect(ev){
-  const file = ev.target.files[0];
-  if(!file) return;
-  const img = new Image();
-  const reader = new FileReader();
-  reader.onload = e=>{
-    img.onload = ()=>{
-      const maxW=800;
-      const scale = Math.min(1, maxW/img.width);
-      const canvas=document.createElement('canvas');
-      canvas.width=img.width*scale; canvas.height=img.height*scale;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,canvas.width,canvas.height);
-      pendingPhotoDataUrl = canvas.toDataURL('image/jpeg',0.7);
-      const prev=document.getElementById('modalPoiPhoto');
-      prev.src=pendingPhotoDataUrl; prev.style.display='block';
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+function selecionarFoto(inp){
+  var f=inp.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    fotoTemp=e.target.result;
+    document.getElementById('pFotoPreview').style.display='block';
+    document.getElementById('pFotoImg').src=fotoTemp;
+  };r.readAsDataURL(f);
 }
-function savePoi(){
-  const p = db.points.find(x=>x.id===editingPoiId);
-  if(!p) return;
-  const nome = document.getElementById('poiNome').value.trim();
-  p.nome = nome || 'Ponto sem nome';
-  p.catId = selectedCatForModal || 'outro';
-  p.descricao = document.getElementById('poiDescricao').value.trim();
-  p.foto = pendingPhotoDataUrl;
-  p.detalhado = true;
-  // Lat/lng manual
-  const latV = parseFloat(document.getElementById('poiLatInput').value);
-  const lngV = parseFloat(document.getElementById('poiLngInput').value);
-  if(!isNaN(latV) && !isNaN(lngV)){ p.lat=latV; p.lng=lngV; }
-  saveDb();
-  closeModal('modalPoi');
-  toast('Ponto salvo');
-  renderPoiList();
-}
-function deleteCurrentPoi(){
-  if(!confirm('Excluir este ponto?')) return;
-  db.points = db.points.filter(p=>p.id!==editingPoiId);
-  db.trips.forEach(t=>{ t.rota = (t.rota||[]).filter(id=>id!==editingPoiId); });
-  saveDb();
-  closeModal('modalPoi');
-  renderPoiList();
-}
-
-/* ======================= MAPA ESQUEMÁTICO ======================= */
-async function usarLocalAtualComoReferencia(){
-  try{
-    toast('Obtendo posição...');
-    const pos=await getGps();
-    mapRef={lat:pos.lat,lng:pos.lng,label:'Minha posição agora'};
-    renderMap();
-  }catch(e){ toast('GPS indisponível'); }
-}
-function getDefaultRef(){
-  const t = db.trips.find(x=>x.id===currentTripId);
-  if(t && t.origemLat!=null) return {lat:t.origemLat,lng:t.origemLng,label:'Partida da viagem'};
-  const pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
-  if(pts.length>0) return {lat:pts[0].lat,lng:pts[0].lng,label:pts[0].nome};
-  return null;
-}
-let mapMode = 'bussola';
-const RAIO_OPCOES = [
-  {label:'Automático', val:null},
-  {label:'200 m', val:200},
-  {label:'500 m', val:500},
-  {label:'1 km', val:1000},
-  {label:'5 km', val:5000},
-  {label:'20 km', val:20000},
-  {label:'50 km', val:50000},
-];
-let bussolaRaio = null; // null = automático (ajusta pro ponto mais distante)
-function renderRaioRow(){
-  const wrap=document.getElementById('raioRow');
-  wrap.style.display = mapMode==='bussola' ? 'flex' : 'none';
-  wrap.innerHTML='';
-  RAIO_OPCOES.forEach(o=>{
-    const b=document.createElement('button');
-    b.className='filter-chip'+(bussolaRaio===o.val?' active':'');
-    b.textContent=o.label;
-    b.onclick=()=>{ bussolaRaio=o.val; renderRaioRow(); renderMap(); };
-    wrap.appendChild(b);
-  });
-}
-function setMapMode(mode){
-  mapMode = mode;
-  const isBus = mode === 'bussola';
-  const tB = document.getElementById('tabBussola');
-  const tM = document.getElementById('tabMapa');
-  if(tB) tB.classList.toggle('active', isBus);
-  if(tM) tM.classList.toggle('active', !isBus);
-  const cv = document.getElementById('poiCanvas');
-  const lc = document.getElementById('leafletControls');
-  const lm = document.getElementById('leafletMap');
-  const rr = document.getElementById('refBtnRow');
-  const ti = document.getElementById('mapTapInfo');
-  const md = document.getElementById('mapModeDesc');
-  if(isBus){
-    if(cv) cv.style.display = 'block';
-    if(lc) lc.style.display = 'none';
-    if(lm) lm.style.display = 'none';
-    if(rr) rr.style.display = '';
-    if(md) md.textContent = 'Posição relativa dos seus pontos a partir do ponto de referência.';
-    renderBussolaMap();
+function salvarPonto(){
+  var nome=document.getElementById('pNome').value.trim()||'Ponto sem nome';
+  var desc=document.getElementById('pDesc').value.trim();
+  if(editandoPontoId){
+    var p=db.pontos.find(function(x){return x.id===editandoPontoId;});
+    if(p){p.nome=nome;p.cat=catSel;p.desc=desc;if(fotoTemp)p.foto=fotoTemp;}
   } else {
-    if(cv) cv.style.display = 'none';
-    if(lc) lc.style.display = 'block';
-    if(lm) lm.style.display = 'block';
-    if(rr) rr.style.display = 'none';
-    if(md) md.textContent = 'Mapa real OpenStreetMap — requer internet para carregar.';
-    setTimeout(()=>{ initLeaflet(); if(_lmap){ _lmap.invalidateSize(); renderLeafletPOIs(); }}, 150);
+    db.pontos.push({id:uid(),nome:nome,cat:catSel,desc:desc,foto:fotoTemp,lat:null,lng:null,viagemId:null,viagemNome:null,dt:new Date().toISOString()});
   }
-  if(ti) ti.style.display = 'none';
-  renderRaioRow();
+  salvarDb();fecharModal('ovPonto');
+  renderPontos();renderMapaPontos();
+  if(viagemAtiva) renderPontosAtivos();
+  toast('Ponto salvo ✅');
 }
 
-function renderMap(){
-  if(mapMode==='bussola') renderBussolaMap();
-  else if(_lmap) renderLeafletPOIs();
-}
-function renderBussolaMap(){
-  if(!mapRef) mapRef = getDefaultRef();
-  const canvas=document.getElementById('poiCanvas');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width, H=canvas.height, cx=W/2, cy=H/2;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#E4D9C0'; ctx.fillRect(0,0,W,H);
-  document.getElementById('mapRefLabel').textContent = mapRef ? 'Referência: '+mapRef.label : 'Referência: —';
-  if(!mapRef){
-    ctx.fillStyle='#5A4E40'; ctx.font='16px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('Marque um ponto ou defina a referência', cx, cy);
-    document.getElementById('mapScaleLabel').textContent='';
-    return;
-  }
-  const pts = (filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points)
-    .filter(p=>!(p.lat===mapRef.lat && p.lng===mapRef.lng));
-  const trilhas = currentTripId ? trilhasDaViagem(currentTripId).map(t=>t.pontos) : [];
-  if(trilhaBuffer.length>1) trilhas.push(trilhaBuffer);
-  let maxDist = 50;
-  let withGeo = pts.map(p=>{
-    const d=haversine(mapRef.lat,mapRef.lng,p.lat,p.lng);
-    const b=bearing(mapRef.lat,mapRef.lng,p.lat,p.lng);
-    return {p,d,b};
-  });
-  let foraDoAlcance = 0;
-  if(bussolaRaio){
-    maxDist = bussolaRaio;
-    const antes = withGeo.length;
-    withGeo = withGeo.filter(x=>x.d<=maxDist);
-    foraDoAlcance = antes - withGeo.length;
-  } else {
-    withGeo.forEach(x=>{ if(x.d>maxDist) maxDist=x.d; });
-    trilhas.forEach(trilha=>trilha.forEach(pt=>{
-      const d=haversine(mapRef.lat,mapRef.lng,pt.lat,pt.lng);
-      if(d>maxDist) maxDist=d;
-    }));
-    maxDist = maxDist*1.15;
-  }
-  const radiusPx = Math.min(W,H)/2 - 40;
-  // rings
-  ctx.strokeStyle='#C7B896'; ctx.fillStyle='#8A7A5C'; ctx.font='11px sans-serif'; ctx.textAlign='left';
-  [0.33,0.66,1].forEach(f=>{
-    ctx.beginPath(); ctx.arc(cx,cy,radiusPx*f,0,Math.PI*2); ctx.stroke();
-    ctx.fillText(fmtDist(maxDist*f), cx+6, cy-radiusPx*f+12);
-  });
-  // reference point
-  ctx.fillStyle='#2B211A';
-  ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#EDE4D3'; ctx.font='11px sans-serif'; ctx.textAlign='center';
-  ctx.fillText('★', cx, cy+4);
-  // trilhas (linhas de percurso)
-  function toXY(lat,lng){
-    const d=haversine(mapRef.lat,mapRef.lng,lat,lng);
-    const b=bearing(mapRef.lat,mapRef.lng,lat,lng);
-    const rad=(b-90)*Math.PI/180;
-    const r=(d/maxDist)*radiusPx;
-    return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
-  }
-  ctx.strokeStyle='#A8562E'; ctx.lineWidth=2.5; ctx.setLineDash([6,4]);
-  trilhas.forEach(trilha=>{
-    ctx.beginPath();
-    trilha.forEach((pt,i)=>{
-      const xy=toXY(pt.lat,pt.lng);
-      if(i===0) ctx.moveTo(xy.x,xy.y); else ctx.lineTo(xy.x,xy.y);
-    });
-    ctx.stroke();
-  });
-  ctx.setLineDash([]);
-  // points
-  window._mapHitTargets = [];
-  withGeo.forEach(({p,d,b})=>{
-    const rad = (b-90)*Math.PI/180; // 0deg(N) at top
-    const r = (d/maxDist)*radiusPx;
-    const x = cx + r*Math.cos(rad);
-    const y = cy + r*Math.sin(rad);
-    const c = catById(p.catId);
-    ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(c.icone, x, y);
-    window._mapHitTargets.push({x,y,p});
-  });
-  document.getElementById('mapScaleLabel').textContent = 'Raio: '+fmtDist(maxDist) + (foraDoAlcance>0 ? ' · '+foraDoAlcance+' fora do alcance' : '');
-}
-
-/* ======================= MAPA REGIÃO SUL (fixo) ======================= */
-const REGIAO_BOUNDS = {latMin:-34.1, latMax:-22.3, lngMin:-58.0, lngMax:-47.5};
-// Contorno estilizado (aproximado, apenas referência visual — não é carta precisa)
-const REGIAO_OUTLINE = [
-  [-22.5,-53.2],[-23.0,-51.0],[-22.9,-48.6],[-24.9,-48.0],[-25.5,-48.4],
-  [-26.3,-48.6],[-27.1,-48.4],[-27.6,-48.5],[-28.3,-48.7],[-28.6,-49.3],
-  [-29.4,-49.7],[-30.0,-50.2],[-31.0,-51.0],[-31.7,-52.1],[-32.5,-52.5],
-  [-33.7,-53.4],[-33.2,-55.0],[-30.9,-56.0],[-30.2,-57.6],[-28.2,-56.0],
-  [-27.1,-53.9],[-26.9,-53.6],[-25.6,-54.6],[-24.6,-54.5],[-24.0,-54.0],
-  [-23.0,-53.6],[-22.5,-53.2]
-];
-const REGIAO_CIDADES = [
-  {nome:'Curitiba', lat:-25.4284, lng:-49.2733},
-  {nome:'Florianópolis', lat:-27.5954, lng:-48.5480},
-  {nome:'Porto Alegre', lat:-30.0346, lng:-51.2177},
-  {nome:'Londrina', lat:-23.3103, lng:-51.1628},
-  {nome:'Cascavel', lat:-24.9578, lng:-53.4595},
-  {nome:'Foz do Iguaçu', lat:-25.5478, lng:-54.5882},
-  {nome:'Chapecó', lat:-27.1000, lng:-52.6152},
-  {nome:'Joinville', lat:-26.3044, lng:-48.8461},
-  {nome:'Caxias do Sul', lat:-29.1634, lng:-51.1797},
-  {nome:'Santa Maria', lat:-29.6842, lng:-53.8069},
-  {nome:'Pelotas', lat:-31.7654, lng:-52.3376},
-  {nome:'Uruguaiana', lat:-29.7547, lng:-57.0883},
-];
-function regiaoXY(lat,lng,W,H){
-  const {latMin,latMax,lngMin,lngMax} = REGIAO_BOUNDS;
-  const x = (lng-lngMin)/(lngMax-lngMin)*W;
-  const y = (latMax-lat)/(latMax-latMin)*H;
-  return {x,y};
-}
-function renderRegionMap(){
-  const canvas=document.getElementById('poiCanvas');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width, H=canvas.height;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#AFC4C2'; ctx.fillRect(0,0,W,H); // "água"/fundo
-  // grade de coordenadas
-  ctx.strokeStyle='rgba(43,33,26,.15)'; ctx.fillStyle='#3F4A44'; ctx.font='10px sans-serif';
-  for(let lat=Math.ceil(REGIAO_BOUNDS.latMin); lat<=REGIAO_BOUNDS.latMax; lat+=2){
-    const {y} = regiaoXY(lat, REGIAO_BOUNDS.lngMin, W, H);
-    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
-    ctx.fillText(lat+'°', 4, y-3);
-  }
-  for(let lng=Math.ceil(REGIAO_BOUNDS.lngMin); lng<=REGIAO_BOUNDS.lngMax; lng+=2){
-    const {x} = regiaoXY(REGIAO_BOUNDS.latMax, lng, W, H);
-    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
-    ctx.fillText(lng+'°', x+3, 12);
-  }
-  // contorno terrestre estilizado
-  ctx.beginPath();
-  REGIAO_OUTLINE.forEach((pt,i)=>{
-    const {x,y}=regiaoXY(pt[0],pt[1],W,H);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.closePath();
-  ctx.fillStyle='#DCCFA8'; ctx.fill();
-  ctx.strokeStyle='#8A7A5C'; ctx.lineWidth=1.5; ctx.stroke();
-  // cidades de referência
-  ctx.fillStyle='#5A4E40';
-  REGIAO_CIDADES.forEach(c=>{
-    const {x,y}=regiaoXY(c.lat,c.lng,W,H);
-    ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
-    ctx.font='10px sans-serif'; ctx.textAlign='left';
-    ctx.fillText(c.nome, x+5, y+3);
-  });
-  // trilhas de todas as viagens (linha)
-  ctx.strokeStyle='#A8562E'; ctx.lineWidth=2; ctx.setLineDash([6,4]);
-  db.trips.forEach(t=>{
-    (t.trilhas||[]).forEach(trilha=>{
-      ctx.beginPath();
-      trilha.pontos.forEach((pt,i)=>{
-        const {x,y}=regiaoXY(pt.lat,pt.lng,W,H);
-        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      });
-      ctx.stroke();
-    });
-  });
-  if(trilhaBuffer.length>1){
-    ctx.beginPath();
-    trilhaBuffer.forEach((pt,i)=>{
-      const {x,y}=regiaoXY(pt.lat,pt.lng,W,H);
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  // POIs
-  window._mapHitTargets = [];
-  const pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
-  pts.forEach(p=>{
-    const {x,y}=regiaoXY(p.lat,p.lng,W,H);
-    if(x<0||x>W||y<0||y>H) return; // fora da Região Sul
-    const c=catById(p.catId);
-    ctx.font='18px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(c.icone, x, y);
-    window._mapHitTargets.push({x,y,p});
-  });
-  document.getElementById('mapRefLabel').textContent = 'Região Sul do Brasil (RS · SC · PR)';
-  document.getElementById('mapScaleLabel').textContent = 'Contorno estilizado';
-}
-document.getElementById('poiCanvas').addEventListener('click', function(ev){
-  const rect=this.getBoundingClientRect();
-  const scaleX = this.width/rect.width, scaleY=this.height/rect.height;
-  const x=(ev.clientX-rect.left)*scaleX, y=(ev.clientY-rect.top)*scaleY;
-  const targets = window._mapHitTargets||[];
-  let hit=null;
-  targets.forEach(t=>{ if(Math.hypot(t.x-x,t.y-y)<22) hit=t; });
-  const info=document.getElementById('mapTapInfo');
-  if(hit){
-    const c=catById(hit.p.catId);
-    info.style.display='block';
-    info.innerHTML='';
-    const title=document.createElement('strong');
-    title.textContent=c.icone+' '+hit.p.nome;
-    info.appendChild(title);
-    if(hit.p.descricao){
-      const desc=document.createElement('p');
-      desc.style.cssText='margin:4px 0 8px;';
-      desc.textContent=hit.p.descricao;
-      info.appendChild(desc);
-    }
-    const btn=document.createElement('button');
-    btn.textContent='Editar / ver detalhes';
-    btn.className='btn-block';
-    const pid=hit.p.id;
-    btn.addEventListener('click',function(e){
-      e.stopPropagation();
-      openPoiModal(pid);
-    });
-    info.appendChild(btn);
-  } else {
-    info.style.display='none';
-  }
-});
-
-/* ======================= TRILHA (PEGADAS) ======================= */
-let trilhaWatchId = null;
-let trilhaBuffer = []; // pontos sendo gravados na sessão atual
-const TRILHA_MIN_METROS = 80; // grava um novo ponto só se andou pelo menos isso desde o último
-
-function trilhasDaViagem(tripId){
-  const t = db.trips.find(x=>x.id===tripId);
-  if(!t) return [];
-  if(!t.trilhas) t.trilhas=[];
-  return t.trilhas;
-}
-function iniciarTrilha(){
-  if(!currentTripId){ toast('Abra uma viagem primeiro para gravar a trilha'); return; }
-  if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
-  trilhaBuffer = [];
-  document.getElementById('btnTrilhaStart').style.display='none';
-  document.getElementById('btnTrilhaStop').style.display='inline-block';
-  document.getElementById('trilhaStatus').textContent = 'Gravando... 0 pontos registrados.';
-  trilhaWatchId = navigator.geolocation.watchPosition(function(pos){
-    const {latitude:lat, longitude:lng} = pos.coords;
-    const last = trilhaBuffer[trilhaBuffer.length-1];
-    if(!last || haversine(last.lat,last.lng,lat,lng) >= TRILHA_MIN_METROS){
-      trilhaBuffer.push({lat,lng,t:Date.now()});
-      document.getElementById('trilhaStatus').textContent = 'Gravando... '+trilhaBuffer.length+' ponto(s) registrado(s).';
-      renderMap();
-    }
-  }, function(err){
-    console.error(err);
-  }, {enableHighAccuracy:true, maximumAge:5000});
-}
-function pararTrilha(){
-  // Para o GPS — o override acima cuida do restante
-  if(trilhaWatchId!=null){ navigator.geolocation.clearWatch(trilhaWatchId); trilhaWatchId=null; }
-}
-
-/* ======================= ROTA ======================= */
-function currentTripObj(){ return db.trips.find(x=>x.id===currentTripId); }
-function renderRoute(){
-  const t = currentTripObj();
-  const wrapOrdered = document.getElementById('routeOrderedList');
-  const wrapAdd = document.getElementById('routeAddList');
-  const sw = document.getElementById('switchRetorno');
-  if(!t){
-    wrapOrdered.innerHTML = '<div class="empty-state">Abra uma viagem para montar a rota.</div>';
-    wrapAdd.innerHTML='';
-    return;
-  }
-  sw.classList.toggle('on', !!t.retorno);
-  const rota = t.rota || [];
-  wrapOrdered.innerHTML = rota.length===0 ? '<p>Nenhum ponto na rota ainda.</p>' : '';
-  rota.forEach((pid,idx)=>{
-    const p = db.points.find(x=>x.id===pid);
-    if(!p) return;
-    const div=document.createElement('div');
-    div.className='route-item';
-    div.innerHTML = `<div class="num">${idx+1}</div><div class="info">${escapeHtml(p.nome)}</div>`;
-    const controls=document.createElement('div'); controls.className='up-down';
-    const up=document.createElement('button'); up.textContent='↑'; up.onclick=()=>moveRoute(idx,-1);
-    const down=document.createElement('button'); down.textContent='↓'; down.onclick=()=>moveRoute(idx,1);
-    const rm=document.createElement('button'); rm.textContent='✕'; rm.onclick=()=>toggleInRoute(pid);
-    controls.appendChild(up); controls.appendChild(down); controls.appendChild(rm);
-    div.appendChild(controls);
-    wrapOrdered.appendChild(div);
-  });
-  const pts = db.points.filter(p=>p.tripId===currentTripId && !rota.includes(p.id));
-  wrapAdd.innerHTML = pts.length===0 ? '<p>Todos os pontos já estão na rota.</p>' : '';
-  pts.forEach(p=>{
-    const c=catById(p.catId);
-    const div=document.createElement('div');
-    div.className='poi-item';
-    div.innerHTML = `<div class="ic">${c.icone}</div><div class="info"><div class="nome">${escapeHtml(p.nome)}</div></div><div class="check">＋</div>`;
-    div.onclick=()=>toggleInRoute(p.id);
-    wrapAdd.appendChild(div);
-  });
-}
-function toggleInRoute(pid){
-  const t = currentTripObj(); if(!t) return;
-  t.rota = t.rota || [];
-  if(t.rota.includes(pid)) t.rota = t.rota.filter(x=>x!==pid);
-  else t.rota.push(pid);
-  saveDb(); renderRoute();
-}
-function moveRoute(idx,dir){
-  const t = currentTripObj(); if(!t) return;
-  const arr=t.rota; const ni=idx+dir;
-  if(ni<0||ni>=arr.length) return;
-  [arr[idx],arr[ni]]=[arr[ni],arr[idx]];
-  saveDb(); renderRoute();
-}
-function limparRota(){
-  const t = currentTripObj(); if(!t) return;
-  if(!confirm('Limpar todos os pontos da rota?')) return;
-  t.rota=[]; saveDb(); renderRoute();
-}
-function toggleRetorno(){
-  const t = currentTripObj(); if(!t) return;
-  t.retorno = !t.retorno;
-  saveDb(); renderRoute();
-}
-function otimizarRota(){
-  const t = currentTripObj(); if(!t || !t.rota || t.rota.length<2) return;
-  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
-  let startLat, startLng;
-  if(t.origemLat!=null){ startLat=t.origemLat; startLng=t.origemLng; }
-  else { startLat=pts[0].lat; startLng=pts[0].lng; }
-  const remaining = pts.slice();
-  const ordered=[];
-  let curLat=startLat, curLng=startLng;
-  while(remaining.length){
-    let bestIdx=0, bestDist=Infinity;
-    remaining.forEach((p,i)=>{
-      const d=haversine(curLat,curLng,p.lat,p.lng);
-      if(d<bestDist){ bestDist=d; bestIdx=i; }
-    });
-    const next = remaining.splice(bestIdx,1)[0];
-    ordered.push(next.id);
-    curLat=next.lat; curLng=next.lng;
-  }
-  t.rota = ordered;
-  saveDb(); renderRoute();
-  toast('Rota otimizada por proximidade');
-}
-function abrirNoGoogleMaps(){
-  const t = currentTripObj();
-  if(!t || !t.rota || t.rota.length===0){ toast('Adicione pontos à rota primeiro'); return; }
-  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
-  let coords = pts.map(p=>`${p.lat},${p.lng}`);
-  let origin = t.origemLat!=null ? `${t.origemLat},${t.origemLng}` : coords[0];
-  let stops = t.origemLat!=null ? coords : coords.slice(1);
-  let destination;
-  if(t.retorno){
-    destination = origin;
-  } else {
-    destination = stops.length ? stops[stops.length-1] : origin;
-    stops = stops.slice(0,-1);
-  }
-  const waypoints = stops.slice(0,9).join('|');
-  let url = `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin}&destination=${destination}`;
-  if(waypoints) url += `&waypoints=${encodeURIComponent(waypoints)}`;
-  window.open(url, '_blank');
-}
-
-/* ======================= CATEGORIAS PERSONALIZADAS ======================= */
-function renderCustomCats(){
-  const wrap=document.getElementById('customCatList');
-  if(db.customCats.length===0){ wrap.innerHTML='<p>Nenhuma categoria personalizada ainda.</p>'; return; }
-  wrap.innerHTML='';
-  db.customCats.forEach(c=>{
-    const div=document.createElement('div');
-    div.className='poi-item';
-    div.innerHTML = `<div class="ic">${c.icone}</div><div class="info"><div class="nome">${escapeHtml(c.nome)}</div></div>`;
-    const rm=document.createElement('button'); rm.className='ghost'; rm.textContent='Remover';
-    rm.onclick=()=>{ db.customCats = db.customCats.filter(x=>x.id!==c.id); saveDb(); renderCustomCats(); };
-    div.appendChild(rm);
-    wrap.appendChild(div);
-  });
-}
-function openNewCategoryModal(){
-  document.getElementById('catNome').value='';
-  document.getElementById('catIconePicked').value='📍';
-  const grid=document.getElementById('iconPickerGrid');
-  grid.innerHTML='';
-  ICON_CHOICES.forEach(ic=>{
-    const d=document.createElement('div');
-    d.className='cat-chip'+(ic==='📍'?' selected':'');
-    d.innerHTML=`<span class="ic">${ic}</span>`;
-    d.onclick=()=>{
-      document.getElementById('catIconePicked').value=ic;
-      Array.from(grid.children).forEach(ch=>ch.classList.remove('selected'));
-      d.classList.add('selected');
-    };
-    grid.appendChild(d);
-  });
-  openModal('modalCat');
-}
-function createCategory(){
-  const nome=document.getElementById('catNome').value.trim();
-  if(!nome){ toast('Dê um nome para a categoria'); return; }
-  const icone=document.getElementById('catIconePicked').value;
-  db.customCats.push({id:'c_'+uid(), nome, icone});
-  saveDb();
-  closeModal('modalCat');
-  renderCustomCats();
-  toast('Categoria criada');
-}
-
-/* ======================= BACKUP E COMPARTILHAMENTO ======================= */
-function downloadJson(obj, filename){
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download=filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-async function shareOrDownload(obj, filename, tituloCompartilhamento){
-  const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-  const file = new File([blob], filename, {type:'application/json'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    try{
-      await navigator.share({files:[file], title: tituloCompartilhamento||'Rastro'});
-      return;
-    }catch(e){
-      if(e.name==='AbortError') return; // usuário cancelou o compartilhamento
-    }
-  }
-  downloadJson(obj, filename);
-  toast('Arquivo baixado — anexe manualmente no WhatsApp/Drive');
-}
-function slug(s){ return (s||'arquivo').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
-
-function exportTrip(tripId){
-  const t = db.trips.find(x=>x.id===tripId);
-  if(!t) return;
-  const pts = db.points.filter(p=>p.tripId===tripId);
-  shareOrDownload({tipo:'viagem', trip:t, points:pts, customCats:db.customCats}, 'viagem-'+slug(t.nome)+'.json', 'Viagem: '+t.nome);
-}
-function exportPoint(pid){
-  const p = db.points.find(x=>x.id===pid);
-  if(!p) return;
-  shareOrDownload({tipo:'ponto', point:p, categoria:catById(p.catId)}, 'ponto-'+slug(p.nome)+'.json', 'Ponto: '+p.nome);
-}
-function exportAllPoints(){
-  if(db.points.length===0){ toast('Nenhum ponto cadastrado ainda'); return; }
-  shareOrDownload({tipo:'pontos', points:db.points, customCats:db.customCats}, 'rastro-todos-os-pontos.json', 'Meus pontos — Rastro');
-}
-function exportRoute(){
-  const t = currentTripObj();
-  if(!t || !t.rota || t.rota.length===0){ toast('Monte a rota primeiro'); return; }
-  const pts = t.rota.map(id=>db.points.find(p=>p.id===id)).filter(Boolean);
-  shareOrDownload({tipo:'rota', viagemNome:t.nome, origemLat:t.origemLat, origemLng:t.origemLng, retorno:t.retorno, points:pts, customCats:db.customCats}, 'rota-'+slug(t.nome)+'.json', 'Rota: '+t.nome);
-}
-function exportAll(){
-  shareOrDownload({tipo:'backup', ...db}, 'rastro-backup-'+new Date().toISOString().slice(0,10)+'.json', 'Backup completo — Rastro');
-}
-function importAll(ev){
-  const file = ev.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e=>{
-    try{
-      const incoming = JSON.parse(e.target.result);
-      const tipo = incoming.tipo || (incoming.trip ? 'viagem' : (incoming.trips ? 'backup' : null));
-      (incoming.customCats||[]).forEach(c=>{ if(!db.customCats.find(x=>x.id===c.id)) db.customCats.push(c); });
-
-      if(tipo==='ponto'){
-        const p = incoming.point;
-        if(p && !db.points.find(x=>x.id===p.id)){ p.tripId=null; db.points.push(p); }
-        toast('Ponto importado no acervo geral');
-      } else if(tipo==='pontos'){
-        (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)){ p.tripId=null; db.points.push(p); } });
-        toast('Pontos importados no acervo geral');
-      } else if(tipo==='rota'){
-        const nome = 'Rota recebida: '+(incoming.viagemNome||'sem nome');
-        const novaViagem = {id:uid(), nome, data:new Date().toISOString().slice(0,10), origemLat:incoming.origemLat||null, origemLng:incoming.origemLng||null, retorno:!!incoming.retorno, rota:[]};
-        (incoming.points||[]).forEach(p=>{
-          if(!db.points.find(x=>x.id===p.id)){ p.tripId=novaViagem.id; db.points.push(p); }
-          novaViagem.rota.push(p.id);
-        });
-        db.trips.push(novaViagem);
-        toast('Rota importada como nova viagem');
-      } else if(tipo==='viagem'){
-        if(!db.trips.find(t=>t.id===incoming.trip.id)) db.trips.push(incoming.trip);
-        (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
-        toast('Viagem importada');
-      } else if(tipo==='backup'){
-        if(confirm('Importar como backup completo? OK = mesclar com os dados atuais, Cancelar = substituir tudo')){
-          (incoming.trips||[]).forEach(t=>{ if(!db.trips.find(x=>x.id===t.id)) db.trips.push(t); });
-          (incoming.points||[]).forEach(p=>{ if(!db.points.find(x=>x.id===p.id)) db.points.push(p); });
-        } else {
-          db = {trips:incoming.trips||[], points:incoming.points||[], customCats:incoming.customCats||[]};
-        }
-        toast('Backup importado');
-      } else {
-        toast('Arquivo não reconhecido');
-        return;
-      }
-      saveDb();
-      showScreen('viagens');
-    }catch(err){
-      toast('Arquivo inválido');
-      console.error(err);
-    }
-  };
-  reader.readAsText(file);
-  ev.target.value='';
-}
-
-/* ======================= UTIL ======================= */
-function escapeHtml(str){
-  return (str||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-/* ======================= INIT ======================= */
-window.addEventListener('load', function(){
-  loadDb();
-  showScreen('viagens');
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log('SW não registrado (ok em file://): ', e); });
-  }
-});
-// ══════════════════════════════════════════════════════════════
-// LEAFLET + MAPA REAL
-// ══════════════════════════════════════════════════════════════
-let _lmap = null;
-let _lmarkers = [];
-let _rotaLayer = null;
-let _tileLayer = null;
-
-const TILES = {
-  rua: {
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attr: '© OpenStreetMap'
-  },
-  satelite: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attr: '© Esri'
-  },
-  relevo: {
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    attr: '© OpenTopoMap'
-  }
-};
-
-const CIDADES_SUL = [
-  {n:"Curitiba",lat:-25.429,lng:-49.271,t:"cap"},
-  {n:"Porto Alegre",lat:-30.034,lng:-51.217,t:"cap"},
-  {n:"Florianópolis",lat:-27.595,lng:-48.548,t:"cap"},
-  {n:"Joinville",lat:-26.304,lng:-48.846,t:"gde"},
-  {n:"Blumenau",lat:-26.919,lng:-49.066,t:"gde"},
-  {n:"Chapecó",lat:-27.101,lng:-52.615,t:"gde"},
-  {n:"Lages",lat:-27.816,lng:-50.326,t:"gde"},
-  {n:"Criciúma",lat:-28.678,lng:-49.370,t:"gde"},
-  {n:"Itajaí",lat:-26.908,lng:-48.662,t:"gde"},
-  {n:"Rio do Sul",lat:-27.214,lng:-49.641,t:"med"},
-  {n:"Caçador",lat:-26.775,lng:-51.016,t:"med"},
-  {n:"Tubarão",lat:-28.467,lng:-49.010,t:"med"},
-  {n:"Brusque",lat:-27.098,lng:-48.918,t:"med"},
-  {n:"Rancho Queimado",lat:-27.675,lng:-49.013,t:"viz"},
-  {n:"Alfredo Wagner",lat:-27.697,lng:-49.337,t:"viz"},
-  {n:"Leoberto Leal",lat:-27.534,lng:-49.063,t:"viz"},
-  {n:"Angelina",lat:-27.567,lng:-49.001,t:"viz"},
-  {n:"São Bonifácio",lat:-27.904,lng:-48.933,t:"viz"},
-  {n:"Santo Amaro da Imperatriz",lat:-27.693,lng:-48.797,t:"viz"},
-  {n:"Anitápolis",lat:-27.907,lng:-49.131,t:"viz"},
-  {n:"Águas Mornas",lat:-27.716,lng:-48.827,t:"viz"},
-  {n:"São Pedro de Alcântara",lat:-27.614,lng:-48.820,t:"viz"},
-  {n:"Antônio Carlos",lat:-27.475,lng:-48.745,t:"viz"},
-  {n:"Paulo Lopes",lat:-27.961,lng:-48.680,t:"viz"},
-  {n:"Garopaba",lat:-28.026,lng:-48.618,t:"viz"},
-];
-
-function initLeaflet(){
-  if(_lmap) return;
-  const el = document.getElementById('leafletMap');
-  if(!el) return;
-  // Carregar Leaflet JS se ainda não carregou
-  if(typeof L === 'undefined'){
-    const s = document.createElement('script');
-    s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.onload = function(){ _initLeafletMap(); };
-    s.onerror = function(){ if(el) el.innerHTML='<div style="padding:20px;text-align:center;color:#64748b;">Mapa requer conexão com internet.</div>'; };
-    document.head.appendChild(s);
-    return;
-  }
-  _initLeafletMap();
-}
-function _initLeafletMap(){
-  const el = document.getElementById('leafletMap');
-  if(!el||_lmap) return;
-  try{
-    _lmap = L.map('leafletMap', {zoomControl:true}).setView([-27.5,-50.5], 7);
-    const t = TILES.rua;
-    _tileLayer = L.tileLayer(t.url, {attribution:t.attr, maxZoom:19}).addTo(_lmap);
-    // Cidades de referência
-    const cor={cap:"#0f172a",gde:"#334155",med:"#64748b",viz:"#15803d"};
-    const raio={cap:7,gde:5,med:4,viz:5};
-    CIDADES_SUL.forEach(c=>{
-      const mk = L.circleMarker([c.lat,c.lng],{
-        radius:raio[c.t]||4, fillColor:cor[c.t]||"#64748b",
-        color:"#fff", weight:1.5, fillOpacity:0.9
-      }).addTo(_lmap).bindPopup(c.n);
-      if(c.t==="cap"||c.t==="viz"||c.t==="gde"){
-        mk.bindTooltip(c.n,{permanent:true,direction:"right",offset:[raio[c.t]+3,0],className:"city-lbl"});
-      }
-    });
-    _lmap.on('click', e=>{
-      const info = document.getElementById('mapTapInfo');
-      if(info){ info.style.display='block'; info.textContent=`Lat: ${e.latlng.lat.toFixed(5)} Lng: ${e.latlng.lng.toFixed(5)}`; }
-    });
-    setTimeout(()=>_lmap.invalidateSize(), 300);
-  }catch(e){ console.log('Leaflet erro:', e); }
-}
-
-function setTile(tipo){
-  ['tileRua','tileSat','tileRelevo'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.classList.remove('active');
-  });
-  const ids={rua:'tileRua',satelite:'tileSat',relevo:'tileRelevo'};
-  const el=document.getElementById(ids[tipo]);if(el)el.classList.add('active');
-  if(!_lmap||!_tileLayer) return;
-  const t=TILES[tipo];if(!t)return;
-  _lmap.removeLayer(_tileLayer);
-  _tileLayer = L.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_lmap);
-}
-
-function renderLeafletPOIs(){
-  if(!_lmap) return;
-  _lmarkers.forEach(m=>_lmap.removeLayer(m));
-  _lmarkers=[];
-  const pts = filterTrip ? db.points.filter(p=>p.tripId===filterTrip) : db.points;
-  pts.forEach(p=>{
-    if(!p.lat||!p.lng) return;
-    const c=catById(p.catId);
-    const icon=L.divIcon({
-      className:"",
-      html:`<div style="font-size:1.5rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">${c.icone}</div>`,
-      iconSize:[28,28],iconAnchor:[14,14]
-    });
-    const mk=L.marker([p.lat,p.lng],{icon}).addTo(_lmap)
-      .bindPopup(`<b>${p.nome||"Sem nome"}</b>${p.descricao?"<br>"+p.descricao.slice(0,80):""}`);
-    _lmarkers.push(mk);
-  });
-  if(_lmarkers.length>0){
-    try{ _lmap.fitBounds(L.featureGroup(_lmarkers).getBounds().pad(0.3)); }catch(e){}
+// ══ TRILHA / VIAGEM ══════════════════════════════════════════
+function renderTrilha(){
+  var ativa=!!viagemAtiva;
+  document.getElementById('trilhaAtiva').style.display=ativa?'block':'none';
+  document.getElementById('semViagemAtiva').style.display=ativa?'none':'block';
+  document.getElementById('pontosAtivoCard').style.display=ativa?'block':'none';
+  document.getElementById('tripBanner').style.display=ativa?'block':'none';
+  if(ativa){
+    document.getElementById('trilhaNomeAtivo').textContent=viagemAtiva.nome;
+    renderPontosAtivos();
   }
 }
-
-function leafletZoom(lat,lng,zoom){
-  setMapMode('mapa');
-  if(_lmap) setTimeout(()=>_lmap.setView([lat,lng],zoom), 200);
-}
-
-// ══════════════════════════════════════════════════════════════
-// ACERVO
-// ══════════════════════════════════════════════════════════════
-function abrirAcervo(){
-  if(!currentTripId){ toast('Nenhuma viagem ativa'); return; }
-  document.getElementById('acervoBusca').value='';
-  renderAcervo();
-  document.getElementById('modalAcervo').style.display='block';
-}
-function fecharAcervo(){
-  document.getElementById('modalAcervo').style.display='none';
-  renderTripDetail();
-}
-function renderAcervo(){
-  const el=document.getElementById('acervoLista');if(!el)return;
-  const q=(document.getElementById('acervoBusca').value||'').toLowerCase();
-  const naViagem=db.points.filter(p=>p.tripId===currentTripId);
-  const disponiveis=db.points.filter(p=>{
-    if(p.tripId===currentTripId)return false;
-    if(q&&!(p.nome||'').toLowerCase().includes(q)&&!(p.descricao||'').toLowerCase().includes(q))return false;
-    return true;
-  });
-  el.innerHTML='';
-  const mkRow=(p,naV)=>{
-    const c=catById(p.catId);
-    const row=document.createElement('div');
-    row.style.cssText=`display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;margin-bottom:5px;${naV?"background:#f0fdf4;":"background:#f8fafc;border:1.5px solid #e2e8f0;"}`;
-    const ico=document.createElement('span');ico.style.fontSize='1.2rem';ico.textContent=c.icone;
-    const info=document.createElement('div');info.style.flex='1';
-    const nm=document.createElement('div');nm.style.cssText='font-size:.85rem;font-weight:600;';nm.textContent=p.nome||'Sem nome';
-    info.appendChild(nm);
-    if(p.descricao){const ds=document.createElement('div');ds.style.cssText='font-size:.72rem;color:#64748b;';ds.textContent=p.descricao.slice(0,50);info.appendChild(ds);}
-    const btn=document.createElement('button');
-    if(naV){
-      btn.textContent='Remover';btn.style.cssText='background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 8px;font-size:.75rem;font-weight:700;cursor:pointer;';
-      btn.onclick=()=>{const pt=db.points.find(x=>x.id===p.id);if(pt){pt.tripId=null;saveDb();renderAcervo();}};
-    }else{
-      btn.textContent='+ Add';btn.style.cssText='background:#1e293b;color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:.78rem;font-weight:700;cursor:pointer;';
-      btn.onclick=()=>{const pt=db.points.find(x=>x.id===p.id);if(pt){pt.tripId=currentTripId;saveDb();renderAcervo();}};
-    }
-    row.appendChild(ico);row.appendChild(info);row.appendChild(btn);el.appendChild(row);
-  };
-  if(naViagem.length){
-    const h=document.createElement('div');h.style.cssText='font-size:.72rem;font-weight:800;color:#16a34a;margin-bottom:6px;';h.textContent=`✅ Já na viagem (${naViagem.length})`;el.appendChild(h);
-    naViagem.forEach(p=>mkRow(p,true));
-    const sep=document.createElement('div');sep.style.cssText='height:1px;background:#e2e8f0;margin:10px 0;';el.appendChild(sep);
+function abrirModalNovaViagem(){iniciarViagem();}
+function iniciarViagem(){
+  var nome='Viagem de '+new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+  var obs='';
+  viagemAtiva={id:uid(),nome:nome,obs:obs,inicio:Date.now(),watchId:null,buffer:[],timerInt:null};
+  // GPS watch
+  if(navigator.geolocation){
+    viagemAtiva.watchId=navigator.geolocation.watchPosition(
+      function(pos){viagemAtiva.buffer.push({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()});},
+      function(){},{enableHighAccuracy:true,maximumAge:5000,timeout:15000}
+    );
   }
-  if(!disponiveis.length){
-    const empty=document.createElement('div');empty.style.cssText='text-align:center;color:#94a3b8;padding:20px;font-size:.85rem;';
-    empty.textContent=q?'Nenhum resultado.':'Nenhum ponto disponível no acervo.';el.appendChild(empty);
-  }else{
-    const h=document.createElement('div');h.style.cssText='font-size:.72rem;font-weight:800;color:#64748b;margin-bottom:6px;';h.textContent=`📦 Acervo (${disponiveis.length})`;el.appendChild(h);
-    disponiveis.forEach(p=>mkRow(p,false));
+  // Timer
+  viagemAtiva.timerInt=setInterval(function(){
+    var el=document.getElementById('trilhaTimer2');if(!el)return;
+    var ms=Date.now()-viagemAtiva.inicio;var s=Math.floor(ms/1000);var m=Math.floor(s/60);var h=Math.floor(m/60);
+    el.textContent=(h?String(h).padStart(2,'0')+':':'')+String(m%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },1000);
+  fecharModal('ovNovaViagem');renderTrilha();
+  toast('Viagem iniciada! Boa jornada 🐾');
+}
+function abrirViagemAtiva(){irTela('trilha',document.querySelector('.nav-btn[data-s="trilha"]'));}
+
+function marcarPonto(){
+  if(!viagemAtiva){toast('Nenhuma viagem ativa');return;}
+  var num=db.pontos.filter(function(p){return p.viagemId===viagemAtiva.id;}).length+1;
+  var btn=document.getElementById('btnMarcarPonto');
+  btn.textContent='⏳ Capturando GPS…';btn.disabled=true;
+  function salvar(lat,lng){
+    var p={id:uid(),nome:'Ponto '+num,cat:'outro',desc:'Marcado durante a viagem — edite depois com calma',foto:null,lat:lat,lng:lng,viagemId:viagemAtiva.id,viagemNome:viagemAtiva.nome,dt:new Date().toISOString()};
+    db.pontos.push(p);salvarDb();
+    renderPontosAtivos();renderMapaPontos();
+    toast('✅ Ponto '+num+' salvo!');
+    btn.textContent='📍 MARCAR PONTO';btn.disabled=false;
   }
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){salvar(pos.coords.latitude,pos.coords.longitude);},
+      function(){salvar(null,null);toast('Ponto salvo sem GPS');},
+      {enableHighAccuracy:true,timeout:8000,maximumAge:0}
+    );
+  } else {salvar(null,null);}
 }
-
-// ══════════════════════════════════════════════════════════════
-// ROTA COM MEIO DE TRANSPORTE
-// ══════════════════════════════════════════════════════════════
-let modoRota='driving';
-
-function selModoRota(el){
-  document.querySelectorAll('#modoGrid .filter-chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  modoRota=el.dataset.modo;
-}
-
-function navegarNoMaps(){
-  const t=currentTripObj();
-  if(!t||!t.rota||!t.rota.length){ toast('Adicione pontos à rota primeiro'); return; }
-  const pts=t.rota.map(id=>db.points.find(p=>p.id===id)).filter(p=>p&&p.lat&&p.lng);
-  if(!pts.length){ toast('Pontos sem coordenadas GPS'); return; }
-  if(pts.length===1){
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${pts[0].lat},${pts[0].lng}&travelmode=${modoRota}`,'_blank');
-    return;
-  }
-  const origem=pts[0],destino=pts[pts.length-1];
-  const intermediarios=pts.slice(1,-1).map(p=>`${p.lat},${p.lng}`).join('|');
-  const url=`https://www.google.com/maps/dir/?api=1&origin=${origem.lat},${origem.lng}&destination=${destino.lat},${destino.lng}${intermediarios?'&waypoints='+encodeURIComponent(intermediarios):''}&travelmode=${modoRota}`;
-  window.open(url,'_blank');
-}
-
-function verRotaNoMapa(){
-  const t=currentTripObj();
-  if(!t||!t.rota||t.rota.length<2){ toast('Adicione pelo menos 2 pontos à rota'); return; }
-  const pts=t.rota.map(id=>db.points.find(p=>p.id===id)).filter(p=>p&&p.lat&&p.lng);
-  if(pts.length<2){ toast('Pontos sem coordenadas GPS'); return; }
-  showScreen('mapa');
-  setMapMode('mapa');
-  setTimeout(()=>{
-    initLeaflet();
-    if(!_lmap) return;
-    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
-    const latlngs=pts.map(p=>[p.lat,p.lng]);
-    _rotaLayer=L.polyline(latlngs,{color:'#3b82f6',weight:4,opacity:.85,dashArray:'8,4'}).addTo(_lmap);
-    const mIcon={driving:'🚗',walking:'🚶',bicycling:'🚲'}[modoRota]||'📍';
-    pts.forEach((p,i)=>{
-      const icon=L.divIcon({
-        className:'',
-        html:`<div style="background:#3b82f6;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.3);">${i===0?mIcon:i+1}</div>`,
-        iconSize:[26,26],iconAnchor:[13,13]
-      });
-      L.marker([p.lat,p.lng],{icon}).addTo(_lmap).bindPopup(`<b>${i+1}. ${p.nome||'Ponto'}</b>`);
-    });
-    try{ _lmap.fitBounds(_rotaLayer.getBounds().pad(0.2)); }catch(e){}
-  }, 300);
-}
-
-function salvarRota(){
-  const nome=document.getElementById('rotaNome').value.trim();
-  if(!nome){ toast('Informe um nome para a rota'); return; }
-  const t=currentTripObj();
-  const pts=t&&t.rota?t.rota.slice():[];
-  if(pts.length<2){ toast('Adicione pelo menos 2 pontos à rota'); return; }
-  if(!db.rotasSalvas) db.rotasSalvas=[];
-  db.rotasSalvas.push({id:uid(),nome,modo:modoRota,pontos:pts,data:new Date().toISOString().slice(0,10)});
-  saveDb();
-  document.getElementById('rotaNome').value='';
-  renderRotasSalvas();
-  toast('Rota salva: '+nome);
-}
-
-function renderRotasSalvas(){
-  const el=document.getElementById('rotasSalvas');if(!el)return;
-  const lista=db.rotasSalvas||[];
-  if(!lista.length){el.innerHTML='';return;}
-  const mIcon={driving:'🚗',walking:'🚶',bicycling:'🚲'};
-  let h='<div style="font-size:.78rem;font-weight:800;color:#334155;margin-bottom:8px;margin-top:4px;">📁 Rotas salvas</div>';
-  lista.forEach((r,i)=>{
-    h+=`<div style="background:#f1f5f9;border-radius:9px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:1.1rem;">${mIcon[r.modo]||'🗺️'}</span>
-      <div style="flex:1;"><div style="font-size:.85rem;font-weight:700;">${escapeHtml(r.nome)}</div>
-      <div style="font-size:.7rem;color:#64748b;">${r.pontos?r.pontos.length:0} pontos · ${r.data}</div></div>
-      <button data-i="${i}" onclick="carregarRota(parseInt(this.dataset.i))" style="background:#1e293b;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:.75rem;font-weight:700;cursor:pointer;">Carregar</button>
-      <button data-i="${i}" onclick="excluirRota(parseInt(this.dataset.i))" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;padding:4px 6px;font-size:.75rem;cursor:pointer;margin-left:3px;">✕</button>
-    </div>`;
-  });
-  el.innerHTML=h;
-}
-
-function carregarRota(i){
-  const r=(db.rotasSalvas||[])[i];if(!r)return;
-  const t=currentTripObj();if(!t){toast('Abra uma viagem primeiro');return;}
-  t.rota=r.pontos.slice();
-  modoRota=r.modo||'driving';
-  document.querySelectorAll('#modoGrid .filter-chip').forEach(c=>c.classList.toggle('active',c.dataset.modo===modoRota));
-  saveDb();
-  renderRoute();
-  toast('Rota carregada: '+r.nome);
-}
-
-function excluirRota(i){
-  if(!confirm('Excluir esta rota?'))return;
-  (db.rotasSalvas||[]).splice(i,1);
-  saveDb();renderRotasSalvas();
-}
-
-function usarGpsNoPoi(){
-  toast('Obtendo GPS...');
-  getGps().then(pos=>{
-    document.getElementById('poiLatInput').value = pos.lat.toFixed(6);
-    document.getElementById('poiLngInput').value = pos.lng.toFixed(6);
-    document.getElementById('poiCoordsLabel').textContent = 'GPS: '+pos.lat.toFixed(5)+', '+pos.lng.toFixed(5);
-    toast('Posição capturada ✅');
-  }).catch(()=>toast('Não foi possível obter o GPS'));
-}
-
-function colarCoordsMaps(){
-  const txt = prompt('Cole as coordenadas do Google Maps\nEx: -27.697, -49.337 ou -27.697,-49.337');
-  if(!txt) return;
-  const m = txt.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
-  if(!m){ toast('Formato inválido. Use: -27.697, -49.337'); return; }
-  document.getElementById('poiLatInput').value = parseFloat(m[1]).toFixed(6);
-  document.getElementById('poiLngInput').value = parseFloat(m[2]).toFixed(6);
-  document.getElementById('poiCoordsLabel').textContent = 'Coords: '+m[1]+', '+m[2];
-  toast('Coordenadas inseridas ✅');
-}
-
-// Botão pra adicionar ponto sem GPS (só lat/lng ou vazio)
-function adicionarPontoManual(){
-  const p = {
-    id:uid(), nome:'Ponto sem nome', catId:'outro',
-    lat:null, lng:null, tripId:currentTripId,
-    descricao:'', foto:null, detalhado:false, criadoEm:Date.now()
-  };
-  db.points.push(p); saveDb();
-  openPoiModal(p.id);
-}
-
-// ══════════════════════════════════════════════════════════════
-// TRILHA — TELA DEDICADA
-// ══════════════════════════════════════════════════════════════
-let _trilhaTimer = null;
-let _trilhaStart = null;
-let _trilhaPontosSession = [];
-
-function renderTrilhaScreen(){
-  renderTrilhaPontos();
-  renderTrilhasSalvas();
-  const ativa = trilhaWatchId != null;
-  const btnS = document.getElementById('btnTrilhaStart');
-  const btnP = document.getElementById('btnTrilhaStop');
-  const addDiv = document.getElementById('trilhaAddPonto');
-  const ind = document.getElementById('trilhaIndicator');
-  const timer = document.getElementById('trilhaTimer');
-  if(btnS) btnS.style.display = ativa ? 'none' : 'block';
-  if(btnP) btnP.style.display = ativa ? 'block' : 'none';
-  if(addDiv) addDiv.style.display = ativa ? 'block' : 'none';
-  if(ind) ind.style.background = ativa ? '#16a34a' : '#86efac';
-  if(timer) timer.style.display = ativa ? 'block' : 'none';
-  if(ativa && !_trilhaStart){ _trilhaStart = Date.now(); }
-}
-
-function renderTrilhaPontos(){
-  const el = document.getElementById('trilhaPontosList'); if(!el) return;
-  if(!_trilhaPontosSession.length && trilhaWatchId == null){
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:#94a3b8;"><span style="font-size:2rem;">🐾</span><p>Inicie uma trilha para gravar seu percurso.</p></div>';
-    return;
-  }
-  if(!_trilhaPontosSession.length){
-    el.innerHTML = '<div style="text-align:center;padding:12px;color:#64748b;font-size:.82rem;">Nenhum ponto marcado ainda — toque em "Marcar posição atual" durante a trilha.</div>';
-    return;
-  }
-  el.innerHTML='';
-  const h = document.createElement('div');
-  h.style.cssText='font-size:.78rem;font-weight:800;color:#334155;margin-bottom:8px;';
-  h.textContent='📍 Pontos desta trilha ('+_trilhaPontosSession.length+') — toque em ✏️ para editar';
-  el.appendChild(h);
-  _trilhaPontosSession.forEach(function(p,i){
-    const row=document.createElement('div');
-    row.style.cssText='background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;';
-    const num=document.createElement('div');
-    num.style.cssText='background:#3b82f6;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;';
-    num.textContent=i+1;
-    const info=document.createElement('div');
-    info.style.flex='1';
-    info.innerHTML='<div style="font-size:.85rem;font-weight:700;">'+(p.nome||'Ponto '+(i+1))+'</div>'
-      +'<div style="font-size:.7rem;color:#64748b;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>';
-    const btn=document.createElement('button');
-    btn.textContent='✏️';
-    btn.style.cssText='background:none;border:1.5px solid #e2e8f0;border-radius:7px;padding:5px 8px;font-size:.9rem;cursor:pointer;';
-    btn.title='Editar depois';
-    btn.onclick=(function(id){ return function(){ openPoiModal(id); }; })(p.id);
+function renderPontosAtivos(){
+  var pts=db.pontos.filter(function(p){return p.viagemId===viagemAtiva.id;});
+  document.getElementById('trilhaPontosCount').textContent=pts.length+' ponto'+(pts.length!==1?'s':'')+' marcado'+(pts.length!==1?'s':'');
+  var el=document.getElementById('pontosAtivoList');el.innerHTML='';
+  pts.forEach(function(p,i){
+    var c=catById(p.cat);
+    var row=document.createElement('div');row.className='ponto-row';
+    var num=document.createElement('div');num.className='ponto-num';num.textContent=i+1;
+    var info=document.createElement('div');info.className='ponto-info';
+    info.innerHTML='<div class="nome">'+c.ic+' '+escH(p.nome)+'</div><div class="coords">'+(p.lat?p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS')+'</div>';
+    var btn=document.createElement('button');btn.className='edit-btn';btn.textContent='✏️';
+    btn.addEventListener('click',(function(id){return function(){abrirEditarPonto(id);};})(p.id));
     row.appendChild(num);row.appendChild(info);row.appendChild(btn);
     el.appendChild(row);
   });
+  if(pts.length) document.getElementById('pontosAtivoCard').style.display='block';
 }
 
-function renderTrilhasSalvas(){
-  const el = document.getElementById('trilhasSalvasList'); if(!el) return;
-  el.innerHTML = '';
-  const t = currentTripObj();
-  const trilhasViagem = t && t.trilhas ? t.trilhas : [];
-  const trilhasLivres = db.trilhasLivres || [];
-  const todas = trilhasViagem.map(function(tr){ return {tr:tr,tipo:'viagem'}; })
-    .concat(trilhasLivres.map(function(tr){ return {tr:tr,tipo:'livre'}; }));
-  if(!todas.length){
-    el.innerHTML = '<div style="font-size:.78rem;color:#94a3b8;">Nenhuma trilha salva ainda.</div>';
-    return;
-  }
-  todas.forEach(function(item,i){
-    const tr=item.tr, tipo=item.tipo;
-    const nGps = tr.pontos ? tr.pontos.length : 0;
-    const nPts = tr.pontosIds ? tr.pontosIds.length : 0;
-    const data = tr.criadoEm ? new Date(tr.criadoEm).toLocaleDateString('pt-BR') : '';
-    const nome = tr.nome || ('Trilha '+(i+1));
-    // Card principal
-    const card=document.createElement('div');
-    card.style.cssText='background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:12px;margin-bottom:10px;';
-    // Header
-    const hdr=document.createElement('div');
-    hdr.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
-    hdr.innerHTML='<span style="font-size:1.2rem;">🐾</span>'
-      +'<div style="flex:1;"><div style="font-size:.88rem;font-weight:800;">'+escapeHtml(nome)
-      +(tipo==='livre'?' <span style="font-size:.68rem;background:#ede9fe;color:#7c3aed;padding:2px 6px;border-radius:10px;">Livre</span>':'')+'</div>'
-      +'<div style="font-size:.7rem;color:#64748b;">'+nGps+' pts GPS'+(nPts?' · '+nPts+' ponto'+(nPts>1?'s':'')+' marcado'+(nPts>1?'s':''):'')+'  · '+data+'</div></div>';
-    card.appendChild(hdr);
-    // Pontos marcados
-    if(tr.pontosIds && tr.pontosIds.length){
-      const ptsDiv=document.createElement('div');
-      ptsDiv.style.cssText='margin-bottom:8px;';
-      tr.pontosIds.forEach(function(pid){
-        const pt=db.points.find(function(x){return x.id===pid;});
-        if(!pt) return;
-        const prow=document.createElement('div');
-        prow.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 7px;background:#fff;border-radius:7px;margin-bottom:4px;border:1px solid #e2e8f0;';
-        prow.innerHTML='<span style="font-size:.9rem;">📍</span>'
-          +'<div style="flex:1;font-size:.78rem;font-weight:600;">'+(pt.nome||'Sem nome')+'</div>';
-        const editBtn=document.createElement('button');
-        editBtn.textContent='✏️';
-        editBtn.style.cssText='background:none;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;cursor:pointer;font-size:.8rem;';
-        editBtn.onclick=(function(id){return function(){openPoiModal(id);};})(pt.id);
-        prow.appendChild(editBtn);
-        ptsDiv.appendChild(prow);
-      });
-      card.appendChild(ptsDiv);
+function encerrarViagem(){
+  if(!viagemAtiva)return;
+  var pts=db.pontos.filter(function(p){return p.viagemId===viagemAtiva.id;});
+  var dur=Date.now()-viagemAtiva.inicio;
+  document.getElementById('encNome').value=viagemAtiva.nome;
+  document.getElementById('encObs').value=viagemAtiva.obs||'';
+  document.getElementById('encResumo').innerHTML='⏱ '+fmtDur(dur)+' &nbsp;·&nbsp; 📍 '+pts.length+' ponto'+(pts.length!==1?'s':'')+' &nbsp;·&nbsp; 🐾 '+viagemAtiva.buffer.length+' pts GPS';
+  abrirModal('ovEncerrar');
+}
+function salvarViagem(){
+  if(!viagemAtiva)return;
+  var nome=document.getElementById('encNome').value.trim()||viagemAtiva.nome;
+  var obs=document.getElementById('encObs').value.trim();
+  // Parar GPS e timer
+  if(viagemAtiva.watchId!=null)navigator.geolocation.clearWatch(viagemAtiva.watchId);
+  if(viagemAtiva.timerInt)clearInterval(viagemAtiva.timerInt);
+  // Atualizar nome nos pontos
+  db.pontos.forEach(function(p){if(p.viagemId===viagemAtiva.id){p.viagemNome=nome;}});
+  // Salvar viagem no diário
+  var v={id:viagemAtiva.id,nome:nome,obs:obs,inicio:viagemAtiva.inicio,fim:Date.now(),trilha:viagemAtiva.buffer.slice()};
+  db.viagens.push(v);
+  salvarDb();
+  viagemAtiva=null;
+  fecharModal('ovEncerrar');
+  renderTrilha();renderDiario();renderMapaTrilha();
+  document.getElementById('tripBanner').style.display='none';
+  toast('Viagem "'+nome+'" salva no diário ✅');
+}
+
+// ══ MAPA ═════════════════════════════════════════════════════
+var _map=null,_tileL=null,_mkrs=[],_trilhaL=null;
+var TILES={
+  rua:{u:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',a:'© OpenStreetMap'},
+  satelite:{u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',a:'© Esri'},
+  relevo:{u:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',a:'© OpenTopoMap'}
+};
+var CIDADES=[
+  {n:'Florianópolis',lat:-27.595,lng:-48.548},{n:'Curitiba',lat:-25.429,lng:-49.271},
+  {n:'Porto Alegre',lat:-30.034,lng:-51.217},{n:'Blumenau',lat:-26.919,lng:-49.066},
+  {n:'Joinville',lat:-26.304,lng:-48.846},{n:'Lages',lat:-27.816,lng:-50.326},
+  {n:'Rancho Queimado',lat:-27.675,lng:-49.013},{n:'Alfredo Wagner',lat:-27.697,lng:-49.337},
+  {n:'São Bonifácio',lat:-27.904,lng:-48.933},{n:'Anitápolis',lat:-27.907,lng:-49.131},
+  {n:'Águas Mornas',lat:-27.716,lng:-48.827},{n:'Antônio Carlos',lat:-27.475,lng:-48.745},
+];
+function initMapa(){
+  if(_map)return;
+  var el=document.getElementById('mapaLeaflet');if(!el)return;
+  if(typeof L==='undefined'){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);">Mapa requer internet.</div>';return;}
+  _map=L.map(el,{zoomControl:true}).setView([-27.5,-50.0],8);
+  _tileL=L.tileLayer(TILES.rua.u,{attribution:TILES.rua.a,maxZoom:19}).addTo(_map);
+  CIDADES.forEach(function(c){
+    L.circleMarker([c.lat,c.lng],{radius:4,fillColor:'#1C1B19',color:'#fff',weight:1.5,fillOpacity:.9}).addTo(_map)
+      .bindTooltip(c.n,{permanent:true,direction:'right',offset:[6,0],className:'lbl-city'});
+  });
+}
+function setTile(tipo){
+  ['rua','satelite','relevo'].forEach(function(t){
+    var el=document.getElementById('tc-'+t);if(el)el.classList.toggle('on',t===tipo);
+  });
+  if(!_map||!_tileL)return;
+  _map.removeLayer(_tileL);
+  var t=TILES[tipo];_tileL=L.tileLayer(t.u,{attribution:t.a,maxZoom:tipo==='relevo'?17:19}).addTo(_map);
+}
+function renderMapaPontos(){
+  if(!_map)return;
+  _mkrs.forEach(function(m){_map.removeLayer(m);});_mkrs=[];
+  db.pontos.forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var c=catById(p.cat);
+    var icon=L.divIcon({className:'',html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));">'+c.ic+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    var mk=L.marker([p.lat,p.lng],{icon:icon}).addTo(_map).bindPopup('<b>'+escH(p.nome)+'</b>'+(p.desc?'<br><span style="font-size:.8rem;">'+escH(p.desc.slice(0,60))+'</span>':''));
+    mk.on('click',function(){mk.openPopup();});
+    _mkrs.push(mk);
+  });
+}
+function renderMapaTrilha(){
+  if(!_map)return;
+  if(_trilhaL){_map.removeLayer(_trilhaL);_trilhaL=null;}
+  // Desenhar todas as trilhas salvas
+  var linhas=[];
+  db.viagens.forEach(function(v){
+    if(v.trilha&&v.trilha.length>=2){
+      var ll=v.trilha.map(function(p){return[p.lat,p.lng];});
+      linhas.push(ll);
     }
-    // Botões
-    const btns=document.createElement('div');
-    btns.style.cssText='display:flex;gap:6px;';
-    const btnMapa=document.createElement('button');
-    btnMapa.textContent='🗺️ Ver no mapa';
-    btnMapa.style.cssText='flex:1;background:#1e293b;color:#fff;border:none;border-radius:8px;padding:8px;font-size:.78rem;font-weight:700;cursor:pointer;';
-    btnMapa.onclick=(function(idx,tp){return function(){verTrilhaNoMapaIdx(idx,tp);};})(i,tipo);
-    const btnShare=document.createElement('button');
-    btnShare.textContent='📤 Compartilhar';
-    btnShare.style.cssText='flex:1;background:#f1f5f9;color:#334155;border:none;border-radius:8px;padding:8px;font-size:.78rem;font-weight:700;cursor:pointer;';
-    btnShare.onclick=(function(idx,tp){return function(){compartilharTrilha(idx,tp);};})(i,tipo);
-    btns.appendChild(btnMapa);btns.appendChild(btnShare);
-    card.appendChild(btns);
+  });
+  // Trilha ativa
+  if(viagemAtiva&&viagemAtiva.buffer.length>=2){
+    var ll2=viagemAtiva.buffer.map(function(p){return[p.lat,p.lng];});
+    linhas.push(ll2);
+  }
+  if(!linhas.length)return;
+  var group=L.featureGroup();
+  linhas.forEach(function(ll){L.polyline(ll,{color:'#2D6A4F',weight:4,opacity:.8}).addTo(group);});
+  group.addTo(_map);_trilhaL=group;
+}
+function mapaFitAll(){
+  if(!_map)return;
+  var pts=db.pontos.filter(function(p){return p.lat&&p.lng;});
+  if(!pts.length){toast('Nenhum ponto com GPS');return;}
+  var bounds=L.latLngBounds(pts.map(function(p){return[p.lat,p.lng];}));
+  _map.fitBounds(bounds.pad(0.2));
+}
+function mapaZoom(lat,lng,z){
+  initMapa();setTimeout(function(){if(_map)_map.setView([lat,lng],z);},150);
+  irTela('mapa',document.querySelector('.nav-btn[data-s="mapa"]'));
+}
+function centralizarGps(){
+  if(!navigator.geolocation){toast('GPS indisponível');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    if(_map)_map.setView([pos.coords.latitude,pos.coords.longitude],14);
+    toast('📡 Posição atualizada');
+  },function(){toast('Não foi possível obter GPS');},{enableHighAccuracy:true,timeout:8000});
+}
+
+// ══ ROTA ═════════════════════════════════════════════════════
+function renderRota(){
+  // Ordem
+  var el=document.getElementById('rotaOrdem');el.innerHTML='';
+  if(!rotaPontos.length){el.innerHTML='<div style="font-size:.82rem;color:var(--t3);padding:6px 0;">Nenhum ponto na rota. Adicione abaixo.</div>';}
+  else{
+    rotaPontos.forEach(function(pid,i){
+      var p=db.pontos.find(function(x){return x.id===pid;});if(!p)return;
+      var c=catById(p.cat);
+      var row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bdr);';
+      row.innerHTML='<div style="width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;flex-shrink:0;">'+(i+1)+'</div>'
+        +'<span>'+c.ic+'</span><div style="flex:1;font-size:.85rem;font-weight:600;">'+escH(p.nome)+'</div>';
+      var rm=document.createElement('button');rm.className='edit-btn';rm.style.fontSize='.8rem';rm.textContent='✕';
+      rm.addEventListener('click',(function(id){return function(){rotaPontos=rotaPontos.filter(function(x){return x!==id;});renderRota();};})(pid));
+      row.appendChild(rm);el.appendChild(row);
+    });
+  }
+  // Acervo
+  var ac=document.getElementById('rotaAcervo');ac.innerHTML='';
+  var disponiveis=db.pontos.filter(function(p){return p.lat&&p.lng&&!rotaPontos.includes(p.id);});
+  if(!disponiveis.length){ac.innerHTML='<div style="padding:10px;font-size:.78rem;color:var(--t3);">Nenhum ponto disponível com GPS.</div>';return;}
+  disponiveis.forEach(function(p){
+    var c=catById(p.cat);
+    var row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bdr);cursor:pointer;';
+    row.innerHTML='<span>'+c.ic+'</span><div style="flex:1;font-size:.85rem;">'+escH(p.nome)+'</div><div style="font-size:.72rem;color:var(--t3);">'+p.lat.toFixed(3)+', '+p.lng.toFixed(3)+'</div>';
+    row.addEventListener('click',(function(id){return function(){rotaPontos.push(id);renderRota();};})(p.id));
+    ac.appendChild(row);
+  });
+}
+function selModo(btn){
+  document.querySelectorAll('#scr-rota [data-modo]').forEach(function(b){b.className='btn btn-ghost btn-sm';});
+  btn.className='btn btn-pri btn-sm';modoRota=btn.dataset.modo;
+}
+function navegarMaps(){
+  if(!rotaPontos.length){toast('Adicione pontos à rota');return;}
+  var pts=rotaPontos.map(function(id){return db.pontos.find(function(p){return p.id===id;});}).filter(function(p){return p&&p.lat&&p.lng;});
+  if(!pts.length){toast('Pontos sem GPS');return;}
+  if(pts.length===1){window.open('https://www.google.com/maps/dir/?api=1&destination='+pts[0].lat+','+pts[0].lng+'&travelmode='+modoRota,'_blank');return;}
+  var o=pts[0],d=pts[pts.length-1];
+  var mid=pts.slice(1,-1).map(function(p){return p.lat+','+p.lng;}).join('|');
+  window.open('https://www.google.com/maps/dir/?api=1&origin='+o.lat+','+o.lng+'&destination='+d.lat+','+d.lng+(mid?'&waypoints='+encodeURIComponent(mid):'')+('&travelmode='+modoRota),'_blank');
+}
+function verRotaMapa(){
+  if(rotaPontos.length<2){toast('Adicione pelo menos 2 pontos');return;}
+  var pts=rotaPontos.map(function(id){return db.pontos.find(function(p){return p.id===id;});}).filter(function(p){return p&&p.lat&&p.lng;});
+  if(pts.length<2){toast('Pontos sem GPS suficientes');return;}
+  irTela('mapa',document.querySelector('.nav-btn[data-s="mapa"]'));
+  setTimeout(function(){
+    initMapa();if(!_map)return;
+    var ll=pts.map(function(p){return[p.lat,p.lng];});
+    var rLayer=L.polyline(ll,{color:'#2563EB',weight:4,opacity:.9,dashArray:'8,4'}).addTo(_map);
+    pts.forEach(function(p,i){
+      var icon=L.divIcon({className:'',html:'<div style="background:#2563EB;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid #fff;">'+(i+1)+'</div>',iconSize:[24,24],iconAnchor:[12,12]});
+      L.marker([p.lat,p.lng],{icon:icon}).addTo(_map).bindPopup('<b>'+(i+1)+'. '+escH(p.nome)+'</b>');
+    });
+    try{_map.fitBounds(rLayer.getBounds().pad(0.2));}catch(e){}
+  },300);
+}
+
+// ══ DIÁRIO ═══════════════════════════════════════════════════
+function renderDiario(){
+  var lista=db.viagens.slice().reverse();
+  document.getElementById('diarioEmpty').style.display=lista.length?'none':'flex';
+  var el=document.getElementById('diarioList');el.innerHTML='';
+  lista.forEach(function(v){
+    var pts=db.pontos.filter(function(p){return p.viagemId===v.id;});
+    var dur=v.fim?fmtDur(v.fim-v.inicio):'';
+    var card=document.createElement('div');card.className='viagem-card';
+    var head=document.createElement('div');head.className='vc-head';
+    head.innerHTML='<div style="font-size:1.3rem;">🐾</div><div><div class="vc-nome">'+escH(v.nome)+'</div><div class="vc-meta">'+fmtData(v.inicio)+(dur?' · ⏱ '+dur:'')+'</div>'+(v.obs?'<div style="font-size:.78rem;color:var(--t2);margin-top:3px;">'+escH(v.obs.slice(0,60))+'</div>':'')+'</div>';
+    var foot=document.createElement('div');foot.className='vc-foot';
+    foot.innerHTML='<span class="bdg bdg-g">📍 '+pts.length+' ponto'+(pts.length!==1?'s':'')+'</span>'+(v.trilha&&v.trilha.length?'<span class="bdg bdg-b">🐾 '+v.trilha.length+' pts GPS</span>':'');
+    card.appendChild(head);card.appendChild(foot);
+    card.addEventListener('click',(function(vid){return function(){abrirDetViagem(vid);};})(v.id));
     el.appendChild(card);
   });
 }
-
-function verTrilhaNoMapaIdx(i,tipo){
-  const todas = (currentTripObj()&&currentTripObj().trilhas ? currentTripObj().trilhas.map(function(tr){return{tr,tipo:'viagem'};}) : [])
-    .concat((db.trilhasLivres||[]).map(function(tr){return{tr,tipo:'livre'};}));
-  if(!todas[i]) return;
-  const trilha=todas[i].tr;
-  showScreen('mapa'); setMapMode('mapa');
+function abrirDetViagem(id){
+  editandoViagemId=id;
+  var v=db.viagens.find(function(x){return x.id===id;});if(!v)return;
+  document.getElementById('vNome').value=v.nome;
+  document.getElementById('vObs').value=v.obs||'';
+  var pts=db.pontos.filter(function(p){return p.viagemId===id;});
+  var dur=v.fim?fmtDur(v.fim-v.inicio):'';
+  document.getElementById('vResumo').innerHTML='📅 '+fmtData(v.inicio)+(dur?' &nbsp;·&nbsp; ⏱ '+dur:'')+'<br>📍 '+pts.length+' pontos &nbsp;·&nbsp; 🐾 '+(v.trilha?v.trilha.length:0)+' pts GPS';
+  document.getElementById('vPontosTit').textContent='Pontos desta viagem ('+pts.length+')';
+  var el=document.getElementById('vPontosList');el.innerHTML='';
+  if(!pts.length){el.innerHTML='<div style="padding:12px;font-size:.82rem;color:var(--t3);">Nenhum ponto marcado.</div>';}
+  else{
+    pts.forEach(function(p){
+      var c=catById(p.cat);
+      var row=document.createElement('div');row.className='ponto-row';
+      row.innerHTML='<span style="font-size:1.1rem;">'+c.ic+'</span><div class="ponto-info"><div class="nome">'+escH(p.nome)+'</div><div class="coords">'+(p.lat?p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS')+'</div></div>';
+      var btn=document.createElement('button');btn.className='edit-btn';btn.textContent='✏️';
+      btn.addEventListener('click',(function(pid){return function(){fecharModal('ovViagem');abrirEditarPonto(pid);};})(p.id));
+      row.appendChild(btn);el.appendChild(row);
+    });
+  }
+  abrirModal('ovViagem');
+}
+function salvarEdicaoViagem(){
+  var v=db.viagens.find(function(x){return x.id===editandoViagemId;});if(!v)return;
+  var novoNome=document.getElementById('vNome').value.trim()||v.nome;
+  v.nome=novoNome;v.obs=document.getElementById('vObs').value.trim();
+  // Atualizar nome nos pontos
+  db.pontos.forEach(function(p){if(p.viagemId===v.id)p.viagemNome=novoNome;});
+  salvarDb();fecharModal('ovViagem');renderDiario();toast('Viagem atualizada ✅');
+}
+function verViagemMapa(){
+  var v=db.viagens.find(function(x){return x.id===editandoViagemId;});if(!v)return;
+  fecharModal('ovViagem');
+  irTela('mapa',document.querySelector('.nav-btn[data-s="mapa"]'));
   setTimeout(function(){
-    initLeaflet(); if(!_lmap) return;
-    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
-    const latlngs=trilha.pontos.map(function(p){return[p.lat,p.lng];});
-    _rotaLayer=L.polyline(latlngs,{color:'#16a34a',weight:4,opacity:.85}).addTo(_lmap);
-    try{_lmap.fitBounds(_rotaLayer.getBounds().pad(0.2));}catch(e){}
-    toast('Trilha exibida no mapa');
-  }, 300);
-}
-
-function marcarPontoNaTrilha(){
-  // Ponto sem viagem fica no acervo geral (tripId=null)
-  const num = _trilhaPontosSession.length + 1;
-  const nome = 'Ponto ' + num;
-  // Feedback visual imediato
-  const btn = document.querySelector('#trilhaAddPonto button');
-  if(btn){ btn.textContent = '⏳ Capturando GPS…'; btn.disabled = true; }
-  getGps().then(function(pos){
-    const p = {
-      id:uid(), nome:nome, catId:'outro',
-      lat:pos.lat, lng:pos.lng, tripId:currentTripId,
-      descricao:'Marcado durante trilha — editar depois',
-      foto:null, detalhado:false, criadoEm:Date.now()
-    };
-    db.points.push(p);
-    saveDb();
-    _trilhaPontosSession.push({id:p.id, nome:nome, lat:pos.lat, lng:pos.lng});
-    renderTrilhaPontos();
-    // Atualizar mapa se estiver aberto
-    if(_lmap) renderLeafletPOIs();
-    renderMap();
-    toast('✅ '+nome+' salvo!');
-    if(btn){ btn.textContent = '📍 MARCAR PONTO'; btn.disabled = false; }
-  }).catch(function(){
-    toast('Não foi possível obter o GPS');
-    if(btn){ btn.textContent = '📍 MARCAR PONTO'; btn.disabled = false; }
-  });
-}
-
-function verTrilhaNoMapa(i){
-  const t = currentTripObj();
-  if(!t||!t.trilhas||!t.trilhas[i]) return;
-  const trilha = t.trilhas[i];
-  showScreen('mapa');
-  setMapMode('mapa');
-  setTimeout(function(){
-    initLeaflet();
-    if(!_lmap) return;
-    if(_rotaLayer){ _lmap.removeLayer(_rotaLayer); _rotaLayer=null; }
-    const latlngs = trilha.pontos.map(function(p){ return [p.lat, p.lng]; });
-    _rotaLayer = L.polyline(latlngs, {color:'#16a34a', weight:4, opacity:.85}).addTo(_lmap);
-    try{ _lmap.fitBounds(_rotaLayer.getBounds().pad(0.2)); }catch(e){}
-    toast('Trilha '+(i+1)+' exibida no mapa');
-  }, 300);
-}
-
-// Sobrescrever iniciarTrilha para atualizar a tela dedicada
-const _origIniciarTrilha = iniciarTrilha;
-iniciarTrilha = function(){
-  // Trilha pode ser gravada sem viagem — pontos ficam sem tripId
-  _trilhaPontosSession = [];
-  if(currentTripId){
-    _origIniciarTrilha(); // usa a função original que já gerencia trilhaWatchId
-  } else {
-    // Sem viagem: gravar trilha livre
-    if(!navigator.geolocation){ toast('GPS indisponível neste aparelho'); return; }
-    trilhaBuffer = [];
-    document.getElementById('trilhaStatus').textContent = 'Gravando percurso livre…';
-    trilhaWatchId = navigator.geolocation.watchPosition(
-      function(pos){ trilhaBuffer.push({lat:pos.coords.latitude, lng:pos.coords.longitude, ts:Date.now()}); },
-      function(){ },
-      {enableHighAccuracy:true, maximumAge:5000, timeout:10000}
-    );
-  }
-  // Atualizar UI da tela trilha
-  const addDiv = document.getElementById('trilhaAddPonto');
-  const ind = document.getElementById('trilhaIndicator');
-  const btnS = document.getElementById('btnTrilhaStart');
-  const btnP = document.getElementById('btnTrilhaStop');
-  if(addDiv) addDiv.style.display = 'block';
-  if(ind) ind.style.background = '#16a34a';
-  if(btnS) btnS.style.display = 'none';
-  if(btnP) btnP.style.display = 'block';
-  // Timer
-  _trilhaStart = Date.now();
-  _trilhaTimer = setInterval(function(){
-    const el = document.getElementById('trilhaTimer');
-    if(!el) return;
-    const s = Math.floor((Date.now()-_trilhaStart)/1000);
-    const m = Math.floor(s/60);
-    el.style.display = 'block';
-    el.textContent = String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-  }, 1000);
-  renderTrilhaPontos();
-};
-
-var _trilhaBufferTemp = [];
-var _trilhaPontosTemp = [];
-
-const _origPararTrilha = pararTrilha;
-pararTrilha = function(){
-  // Parar GPS watch
-  if(trilhaWatchId!=null){ navigator.geolocation.clearWatch(trilhaWatchId); trilhaWatchId=null; }
-  if(_trilhaTimer){ clearInterval(_trilhaTimer); _trilhaTimer=null; }
-  // Esconder botão parar, mostrar iniciar
-  const addDiv = document.getElementById('trilhaAddPonto');
-  const ind = document.getElementById('trilhaIndicator');
-  const btnS = document.getElementById('btnTrilhaStart');
-  const btnP = document.getElementById('btnTrilhaStop');
-  const timer = document.getElementById('trilhaTimer');
-  if(addDiv) addDiv.style.display = 'none';
-  if(ind) ind.style.background = '#86efac';
-  if(btnS) btnS.style.display = 'block';
-  if(btnP) btnP.style.display = 'none';
-  if(timer) timer.style.display = 'none';
-  // Guardar buffer temporário e abrir modal de nome
-  _trilhaBufferTemp = trilhaBuffer ? trilhaBuffer.slice() : [];
-  _trilhaPontosTemp = _trilhaPontosSession ? _trilhaPontosSession.slice() : [];
-  trilhaBuffer = [];
-  if(_trilhaBufferTemp.length === 0 && _trilhaPontosTemp.length === 0){
-    document.getElementById('trilhaStatus').textContent = 'Trilha muito curta, não foi salva.';
-    _trilhaPontosSession = [];
-    renderTrilhaPontos();
-    return;
-  }
-  // Mostrar modal de nome
-  const info = document.getElementById('trilhaNomePontosInfo');
-  if(info){
-    const nGps = _trilhaBufferTemp.length;
-    const nPts = _trilhaPontosTemp.length;
-    info.textContent = nGps+' pontos GPS gravados'+(nPts?' · '+nPts+' ponto'+(nPts>1?'s':'')+' marcado'+(nPts>1?'s':''):'');
-  }
-  document.getElementById('trilhaNomeInput').value = '';
-  openModal('modalNomeTrilha');
-};
-
-function salvarTrilhaComNome(){
-  const nome = document.getElementById('trilhaNomeInput').value.trim() || ('Trilha '+new Date().toLocaleDateString('pt-BR'));
-  const trilhaId = uid();
-  // Vincular pontos marcados a esta trilha
-  _trilhaPontosTemp.forEach(function(p){
-    const pt = db.points.find(function(x){ return x.id===p.id; });
-    if(pt){ pt.trilhaId = trilhaId; pt.trilhaNome = nome; }
-  });
-  // Salvar trilha
-  const trilhaObj = {
-    id: trilhaId,
-    nome: nome,
-    pontos: _trilhaBufferTemp,
-    pontosIds: _trilhaPontosTemp.map(function(p){ return p.id; }),
-    criadoEm: Date.now()
-  };
-  if(currentTripId){
-    const t = db.trips.find(function(x){ return x.id===currentTripId; });
-    if(t){ if(!t.trilhas) t.trilhas=[]; t.trilhas.push(trilhaObj); }
-  } else {
-    if(!db.trilhasLivres) db.trilhasLivres=[];
-    db.trilhasLivres.push(trilhaObj);
-  }
-  saveDb();
-  // Force re-init db.trilhasLivres reference after save
-  if(!db.trilhasLivres) db.trilhasLivres=[];
-  closeModal('modalNomeTrilha');
-  document.getElementById('trilhaStatus').textContent = 'Trilha "'+nome+'" salva!';
-  _trilhaPontosSession = [];
-  _trilhaPontosTemp = [];
-  _trilhaBufferTemp = [];
-  renderTrilhaPontos();
-  renderTrilhasSalvas();
-  toast('Trilha "'+nome+'" salva ✅');
-  // Force refresh of trilha screen
-  setTimeout(function(){ renderTrilhaScreen(); }, 100);
-}
-
-function descartarTrilha(){
-  closeModal('modalNomeTrilha');
-  _trilhaPontosSession = [];
-  _trilhaPontosTemp = [];
-  _trilhaBufferTemp = [];
-  document.getElementById('trilhaStatus').textContent = 'Trilha descartada.';
-  renderTrilhaPontos();
-}
-
-function compartilharTrilha(i,tipo){
-  const todas = (currentTripObj()&&currentTripObj().trilhas ? currentTripObj().trilhas.map(function(tr){return{tr,tipo:'viagem'};}) : [])
-    .concat((db.trilhasLivres||[]).map(function(tr){return{tr,tipo:'livre'};}));
-  if(!todas[i]) return;
-  const trilha=todas[i].tr;
-  const nome=trilha.nome||'Trilha';
-  // Pegar pontos marcados
-  const pts = trilha.pontosIds ? trilha.pontosIds.map(function(pid){
-    return db.points.find(function(x){return x.id===pid;});
-  }).filter(Boolean) : [];
-  // Pegar pontos GPS (máx 10 waypoints para o Maps)
-  const gps = trilha.pontos || [];
-  let url = '';
-  if(pts.length >= 2){
-    // Usar pontos marcados como waypoints no Maps
-    const coords = pts.map(function(p){return p.lat+','+p.lng;});
-    const origem=coords[0], destino=coords[coords.length-1];
-    const mid=coords.slice(1,-1).join('|');
-    url='https://www.google.com/maps/dir/?api=1&origin='+origem+'&destination='+destino+(mid?'&waypoints='+encodeURIComponent(mid):'');
-  } else if(pts.length===1){
-    url='https://www.google.com/maps/search/?api=1&query='+pts[0].lat+','+pts[0].lng;
-  } else if(gps.length>=2){
-    // Pegar início e fim da trilha GPS
-    const p0=gps[0], pN=gps[gps.length-1];
-    // Pegar até 8 pontos intermediários espaçados
-    const step=Math.max(1,Math.floor(gps.length/8));
-    const mid=[];
-    for(let k=step;k<gps.length-1;k+=step) mid.push(gps[k].lat+','+gps[k].lng);
-    url='https://www.google.com/maps/dir/?api=1&origin='+p0.lat+','+p0.lng+'&destination='+pN.lat+','+pN.lng+(mid.length?'&waypoints='+encodeURIComponent(mid.join('|')):'');
-  } else {
-    toast('Trilha sem pontos suficientes para compartilhar.');
-    return;
-  }
-  // Montar mensagem
-  var linhas = ['🐾 *'+nome+'*',''];
-  if(pts.length){
-    linhas.push('📍 Pontos:');
-    pts.forEach(function(p,j){ linhas.push((j+1)+'. '+(p.nome||'Ponto')+(p.descricao?' — '+p.descricao.slice(0,40):'')); });
-    linhas.push('');
-  }
-  linhas.push('🗺️ Ver no mapa:');
-  linhas.push(url);
-  const msg = linhas.join('\n');
-  // Tentar Web Share API
-  if(navigator.share){
-    navigator.share({title:nome, text:msg, url:url}).catch(function(){});
-  } else {
-    // Fallback: copiar para clipboard e abrir WhatsApp
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(msg).then(function(){
-        toast('Copiado! Cole no WhatsApp.');
-        setTimeout(function(){
-          window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-        },500);
-      });
-    } else {
-      window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+    initMapa();if(!_map)return;
+    var pts=db.pontos.filter(function(p){return p.viagemId===v.id&&p.lat&&p.lng;});
+    var group=L.featureGroup();
+    if(v.trilha&&v.trilha.length>=2){
+      var ll=v.trilha.map(function(p){return[p.lat,p.lng];});
+      L.polyline(ll,{color:'#2D6A4F',weight:4,opacity:.85}).addTo(group);
     }
-  }
+    pts.forEach(function(p){
+      var c=catById(p.cat);
+      var icon=L.divIcon({className:'',html:'<div style="font-size:1.3rem;">'+c.ic+'</div>',iconSize:[26,26],iconAnchor:[13,13]});
+      L.marker([p.lat,p.lng],{icon:icon}).addTo(group).bindPopup('<b>'+escH(p.nome)+'</b>');
+    });
+    if(Object.keys(group._layers).length){group.addTo(_map);try{_map.fitBounds(group.getBounds().pad(0.2));}catch(e){}}
+    else{toast('Nenhum ponto com GPS nesta viagem');}
+  },300);
+}
+function excluirViagem(){
+  if(!confirm('Excluir esta viagem e todos os pontos vinculados?'))return;
+  db.viagens=db.viagens.filter(function(v){return v.id!==editandoViagemId;});
+  db.pontos=db.pontos.filter(function(p){return p.viagemId!==editandoViagemId;});
+  salvarDb();fecharModal('ovViagem');renderDiario();renderPontos();renderMapaPontos();
+  toast('Viagem excluída');
 }
 
-</script>
-<div id="modalAcervo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;overflow-y:auto;padding:16px;">
-  <div style="background:#fff;border-radius:16px;padding:16px;max-width:480px;margin:0 auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <strong>📦 Adicionar do acervo</strong>
-      <button onclick="fecharAcervo()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;">✕</button>
-    </div>
-    <input type="text" id="acervoBusca" placeholder="🔍 Buscar…" oninput="renderAcervo()"
-      style="width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;margin-bottom:10px;box-sizing:border-box;">
-    <div id="acervoLista" style="max-height:55vh;overflow-y:auto;"></div>
-    <button onclick="fecharAcervo()" style="width:100%;margin-top:12px;padding:11px;background:#334155;color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;">Concluir ✓</button>
-  </div>
+// ══ INIT ═════════════════════════════════════════════════════
+carregarDb();
+// DADOS DE TESTE — remover após verificar
+(function(){
+  if(db.viagens.length||db.pontos.length) return; // só injeta se vazio
+  db.viagens=[{id:'abc123',nome:'Passeio Serra Catarinense',obs:'Dia lindo, estrada boa, muito verde',inicio:1753900000000,fim:1753907200000,trilha:[{lat:-27.6750,lng:-49.0130,ts:1753900000000},{lat:-27.6780,lng:-49.0200,ts:1753901000000},{lat:-27.6820,lng:-49.0310,ts:1753902000000},{lat:-27.6890,lng:-49.0450,ts:1753903000000},{lat:-27.6950,lng:-49.0600,ts:1753904000000},{lat:-27.7010,lng:-49.0750,ts:1753905000000},{lat:-27.7080,lng:-49.0900,ts:1753906000000}]}];
+  db.pontos=[
+    {id:'p1',nome:'Trevo de Rancho Queimado',cat:'estrada',desc:'Trevo principal, boa referência para entrar na Serra',foto:null,lat:-27.6750,lng:-49.0130,viagemId:'abc123',viagemNome:'Passeio Serra Catarinense',dt:'2026-07-31T09:00:00Z'},
+    {id:'p2',nome:'Cachoeira do Vale',cat:'agua',desc:'Cachoeira linda, água gelada, acesso fácil pela estrada de terra',foto:null,lat:-27.6820,lng:-49.0310,viagemId:'abc123',viagemNome:'Passeio Serra Catarinense',dt:'2026-07-31T09:30:00Z'},
+    {id:'p3',nome:'Mirante da Serra',cat:'vista',desc:'Vista incrível do vale, dá pra ver Florianópolis em dia claro',foto:null,lat:-27.6950,lng:-49.0600,viagemId:'abc123',viagemNome:'Passeio Serra Catarinense',dt:'2026-07-31T10:15:00Z'},
+    {id:'p4',nome:'Restaurante da Dona Maria',cat:'comida',desc:'Almoço típico, galinhada caipira, preço justo',foto:null,lat:-27.7080,lng:-49.0900,viagemId:'abc123',viagemNome:'Passeio Serra Catarinense',dt:'2026-07-31T12:00:00Z'},
+  ];
+  salvarDb();
+})();
+renderPontos();
+// Banner de viagem ativa (recuperar do localStorage se houver)
+document.getElementById('tripBanner').style.display='none';
 
-<!-- MODAL NOME DA TRILHA -->
-<div id="modalNomeTrilha" class="modal-bg">
-  <div class="modal" style="padding:20px;">
-    <h2 style="margin-bottom:8px;">🐾 Salvar trilha</h2>
-    <p style="font-size:.78rem;color:#64748b;margin-bottom:14px;">Dê um nome para identificar este percurso depois.</p>
-    <input type="text" id="trilhaNomeInput" placeholder="Ex: Estrada do Engenho, Trilha da Serra…"
-      style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:.95rem;box-sizing:border-box;margin-bottom:8px;">
-    <div id="trilhaNomePontosInfo" style="font-size:.75rem;color:#64748b;margin-bottom:14px;"></div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="salvarTrilhaComNome()" style="flex:2;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.92rem;font-weight:800;cursor:pointer;">Salvar ✓</button>
-      <button onclick="descartarTrilha()" style="flex:1;background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:12px;font-size:.88rem;font-weight:700;cursor:pointer;">Descartar</button>
-    </div>
-  </div>
-</div>
+// Fix renderMapaTrilha polyline color
+</script>
 </body>
 </html>
