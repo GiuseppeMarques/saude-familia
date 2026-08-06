@@ -3,246 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
 <title>App do Perito</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTFhMmUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNjIxM2UiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExNSIgZmlsbD0idXJsKCNiZzIpIi8+PGNpcmNsZSBjeD0iMjEwIiBjeT0iMjEwIiByPSIxMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0MwMjcyRCIgc3Ryb2tlLXdpZHRoPSIyOCIvPjxjaXJjbGUgY3g9IjIxMCIgY3k9IjIxMCIgcj0iODIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4wOCIvPjxwYXRoIGQ9Ik0yMTAgMTU1IFEyMjUgMTc1IDIxNSAxOTUgUTIzNSAxNzUgMjMwIDE1NSBRMjUwIDE4NSAyNDAgMjE1IFEyNTUgMjAwIDI1MCAxNzUgUTI3NSAyMTAgMjYwIDI0MCBRMjQ4IDI2NSAyMTAgMjcwIFExNzIgMjY1IDE2MCAyNDAgUTE0NSAyMTAgMTcwIDE3NSBRMTY1IDIwMCAxODAgMjE1IFExNzAgMTg1IDE5MCAxNTUgUTE4NSAxNzUgMjA1IDE5NSBRMTk1IDE3NSAyMTAgMTU1WiIgZmlsbD0iI0ZGNkIzNSIvPjxwYXRoIGQ9Ik0yMTAgMTc1IFEyMjAgMTkwIDIxMyAyMDUgUTIyNSAxOTIgMjIyIDE3NSBRMjM4IDIwMCAyMjggMjIyIFEyMjIgMjM4IDIxMCAyNDIgUTE5OCAyMzggMTkyIDIyMiBRMTgyIDIwMCAxOTggMTc1IFExOTUgMTkyIDIwNyAyMDUgUTIwMCAxOTAgMjEwIDE3NVoiIGZpbGw9IiNGRkQ3MDAiLz48cmVjdCB4PSIyOTAiIHk9IjI5MCIgd2lkdGg9IjMyIiBoZWlnaHQ9Ijk1IiByeD0iMTYiIHRyYW5zZm9ybT0icm90YXRlKDQ1IDI5MCAyOTApIiBmaWxsPSIjQzAyNzJEIi8+PHBhdGggZD0iTTMxMCAxMjAgUTM0MCAxMDggMzcwIDEyMCBMMzcwIDE2OCBRMzQwIDE5MCAzMTAgMTY4IFoiIGZpbGw9IiNDMDI3MkQiLz48dGV4dCB4PSIzNDAiIHk9IjE2MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TQzwvdGV4dD48dGV4dCB4PSIyNTYiIHk9IjQzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjQzAyNzJEIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNCI+UEVSSVRPPC90ZXh0Pjwvc3ZnPg==">
-<link rel="apple-touch-icon" id="aic_Perito" href="#">
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlBlcml0byBDQk1TQyIsICJzaG9ydF9uYW1lIjogIlBlcml0byIsICJzdGFydF91cmwiOiAiLi9QZXJpdG8uaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMWExYTJlIiwgInRoZW1lX2NvbG9yIjogIiMxYTFhMmUiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlqNDhaR1ZtY3o0OGJHbHVaV0Z5UjNKaFpHbGxiblFnYVdROUltSm5NaUlnZURFOUlqQWlJSGt4UFNJd0lpQjRNajBpTVNJZ2VUSTlJakVpUGp4emRHOXdJRzltWm5ObGREMGlNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTXhZVEZoTW1VaUx6NDhjM1J2Y0NCdlptWnpaWFE5SWpFd01DVWlJSE4wYjNBdFkyOXNiM0k5SWlNeE5qSXhNMlVpTHo0OEwyeHBibVZoY2tkeVlXUnBaVzUwUGp3dlpHVm1jejQ4Y21WamRDQjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2NuZzlJakV4TlNJZ1ptbHNiRDBpZFhKc0tDTmlaeklwSWk4K1BHTnBjbU5zWlNCamVEMGlNakV3SWlCamVUMGlNakV3SWlCeVBTSXhNVEFpSUdacGJHdzlJbTV2Ym1VaUlITjBjbTlyWlQwaUkwTXdNamN5UkNJZ2MzUnliMnRsTFhkcFpIUm9QU0l5T0NJdlBqeGphWEpqYkdVZ1kzZzlJakl4TUNJZ1kzazlJakl4TUNJZ2NqMGlPRElpSUdacGJHdzlJaU5tWm1ZaUlHOXdZV05wZEhrOUlpNHdPQ0l2UGp4d1lYUm9JR1E5SWsweU1UQWdNVFUxSUZFeU1qVWdNVGMxSURJeE5TQXhPVFVnVVRJek5TQXhOelVnTWpNd0lERTFOU0JSTWpVd0lERTROU0F5TkRBZ01qRTFJRkV5TlRVZ01qQXdJREkxTUNBeE56VWdVVEkzTlNBeU1UQWdNall3SURJME1DQlJNalE0SURJMk5TQXlNVEFnTWpjd0lGRXhOeklnTWpZMUlERTJNQ0F5TkRBZ1VURTBOU0F5TVRBZ01UY3dJREUzTlNCUk1UWTFJREl3TUNBeE9EQWdNakUxSUZFeE56QWdNVGcxSURFNU1DQXhOVFVnVVRFNE5TQXhOelVnTWpBMUlERTVOU0JSTVRrMUlERTNOU0F5TVRBZ01UVTFXaUlnWm1sc2JEMGlJMFpHTmtJek5TSXZQanh3WVhSb0lHUTlJazB5TVRBZ01UYzFJRkV5TWpBZ01Ua3dJREl4TXlBeU1EVWdVVEl5TlNBeE9USWdNakl5SURFM05TQlJNak00SURJd01DQXlNamdnTWpJeUlGRXlNaklnTWpNNElESXhNQ0F5TkRJZ1VURTVPQ0F5TXpnZ01Ua3lJREl5TWlCUk1UZ3lJREl3TUNBeE9UZ2dNVGMxSUZFeE9UVWdNVGt5SURJd055QXlNRFVnVVRJd01DQXhPVEFnTWpFd0lERTNOVm9pSUdacGJHdzlJaU5HUmtRM01EQWlMejQ4Y21WamRDQjRQU0l5T1RBaUlIazlJakk1TUNJZ2QybGtkR2c5SWpNeUlpQm9aV2xuYUhROUlqazFJaUJ5ZUQwaU1UWWlJSFJ5WVc1elptOXliVDBpY205MFlYUmxLRFExSURJNU1DQXlPVEFwSWlCbWFXeHNQU0lqUXpBeU56SkVJaTgrUEhCaGRHZ2daRDBpVFRNeE1DQXhNakFnVVRNME1DQXhNRGdnTXpjd0lERXlNQ0JNTXpjd0lERTJPQ0JSTXpRd0lERTVNQ0F6TVRBZ01UWTRJRm9pSUdacGJHdzlJaU5ETURJM01rUWlMejQ4ZEdWNGRDQjRQU0l6TkRBaUlIazlJakUyTWlJZ1ptOXVkQzFtWVcxcGJIazlJa0Z5YVdGc0lpQm1iMjUwTFhOcGVtVTlJakl3SWlCbWIyNTBMWGRsYVdkb2REMGlPVEF3SWlCbWFXeHNQU0lqWm1abUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJajVUUXp3dmRHVjRkRDQ4ZEdWNGRDQjRQU0l5TlRZaUlIazlJalF6TUNJZ1ptOXVkQzFtWVcxcGJIazlJa0Z5YVdGc0lpQm1iMjUwTFhOcGVtVTlJak00SWlCbWIyNTBMWGRsYVdkb2REMGlPVEF3SWlCbWFXeHNQU0lqUXpBeU56SkVJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsSWlCc1pYUjBaWEl0YzNCaFkybHVaejBpTkNJK1VFVlNTVlJQUEM5MFpYaDBQand2YzNablBnPT0iLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Perito CBMSC">
-<meta name="theme-color" content="#1a1a2e">
-<script>
-(function(){
-  var ic="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnMiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMxYTFhMmUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxNjIxM2UiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExNSIgZmlsbD0idXJsKCNiZzIpIi8+PGNpcmNsZSBjeD0iMjEwIiBjeT0iMjEwIiByPSIxMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0MwMjcyRCIgc3Ryb2tlLXdpZHRoPSIyOCIvPjxjaXJjbGUgY3g9IjIxMCIgY3k9IjIxMCIgcj0iODIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4wOCIvPjxwYXRoIGQ9Ik0yMTAgMTU1IFEyMjUgMTc1IDIxNSAxOTUgUTIzNSAxNzUgMjMwIDE1NSBRMjUwIDE4NSAyNDAgMjE1IFEyNTUgMjAwIDI1MCAxNzUgUTI3NSAyMTAgMjYwIDI0MCBRMjQ4IDI2NSAyMTAgMjcwIFExNzIgMjY1IDE2MCAyNDAgUTE0NSAyMTAgMTcwIDE3NSBRMTY1IDIwMCAxODAgMjE1IFExNzAgMTg1IDE5MCAxNTUgUTE4NSAxNzUgMjA1IDE5NSBRMTk1IDE3NSAyMTAgMTU1WiIgZmlsbD0iI0ZGNkIzNSIvPjxwYXRoIGQ9Ik0yMTAgMTc1IFEyMjAgMTkwIDIxMyAyMDUgUTIyNSAxOTIgMjIyIDE3NSBRMjM4IDIwMCAyMjggMjIyIFEyMjIgMjM4IDIxMCAyNDIgUTE5OCAyMzggMTkyIDIyMiBRMTgyIDIwMCAxOTggMTc1IFExOTUgMTkyIDIwNyAyMDUgUTIwMCAxOTAgMjEwIDE3NVoiIGZpbGw9IiNGRkQ3MDAiLz48cmVjdCB4PSIyOTAiIHk9IjI5MCIgd2lkdGg9IjMyIiBoZWlnaHQ9Ijk1IiByeD0iMTYiIHRyYW5zZm9ybT0icm90YXRlKDQ1IDI5MCAyOTApIiBmaWxsPSIjQzAyNzJEIi8+PHBhdGggZD0iTTMxMCAxMjAgUTM0MCAxMDggMzcwIDEyMCBMMzcwIDE2OCBRMzQwIDE5MCAzMTAgMTY4IFoiIGZpbGw9IiNDMDI3MkQiLz48dGV4dCB4PSIzNDAiIHk9IjE2MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjIwIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TQzwvdGV4dD48dGV4dCB4PSIyNTYiIHk9IjQzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjQzAyNzJEIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNCI+UEVSSVRPPC90ZXh0Pjwvc3ZnPg==";
-  // Apple touch icon via canvas
-  try{
-    var c=document.createElement('canvas');c.width=180;c.height=180;
-    var x=c.getContext('2d');var img=new Image();
-    img.onload=function(){x.drawImage(img,0,0,180,180);
-      var ai=document.getElementById('aic_Perito');if(ai)ai.href=c.toDataURL('image/png');
-    };img.src=ic;
-  }catch(e){var ai=document.getElementById('aic_Perito');if(ai)ai.href=ic;}
-})();
-
-// ══ MAPA LEAFLET (sistema idêntico ao Pontos de Interesse) ══════
-var _lmapCBM=null, _tileCBM=null, _markersCBM=[], _poiEditCBM=null, _poiCatCBM='hidrante', _poiLatCBM=null, _poiLngCBM=null;
-
-var TILES_CBM={
-  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
-  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
-  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
-};
-
-var CIDADES_CBM=[
-  {n:'Florianópolis',lat:-27.595,lng:-48.548,t:'cap'},
-  {n:'Curitiba',lat:-25.429,lng:-49.271,t:'cap'},
-  {n:'Porto Alegre',lat:-30.034,lng:-51.217,t:'cap'},
-  {n:'Joinville',lat:-26.304,lng:-48.846,t:'gde'},
-  {n:'Blumenau',lat:-26.919,lng:-49.066,t:'gde'},
-  {n:'Chapecó',lat:-27.101,lng:-52.615,t:'gde'},
-  {n:'Lages',lat:-27.816,lng:-50.326,t:'gde'},
-  {n:'Rancho Queimado',lat:-27.675,lng:-49.013,t:'viz'},
-  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337,t:'viz'},
-  {n:'Leoberto Leal',lat:-27.534,lng:-49.063,t:'viz'},
-  {n:'Angelina',lat:-27.567,lng:-49.001,t:'viz'},
-  {n:'Santo Amaro',lat:-27.693,lng:-48.797,t:'viz'},
-  {n:'São Bonifácio',lat:-27.904,lng:-48.933,t:'viz'},
-  {n:'Anitápolis',lat:-27.907,lng:-49.131,t:'viz'},
-  {n:'Águas Mornas',lat:-27.716,lng:-48.827,t:'viz'},
-  {n:'Antônio Carlos',lat:-27.475,lng:-48.745,t:'viz'},
-];
-
-var CATS_CBM=[
-  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
-  {id:'manancial',nome:'Manancial',ico:'🌊'},
-  {id:'ponte',nome:'Ponte',ico:'🌉'},
-  {id:'edificacao',nome:'Edificação',ico:'🏢'},
-  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
-  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
-  {id:'referencia',nome:'Referência',ico:'📍'},
-];
-
-function getPOIsCBM(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return[];}}
-function savePOIsCBM(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
-
-function initMapCBM(mapDivId){
-  if(_lmapCBM) return;
-  var el=document.getElementById(mapDivId||'mapCBM');
-  if(!el){console.log('MapCBM: div não encontrado');return;}
-  if(typeof LF==='undefined'){
-    el.innerHTML='<div style="padding:20px;text-align:center;color:#888;font-size:.85rem;">Mapa requer conexão com internet.<br>Conecte-se e recarregue.</div>';
-    return;
-  }
-  // Force dimensions
-  el.style.width='100%';
-  el.style.height='52vh';
-  el.style.minHeight='300px';
-  el.style.display='block';
-  try{
-    _lmapCBM=LF.map(el,{zoomControl:true}).setView([-27.5,-49.0],9);
-    _tileCBM=LF.tileLayer(TILES_CBM.rua.url,{attribution:TILES_CBM.rua.attr,maxZoom:19}).addTo(_lmapCBM);
-    // Cidades de referência
-    var cor={cap:'#0f172a',gde:'#334155',med:'#64748b',viz:'#C0272D'};
-    var raio={cap:7,gde:5,med:4,viz:5};
-    CIDADES_CBM.forEach(function(c){
-      var mk=LF.circleMarker([c.lat,c.lng],{
-        radius:raio[c.t]||4,fillColor:cor[c.t]||'#64748b',
-        color:'#fff',weight:1.5,fillOpacity:0.9
-      }).addTo(_lmapCBM).bindPopup(c.n);
-      if(c.t==='cap'||c.t==='viz'||c.t==='gde'){
-        mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[raio[c.t]+3,0],
-          className:'city-lbl-cbm'});
-      }
-    });
-    // Clique no mapa → abre modal com coords preenchidas
-    _lmapCBM.on('click',function(e){
-      _poiLatCBM=e.latlng.lat;_poiLngCBM=e.latlng.lng;
-      var fl=document.getElementById('poi-lat-cbm');
-      var fl2=document.getElementById('poi-lng-cbm');
-      if(fl)fl.value=_poiLatCBM.toFixed(6);
-      if(fl2)fl2.value=_poiLngCBM.toFixed(6);
-      abrirModalPOICBM(null);
-    });
-    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();renderMarkersCBM();},400);
-  }catch(e){console.log('MapCBM erro:',e);}
-}
-
-function setTileCBM(tipo){
-  // Update button states
-  document.querySelectorAll('.tile-btn-cbm').forEach(function(b){
-    b.classList.toggle('active',b.dataset.tile===tipo);
-  });
-  if(!_lmapCBM||!_tileCBM)return;
-  _lmapCBM.removeLayer(_tileCBM);
-  var t=TILES_CBM[tipo];if(!t)return;
-  _tileCBM=LF.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_lmapCBM);
-}
-
-function renderMarkersCBM(){
-  if(!_lmapCBM)return;
-  _markersCBM.forEach(function(m){_lmapCBM.removeLayer(m);});_markersCBM=[];
-  getPOIsCBM().forEach(function(p){
-    if(!p.lat||!p.lng)return;
-    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
-    var icon=LF.divIcon({
-      className:'',
-      html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',
-      iconSize:[28,28],iconAnchor:[14,14]
-    });
-    var mk=LF.marker([p.lat,p.lng],{icon:icon}).addTo(_lmapCBM)
-      .bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
-    _markersCBM.push(mk);
-  });
-}
-
-function usarGpsCBM(){
-  if(!navigator.geolocation){alert('GPS indisponível.');return;}
-  navigator.geolocation.getCurrentPosition(function(pos){
-    _poiLatCBM=pos.coords.latitude;_poiLngCBM=pos.coords.longitude;
-    var fl=document.getElementById('poi-lat-cbm');
-    var fl2=document.getElementById('poi-lng-cbm');
-    if(fl)fl.value=_poiLatCBM.toFixed(6);
-    if(fl2)fl2.value=_poiLngCBM.toFixed(6);
-    if(_lmapCBM)_lmapCBM.setView([_poiLatCBM,_poiLngCBM],14);
-    alert('GPS capturado ✅');
-  },function(){alert('Não foi possível obter GPS.');});
-}
-
-function abrirModalPOICBM(id){
-  _poiEditCBM=id;
-  var m=document.getElementById('mo-poi-cbm');if(!m)return;
-  document.getElementById('mo-poi-cbm-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
-  renderCatGridCBM();
-  if(id){
-    var p=getPOIsCBM().find(function(x){return x.id===id;});
-    if(p){_poiCatCBM=p.cat;
-      document.getElementById('poi-nome-cbm').value=p.nome||'';
-      document.getElementById('poi-obs-cbm').value=p.obs||'';
-      document.getElementById('poi-lat-cbm').value=p.lat||'';
-      document.getElementById('poi-lng-cbm').value=p.lng||'';
-      _poiLatCBM=p.lat;_poiLngCBM=p.lng;
-    }
-  }else{
-    document.getElementById('poi-nome-cbm').value='';
-    document.getElementById('poi-obs-cbm').value='';
-    document.getElementById('poi-lat-cbm').value=_poiLatCBM?_poiLatCBM.toFixed(6):'';
-    document.getElementById('poi-lng-cbm').value=_poiLngCBM?_poiLngCBM.toFixed(6):'';
-  }
-  renderCatGridCBM();
-  m.style.display='flex';
-}
-function fecharModalPOICBM(){
-  var m=document.getElementById('mo-poi-cbm');if(m)m.style.display='none';
-  _poiLatCBM=null;_poiLngCBM=null;_poiEditCBM=null;
-}
-function renderCatGridCBM(){
-  var el=document.getElementById('cat-grid-cbm');if(!el)return;el.innerHTML='';
-  CATS_CBM.forEach(function(c){
-    var btn=document.createElement('button');
-    var act=c.id===_poiCatCBM;
-    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid '+(act?'#C0272D':'#e2e8f0')+';background:'+(act?'#C0272D':'#f8fafc')+';color:'+(act?'#fff':'#1c1c1e')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
-    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
-    btn.onclick=(function(cid){return function(){_poiCatCBM=cid;renderCatGridCBM();};})(c.id);
-    el.appendChild(btn);
-  });
-}
-function salvarPOICBM(){
-  var nome=document.getElementById('poi-nome-cbm').value.trim();if(!nome){alert('Informe o nome.');return;}
-  var lat=parseFloat(document.getElementById('poi-lat-cbm').value)||_poiLatCBM;
-  var lng=parseFloat(document.getElementById('poi-lng-cbm').value)||_poiLngCBM;
-  var obs=document.getElementById('poi-obs-cbm').value.trim();
-  var lista=getPOIsCBM();
-  if(_poiEditCBM){
-    var i=lista.findIndex(function(x){return x.id===_poiEditCBM;});
-    if(i>=0){lista[i].nome=nome;lista[i].cat=_poiCatCBM;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}
-  }else{
-    lista.push({id:Date.now().toString(36),nome:nome,cat:_poiCatCBM,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});
-  }
-  savePOIsCBM(lista);fecharModalPOICBM();renderListaPOICBM();renderMarkersCBM();
-}
-function renderListaPOICBM(){
-  var el=document.getElementById('lista-poi-cbm');if(!el)return;
-  var lista=getPOIsCBM();
-  if(!lista.length){
-    el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;"><div style="font-size:2rem;">📍</div><p>Nenhum ponto. Toque no mapa ou em "Marcar Ponto".</p></div>';
-    return;
-  }
-  el.innerHTML='';
-  lista.forEach(function(p){
-    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
-    var row=document.createElement('div');
-    row.style.cssText='background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1px solid #e5e5ea;';
-    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
-      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
-      +(p.obs?'<div style="font-size:11px;color:#6c6c70;">'+p.obs+'</div>':'')
-      +(p.lat?'<div style="font-size:10px;color:#6c6c70;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
-      +'</div>';
-    var btnE=document.createElement('button');btnE.textContent='✏️';
-    btnE.style.cssText='background:#f2f2f7;border:1px solid #e5e5ea;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;margin-right:4px;';
-    btnE.onclick=(function(id){return function(){abrirModalPOICBM(id);};})(p.id);
-    var btnD=document.createElement('button');btnD.textContent='🗑️';
-    btnD.style.cssText='background:#fff0f0;border:1px solid #ffcdd2;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;';
-    btnD.onclick=(function(id){return function(){if(confirm('Excluir?')){var l=getPOIsCBM().filter(function(x){return x.id!==id;});savePOIsCBM(l);renderListaPOICBM();renderMarkersCBM();}};})(p.id);
-    row.appendChild(btnE);row.appendChild(btnD);
-    el.appendChild(row);
-  });
-}
-
-function voltarPrincipalCBM(){mudarPagina("lista");}
-function irPontosCBM(){
-  mudarPagina("pontos-cbm");
-  setTimeout(function(){
-    var mapEl=document.getElementById("mapCBM");
-    if(mapEl) mapEl.style.display="block";
-    initMapCBM("mapCBM");
-    renderListaPOICBM();
-    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();},200);
-  },100);
-}
-
-</script>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+<link rel="icon" id="fIconP" type="image/svg+xml" href="#"><link rel="manifest" id="mLinkP" href="#"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Perito CBMSC"><meta name="theme-color" content="#1a1a2e"><script>(function(){var ic="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzFhMWEyZSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzE2MjEzZSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE1IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjIxMCIgY3k9IjIxMCIgcj0iMTEwIiBmaWxsPSJub25lIiBzdHJva2U9IiNDMDI3MkQiIHN0cm9rZS13aWR0aD0iMjgiLz48cGF0aCBkPSJNMjEwIDE1NSBRMjI1IDE3NSAyMTUgMTk1IFEyMzUgMTc1IDIzMCAxNTUgUTI1MCAxODUgMjQwIDIxNSBRMjU1IDIwMCAyNTAgMTc1IFEyNzUgMjEwIDI2MCAyNDAgUTI0OCAyNjUgMjEwIDI3MCBRMTcyIDI2NSAxNjAgMjQwIFExNDUgMjEwIDE3MCAxNzUgUTE2NSAyMDAgMTgwIDIxNSBRMTcwIDE4NSAxOTAgMTU1IFExODUgMTc1IDIwNSAxOTUgUTE5NSAxNzUgMjEwIDE1NVoiIGZpbGw9IiNGRjZCMzUiLz48cGF0aCBkPSJNMjEwIDE3NSBRMjIwIDE5MCAyMTMgMjA1IFEyMjUgMTkyIDIyMiAxNzUgUTIzOCAyMDAgMjI4IDIyMiBRMjIyIDIzOCAyMTAgMjQyIFExOTggMjM4IDE5MiAyMjIgUTE4MiAyMDAgMTk4IDE3NSBRMTk1IDE5MiAyMDcgMjA1IFEyMDAgMTkwIDIxMCAxNzVaIiBmaWxsPSIjRkZENzAwIi8+PHJlY3QgeD0iMjkwIiB5PSIyOTAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI5NSIgcng9IjE2IiB0cmFuc2Zvcm09InJvdGF0ZSg0NSAyOTAgMjkwKSIgZmlsbD0iI0MwMjcyRCIvPjx0ZXh0IHg9IjI1NiIgeT0iNDMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMzgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNDMDI3MkQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGxldHRlci1zcGFjaW5nPSI0Ij5QRVJJVE88L3RleHQ+PC9zdmc+";var mf="data:application/manifest+json;base64,eyJuYW1lIjoiUGVyaXRvIENCTVNDIiwic2hvcnRfbmFtZSI6IlBlcml0byIsInN0YXJ0X3VybCI6Ii4vUGVyaXRvLmh0bWwiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMWExYTJlIiwidGhlbWVfY29sb3IiOiIjMWExYTJlIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0ExTVRJZ05URXlJajQ4WkdWbWN6NDhiR2x1WldGeVIzSmhaR2xsYm5RZ2FXUTlJbUpuSWlCNE1UMGlNQ0lnZVRFOUlqQWlJSGd5UFNJeElpQjVNajBpTVNJK1BITjBiM0FnYjJabWMyVjBQU0l3SlNJZ2MzUnZjQzFqYjJ4dmNqMGlJekZoTVdFeVpTSXZQanh6ZEc5d0lHOW1abk5sZEQwaU1UQXdKU0lnYzNSdmNDMWpiMnh2Y2owaUl6RTJNakV6WlNJdlBqd3ZiR2x1WldGeVIzSmhaR2xsYm5RK1BDOWtaV1p6UGp4eVpXTjBJSGRwWkhSb1BTSTFNVElpSUdobGFXZG9kRDBpTlRFeUlpQnllRDBpTVRFMUlpQm1hV3hzUFNKMWNtd29JMkpuS1NJdlBqeGphWEpqYkdVZ1kzZzlJakl4TUNJZ1kzazlJakl4TUNJZ2NqMGlNVEV3SWlCbWFXeHNQU0p1YjI1bElpQnpkSEp2YTJVOUlpTkRNREkzTWtRaUlITjBjbTlyWlMxM2FXUjBhRDBpTWpnaUx6NDhjR0YwYUNCa1BTSk5NakV3SURFMU5TQlJNakkxSURFM05TQXlNVFVnTVRrMUlGRXlNelVnTVRjMUlESXpNQ0F4TlRVZ1VUSTFNQ0F4T0RVZ01qUXdJREl4TlNCUk1qVTFJREl3TUNBeU5UQWdNVGMxSUZFeU56VWdNakV3SURJMk1DQXlOREFnVVRJME9DQXlOalVnTWpFd0lESTNNQ0JSTVRjeUlESTJOU0F4TmpBZ01qUXdJRkV4TkRVZ01qRXdJREUzTUNBeE56VWdVVEUyTlNBeU1EQWdNVGd3SURJeE5TQlJNVGN3SURFNE5TQXhPVEFnTVRVMUlGRXhPRFVnTVRjMUlESXdOU0F4T1RVZ1VURTVOU0F4TnpVZ01qRXdJREUxTlZvaUlHWnBiR3c5SWlOR1JqWkNNelVpTHo0OGNHRjBhQ0JrUFNKTk1qRXdJREUzTlNCUk1qSXdJREU1TUNBeU1UTWdNakExSUZFeU1qVWdNVGt5SURJeU1pQXhOelVnVVRJek9DQXlNREFnTWpJNElESXlNaUJSTWpJeUlESXpPQ0F5TVRBZ01qUXlJRkV4T1RnZ01qTTRJREU1TWlBeU1qSWdVVEU0TWlBeU1EQWdNVGs0SURFM05TQlJNVGsxSURFNU1pQXlNRGNnTWpBMUlGRXlNREFnTVRrd0lESXhNQ0F4TnpWYUlpQm1hV3hzUFNJalJrWkVOekF3SWk4K1BISmxZM1FnZUQwaU1qa3dJaUI1UFNJeU9UQWlJSGRwWkhSb1BTSXpNaUlnYUdWcFoyaDBQU0k1TlNJZ2NuZzlJakUySWlCMGNtRnVjMlp2Y20wOUluSnZkR0YwWlNnME5TQXlPVEFnTWprd0tTSWdabWxzYkQwaUkwTXdNamN5UkNJdlBqeDBaWGgwSUhnOUlqSTFOaUlnZVQwaU5ETXdJaUJtYjI1MExXWmhiV2xzZVQwaVFYSnBZV3dpSUdadmJuUXRjMmw2WlQwaU16Z2lJR1p2Ym5RdGQyVnBaMmgwUFNJNU1EQWlJR1pwYkd3OUlpTkRNREkzTWtRaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlJR3hsZEhSbGNpMXpjR0ZqYVc1blBTSTBJajVRUlZKSlZFODhMM1JsZUhRK1BDOXpkbWMrIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJwdXJwb3NlIjoiYW55IG1hc2thYmxlIn1dfQ==";var fi=document.getElementById("fIconP");if(fi)fi.href=ic;var ml=document.getElementById("mLinkP");if(ml)ml.href=mf;try{var c=document.createElement("canvas");c.width=180;c.height=180;var x=c.getContext("2d");var img=new Image();img.onload=function(){x.drawImage(img,0,0,180,180);var al=document.createElement("link");al.rel="apple-touch-icon";al.href=c.toDataURL("image/png");document.head.appendChild(al);};img.src=ic;}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 body{margin:0;padding:0;font-family:Arial,sans-serif;background:#f5f5f0;color:#1a1a1a;font-size:15px;}
@@ -326,8 +88,10 @@ textarea{resize:vertical;}
 .agente-group summary{font-size:12px;font-weight:700;color:#555;padding:4px 0;cursor:pointer;}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>var LF = window.L;</script>
+<style>
+#mapPOI-p{width:100%;height:55vh;border-radius:10px;margin-bottom:10px;}
+.city-lbl-p{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;}
+</style>
 </head>
 <body>
 
@@ -336,7 +100,7 @@ textarea{resize:vertical;}
   <div class="header">
     <div><h1>App do Perito</h1><h2>Laudo Pericial de Incêndio</h2></div>
     <div style="display:flex;gap:6px;">
-      <button class="btn btn-outline btn-sm" onclick="irPontosCBM()">📍 Pontos</button>
+      <button class="btn btn-outline btn-sm" onclick="irPontos()">📍 Pontos</button>
       <button class="btn btn-primary" onclick="abrirModalNovo()">+ Novo</button>
     </div>
   </div>
@@ -394,6 +158,52 @@ textarea{resize:vertical;}
     <div id="modal-importado" style="display:none" class="info-box" style="margin-bottom:12px;"></div>
     <label>Nº do Laudo Pericial *</label>
     <input id="novo-numero" type="text" placeholder="Ex: 1260/7ºBBM/2019">
+    <label>RE da Edificação (se houver)</label>
+    <div style="display:flex;gap:6px;margin-bottom:6px;">
+      <input id="novo-re" type="text" placeholder="Ex: RE8013000123A" style="flex:1;">
+      <button type="button" onclick="buscarEdifPorRE()" style="background:#C0272D;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:.85rem;font-weight:700;cursor:pointer;">🔍 Buscar</button>
+    </div>
+    <button type="button" onclick="toggleEdifManual()" id="btnEdifManual" style="width:100%;margin-bottom:6px;padding:7px;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:8px;font-size:.82rem;color:#64748b;cursor:pointer;">✏️ Dados manuais (sem RE)</button>
+    <div id="edifManualBloco" style="display:none;background:#f8fafc;border-radius:10px;padding:10px;margin-bottom:8px;border:1.5px solid #e2e8f0;">
+      <div style="font-size:.75rem;font-weight:800;color:#64748b;margin-bottom:8px;">📋 DADOS MANUAIS DA EDIFICAÇÃO</div>
+      <input id="man-nome" class="fi" placeholder="Nome/Razão Social *" style="margin-bottom:5px;">
+      <input id="man-endereco" class="fi" placeholder="Endereço" style="margin-bottom:5px;">
+      <div style="display:flex;gap:6px;margin-bottom:5px;">
+        <input id="man-municipio" class="fi" placeholder="Município" style="flex:1;">
+        <input id="man-grau" class="fi" placeholder="Grau risco" style="flex:0 0 90px;">
+      </div>
+      <input id="man-resp" class="fi" placeholder="Responsável pelo bloco" style="margin-bottom:5px;">
+      <input id="man-resp-tel" class="fi" placeholder="Telefone do responsável" style="margin-bottom:5px;">
+      <input id="man-obs" class="fi" placeholder="Observações / contexto" style="margin-bottom:0;">
+    </div>
+    <div id="re-resultado" style="display:none;background:#f0fdf4;border:1.5px solid #16a34a;border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="font-size:.78rem;font-weight:800;color:#16a34a;margin-bottom:8px;">✅ Edificação encontrada</div>
+      <div style="display:grid;gap:5px;margin-bottom:8px;">
+        <input id="re-nome" class="fi" placeholder="Nome/Razão Social" style="font-size:.85rem;">
+        <input id="re-endereco" class="fi" placeholder="Endereço" style="font-size:.85rem;">
+        <div style="display:flex;gap:6px;">
+          <input id="re-municipio" class="fi" placeholder="Município" style="flex:1;font-size:.85rem;">
+          <input id="re-grau" class="fi" placeholder="Grau risco" style="flex:0 0 90px;font-size:.85rem;">
+        </div>
+        <input id="re-resp-nome" class="fi" placeholder="Responsável" style="font-size:.85rem;">
+        <input id="re-resp-tel" class="fi" placeholder="Telefone resp." style="font-size:.85rem;">
+        <input id="re-venc-func" class="fi" type="date" style="font-size:.85rem;">
+      </div>
+      <div id="re-preventivos" style="font-size:.78rem;color:#334155;margin-bottom:8px;"></div>
+      <div style="font-size:.75rem;font-weight:800;color:#334155;margin-bottom:4px;">📅 Histórico de Vistorias</div>
+      <div id="re-historico" style="font-size:.78rem;color:#334155;max-height:120px;overflow-y:auto;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:5px;margin-bottom:4px;flex-wrap:wrap;">
+        <input type="date" id="re-hv-data" style="flex:1;padding:6px;border:1.5px solid #ddd;border-radius:7px;font-size:.78rem;min-width:100px;">
+        <select id="re-hv-res" style="flex:1;padding:6px;border:1.5px solid #ddd;border-radius:7px;font-size:.78rem;">
+          <option value="aprovado">✅ Aprovado</option>
+          <option value="reprovado">❌ Reprovado</option>
+          <option value="parcial">⚠️ Parcial</option>
+        </select>
+      </div>
+      <input type="text" id="re-hv-obs" placeholder="Obs da vistoria…" style="width:100%;margin-bottom:5px;padding:6px;border:1.5px solid #ddd;border-radius:7px;font-size:.78rem;box-sizing:border-box;">
+      <button type="button" onclick="reAdicionarHist()" style="width:100%;padding:7px;background:#1e293b;color:#fff;border:none;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer;margin-bottom:6px;">+ Registrar Vistoria</button>
+      <button type="button" onclick="reSalvarNoVistoria()" style="width:100%;padding:9px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;">💾 Salvar alterações no Vistoria</button>
+    </div>
     <label>Nº da Certidão de Ocorrência *</label>
     <input id="novo-certidao" type="text" placeholder="Ex: 70005926">
     <label>Apelido (opcional)</label>
@@ -1122,69 +932,315 @@ function baixarLaudo(){
 // INIT
 // =====================================================================
 renderLista();
+// ══ PONTOS DE INTERESSE PERITO (compartilha cbmsc_pois com Vistoria) ══
+var _mapPOIP=null, _tilePOIP=null, _markersPOIP=[], _poiPEditId=null, _poiPCatSel='hidrante';
+var _poiPLat=null, _poiPLng=null;
+
+var CATS_POIP=[
+  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
+  {id:'manancial',nome:'Manancial',ico:'🌊'},
+  {id:'ponte',nome:'Ponte',ico:'🌉'},
+  {id:'edificacao',nome:'Edificação',ico:'🏢'},
+  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
+  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
+  {id:'referencia',nome:'Referência',ico:'📍'},
+];
+var TILES_POIP={
+  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
+  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
+  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
+};
+var CIDADES_POIP=[
+  {n:'Florianópolis',lat:-27.595,lng:-48.548},{n:'Rancho Queimado',lat:-27.675,lng:-49.013},
+  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337},{n:'Leoberto Leal',lat:-27.534,lng:-49.063},
+  {n:'Angelina',lat:-27.567,lng:-49.001},{n:'Santo Amaro',lat:-27.693,lng:-48.797},
+  {n:'São Bonifácio',lat:-27.904,lng:-48.933},{n:'Anitápolis',lat:-27.907,lng:-49.131},
+  {n:'Águas Mornas',lat:-27.716,lng:-48.827},{n:'Antônio Carlos',lat:-27.475,lng:-48.745},
+];
+function getPOIsP(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return[];}}
+function savePOIsP(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
+
+function irPontos(){
+  document.querySelectorAll('.page').forEach(function(p){p.style.display='none';});
+  document.getElementById('pg-pontos').style.display='block';
+  setTimeout(function(){initMapPOIP();renderListaPOIP();},150);
+}
+function irLista(){
+  document.getElementById('pg-pontos').style.display='none';
+  document.getElementById('pg-lista').style.display='block';
+}
+function initMapPOIP(){
+  if(_mapPOIP)return;
+  var el=document.getElementById('mapPOI-p');if(!el)return;
+  if(typeof L==='undefined'){
+    var s=document.createElement('script');s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload=function(){_initMapPOIPInner();};document.head.appendChild(s);return;
+  }
+  _initMapPOIPInner();
+}
+function _initMapPOIPInner(){
+  if(_mapPOIP)return;
+  var el=document.getElementById('mapPOI-p');if(!el)return;
+  try{
+    _mapPOIP=L.map('mapPOI-p',{zoomControl:true}).setView([-27.5,-49.0],10);
+    _tilePOIP=L.tileLayer(TILES_POIP.rua.url,{attribution:TILES_POIP.rua.attr,maxZoom:19}).addTo(_mapPOIP);
+    CIDADES_POIP.forEach(function(c){
+      var mk=L.circleMarker([c.lat,c.lng],{radius:4,fillColor:'#7c3aed',color:'#fff',weight:1.5,fillOpacity:0.9}).addTo(_mapPOIP);
+      mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[6,0],className:'city-lbl-p'});
+    });
+    _mapPOIP.on('click',function(e){
+      _poiPLat=e.latlng.lat;_poiPLng=e.latlng.lng;
+      document.getElementById('poi-p-lat').value=_poiPLat.toFixed(6);
+      document.getElementById('poi-p-lng').value=_poiPLng.toFixed(6);
+      document.getElementById('poi-p-gps-label').textContent='Selecionado: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5);
+      abrirMoPOIP(null);
+    });
+    setTimeout(function(){_mapPOIP.invalidateSize();renderMarkersPOIP();},300);
+  }catch(e){console.log('MapPOIP erro:',e);}
+}
+function setTileP(tipo){
+  if(!_mapPOIP||!_tilePOIP)return;
+  _mapPOIP.removeLayer(_tilePOIP);
+  _tilePOIP=L.tileLayer(TILES_POIP[tipo].url,{attribution:TILES_POIP[tipo].attr,maxZoom:tipo==='relevo'?17:19}).addTo(_mapPOIP);
+}
+function renderMarkersPOIP(){
+  if(!_mapPOIP)return;
+  _markersPOIP.forEach(function(m){_mapPOIP.removeLayer(m);});_markersPOIP=[];
+  getPOIsP().forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var cat=CATS_POIP.find(function(c){return c.id===p.cat;})||CATS_POIP[6];
+    var icon=L.divIcon({className:'',html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    var mk=L.marker([p.lat,p.lng],{icon:icon}).addTo(_mapPOIP).bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
+    _markersPOIP.push(mk);
+  });
+}
+function renderListaPOIP(){
+  var el=document.getElementById('listaPOI-p');if(!el)return;
+  var lista=getPOIsP();
+  if(!lista.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#6c6c70;"><div style="font-size:2rem;">📍</div><div>Nenhum ponto cadastrado</div><div style="font-size:12px;margin-top:4px;">Toque no mapa ou em "Marcar Ponto"</div></div>';return;}
+  el.innerHTML='';
+  lista.forEach(function(p){
+    var cat=CATS_POIP.find(function(c){return c.id===p.cat;})||CATS_POIP[6];
+    var row=document.createElement('div');
+    row.style.cssText='background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1px solid #e5e5ea;';
+    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
+      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
+      +(p.obs?'<div style="font-size:11px;color:#6c6c70;">'+p.obs+'</div>':'')
+      +(p.lat?'<div style="font-size:10px;color:#6c6c70;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
+      +'</div>';
+    var btnE=document.createElement('button');btnE.textContent='✏️';
+    btnE.style.cssText='background:#f2f2f7;border:1px solid #e5e5ea;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;margin-right:4px;';
+    btnE.onclick=(function(id){return function(){abrirMoPOIP(id);};})(p.id);
+    var btnD=document.createElement('button');btnD.textContent='🗑️';
+    btnD.style.cssText='background:#fff0f0;border:1px solid #ffcdd2;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;';
+    btnD.onclick=(function(id){return function(){if(confirm('Excluir?')){var l=getPOIsP().filter(function(x){return x.id!==id;});savePOIsP(l);renderListaPOIP();renderMarkersPOIP();}};})(p.id);
+    row.appendChild(btnE);row.appendChild(btnD);el.appendChild(row);
+  });
+}
+function marcarPOIP(){_poiPLat=null;_poiPLng=null;_poiPEditId=null;abrirMoPOIP(null);}
+function abrirMoPOIP(id){
+  _poiPEditId=id;
+  var m=document.getElementById('mo-poi-p');if(!m)return;
+  document.getElementById('mo-poi-p-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
+  renderCatGridPOIP();
+  if(id){var p=getPOIsP().find(function(x){return x.id===id;});if(p){_poiPCatSel=p.cat;document.getElementById('poi-p-nome').value=p.nome||'';document.getElementById('poi-p-obs').value=p.obs||'';document.getElementById('poi-p-lat').value=p.lat||'';document.getElementById('poi-p-lng').value=p.lng||'';document.getElementById('poi-p-gps-label').textContent=p.lat?'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS';}}
+  else{document.getElementById('poi-p-nome').value='';document.getElementById('poi-p-obs').value='';if(!_poiPLat){document.getElementById('poi-p-lat').value='';document.getElementById('poi-p-lng').value='';}document.getElementById('poi-p-gps-label').textContent=_poiPLat?'Selecionado: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5):'Sem GPS';}
+  renderCatGridPOIP();
+  m.style.display='flex';
+}
+function fecharMoPOIP(){var m=document.getElementById('mo-poi-p');if(m)m.style.display='none';_poiPLat=null;_poiPLng=null;_poiPEditId=null;}
+function renderCatGridPOIP(){
+  var el=document.getElementById('catGridPOI-p');if(!el)return;el.innerHTML='';
+  CATS_POIP.forEach(function(c){
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid #e5e5ea;background:'+(c.id===_poiPCatSel?'#7c3aed':'#f2f2f7')+';color:'+(c.id===_poiPCatSel?'#fff':'#1c1c1e')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
+    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
+    btn.onclick=(function(cid){return function(){_poiPCatSel=cid;renderCatGridPOIP();};})(c.id);
+    el.appendChild(btn);
+  });
+}
+function usarGpsPOIP(){
+  if(!navigator.geolocation){alert('GPS indisponível.');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _poiPLat=pos.coords.latitude;_poiPLng=pos.coords.longitude;
+    document.getElementById('poi-p-lat').value=_poiPLat.toFixed(6);
+    document.getElementById('poi-p-lng').value=_poiPLng.toFixed(6);
+    document.getElementById('poi-p-gps-label').textContent='GPS: '+_poiPLat.toFixed(5)+', '+_poiPLng.toFixed(5);
+  },function(){alert('Não foi possível obter GPS.');});
+}
+function salvarPOIP(){
+  var nome=document.getElementById('poi-p-nome').value.trim();if(!nome){alert('Informe o nome do ponto.');return;}
+  var lat=parseFloat(document.getElementById('poi-p-lat').value)||_poiPLat;
+  var lng=parseFloat(document.getElementById('poi-p-lng').value)||_poiPLng;
+  var obs=document.getElementById('poi-p-obs').value.trim();
+  var lista=getPOIsP();
+  if(_poiPEditId){var i=lista.findIndex(function(x){return x.id===_poiPEditId;});if(i>=0){lista[i].nome=nome;lista[i].cat=_poiPCatSel;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}}
+  else{lista.push({id:Date.now().toString(36),nome:nome,cat:_poiPCatSel,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});}
+  savePOIsP(lista);fecharMoPOIP();renderListaPOIP();renderMarkersPOIP();
+}
+
+var _reHistTemp=[],_reEdifId=null;
+function buscarEdifPorRE(){
+  var re=document.getElementById('novo-re').value.trim();
+  if(!re){alert('Informe o RE.');return;}
+  var reN=re.toUpperCase().replace(/\s/g,'');
+  var edif=null;
+  try{var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');edif=(db.edificacoes||[]).find(function(e){return(e.numero||'').toUpperCase().replace(/\s/g,'')===reN;});}catch(e){}
+  var el=document.getElementById('re-resultado');
+  if(!edif){el.style.display='block';el.style.background='#fef2f2';el.style.borderColor='#dc2626';el.innerHTML='❌ Edificação não encontrada no Vistoria para RE: <b>'+re+'</b>';return;}
+  _reEdifId=edif.id;
+  var anoAtual=new Date().getFullYear();
+  var cincoAnos=anoAtual-5;
+  var hist=(edif.histVist||[]).filter(function(h){return new Date(h.data).getFullYear()>=cincoAnos;});
+  _reHistTemp=hist.slice();
+  el.style.display='block';el.style.background='#f0fdf4';el.style.borderColor='#16a34a';
+  var fn=document.getElementById('re-nome');if(fn)fn.value=edif.nome||'';
+  var fe=document.getElementById('re-endereco');if(fe)fe.value=edif.endereco||'';
+  var fm=document.getElementById('re-municipio');if(fm)fm.value=edif.municipio||'';
+  var fg=document.getElementById('re-grau');if(fg)fg.value=edif.grauRisco?'Risco '+edif.grauRisco:'';
+  var frn=document.getElementById('re-resp-nome');if(frn)frn.value=edif.respNome||'';
+  var frt=document.getElementById('re-resp-tel');if(frt)frt.value=edif.respTel||'';
+  var fv=document.getElementById('re-venc-func');if(fv)fv.value=edif.vencFunc||'';
+  var fp=document.getElementById('re-preventivos');
+  if(fp&&edif.preventivos&&edif.preventivos.length){
+    fp.innerHTML='<b>Preventivos:</b><br>'+edif.preventivos.map(function(p){
+      var vencOk=!p.venc||p.venc>=new Date().toISOString().slice(0,10);
+      return (vencOk?'✅ ':'❌ ')+p.sistema+(p.atestado?' — '+p.atestado:'')+(p.venc?' (venc: '+p.venc+')':'');
+    }).join('<br>');
+  }
+  if(edif.projetos&&edif.projetos.length){
+    fp.innerHTML+='<br><b>Projetos/Habite-se:</b><br>'+edif.projetos.map(function(p){return '• '+p.tipo+' Nº'+p.numero+(p.data?' — '+p.data:'');}).join('<br>');
+  }
+  reRenderHist();
+  var ap=document.getElementById('novo-apelido');if(ap&&!ap.value)ap.value=edif.nome+(edif.numero?' ('+edif.numero+')':'');
+  window._laudoRE=edif.numero||re;window._laudoEdif=edif;
+}
+function reRenderHist(){
+  var el=document.getElementById('re-historico');if(!el)return;
+  var icons={aprovado:'✅',reprovado:'❌',parcial:'⚠️'};
+  if(!_reHistTemp.length){el.innerHTML='<span style="color:#94a3b8;">Nenhum histórico.</span>';return;}
+  el.innerHTML='';
+  _reHistTemp.forEach(function(h,i){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid #e2e8f0;font-size:.77rem;';
+    row.innerHTML='<span>'+(icons[h.resultado]||'•')+'</span><span style="font-weight:700;">'+h.data+'</span>'+(h.obs?'<span style="flex:1;color:#64748b;">'+h.obs+'</span>':'<span style="flex:1;"></span>');
+    var rm=document.createElement('button');rm.textContent='✕';rm.style.cssText='background:none;border:none;color:#94a3b8;cursor:pointer;';
+    rm.addEventListener('click',(function(i2){return function(){_reHistTemp.splice(i2,1);reRenderHist();};})(i));
+    row.appendChild(rm);el.appendChild(row);
+  });
+}
+function reAdicionarHist(){
+  var data=document.getElementById('re-hv-data').value;if(!data){alert('Informe a data.');return;}
+  var res=document.getElementById('re-hv-res').value;
+  var obs=document.getElementById('re-hv-obs').value.trim();
+  _reHistTemp.unshift({data:data,resultado:res,obs:obs});
+  _reHistTemp.sort(function(a,b){return b.data.localeCompare(a.data);});
+  document.getElementById('re-hv-data').value='';document.getElementById('re-hv-obs').value='';
+  reRenderHist();
+}
+function reSalvarNoVistoria(){
+  if(!_reEdifId){alert('Nenhuma edificação selecionada.');return;}
+  try{
+    var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+    if(!db.edificacoes)db.edificacoes=[];
+    var idx=db.edificacoes.findIndex(function(e){return e.id===_reEdifId;});
+    if(idx===-1){alert('Edificação não encontrada.');return;}
+    var grauVal=(document.getElementById('re-grau').value||'').replace(/\D/g,'');
+    db.edificacoes[idx]=Object.assign(db.edificacoes[idx],{
+      nome:(document.getElementById('re-nome')||{value:''}).value.trim()||db.edificacoes[idx].nome,
+      endereco:(document.getElementById('re-endereco')||{value:''}).value.trim(),
+      municipio:(document.getElementById('re-municipio')||{value:''}).value.trim(),
+      grauRisco:grauVal||db.edificacoes[idx].grauRisco,
+      respNome:(document.getElementById('re-resp-nome')||{value:''}).value.trim(),
+      respTel:(document.getElementById('re-resp-tel')||{value:''}).value.trim(),
+      vencFunc:(document.getElementById('re-venc-func')||{value:''}).value,
+      histVist:_reHistTemp.slice()
+    });
+    localStorage.setItem('vistoria_db',JSON.stringify(db));
+    alert('✅ Dados atualizados no Vistoria!');
+  }catch(e){alert('Erro: '+e.message);}
+}
+function toggleEdifManual(){
+  var bl=document.getElementById('edifManualBloco');
+  var btn=document.getElementById('btnEdifManual');
+  if(!bl)return;
+  var aberto=bl.style.display==='block';
+  bl.style.display=aberto?'none':'block';
+  if(btn)btn.textContent=aberto?'✏️ Dados manuais (sem RE)':'▲ Ocultar dados manuais';
+}
+var _origAbrirModalNovo=abrirModalNovo;
+abrirModalNovo=function(){
+  _origAbrirModalNovo();
+  ['man-nome','man-endereco','man-municipio','man-grau','man-resp','man-resp-tel','man-obs'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var bl=document.getElementById('edifManualBloco');if(bl)bl.style.display='none';
+  var btn=document.getElementById('btnEdifManual');if(btn)btn.textContent='✏️ Dados manuais (sem RE)';
+  var re=document.getElementById('novo-re');if(re)re.value='';
+  var res=document.getElementById('re-resultado');if(res)res.style.display='none';
+  _reEdifId=null;_reHistTemp=[];window._laudoRE=null;window._laudoEdif=null;
+};
+var _origCriarLaudo=criarLaudo;
+criarLaudo=function(){
+  var bl=document.getElementById('edifManualBloco');
+  if(bl&&bl.style.display==='block'){
+    var nome=(document.getElementById('man-nome')||{value:''}).value.trim();
+    if(nome){window._laudoEdif=window._laudoEdif||{};Object.assign(window._laudoEdif,{nome:nome,endereco:(document.getElementById('man-endereco')||{value:''}).value,municipio:(document.getElementById('man-municipio')||{value:''}).value,grauRisco:(document.getElementById('man-grau')||{value:''}).value,respNome:(document.getElementById('man-resp')||{value:''}).value,respTel:(document.getElementById('man-resp-tel')||{value:''}).value,obs:(document.getElementById('man-obs')||{value:''}).value,semRE:true});}
+  }
+  _origCriarLaudo();
+  if(window._laudoRE&&window._laudoEdif){try{var laudos=carregarIdx();if(laudos.length){laudos[laudos.length-1].reEdif=window._laudoRE;laudos[laudos.length-1].dadosEdif=window._laudoEdif;salvarIdx(laudos);}}catch(e){}window._laudoRE=null;window._laudoEdif=null;}
+};
 
 </script>
 
-
-
-<!-- PAINEL DE PONTOS/MAPA CBM -->
-<style>
-#mapCBM{width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;display:block;}
-.city-lbl-cbm{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff;}
-.tile-btn-cbm{padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:.78rem;font-weight:700;cursor:pointer;}
-.tile-btn-cbm.active{background:#C0272D;color:#fff;border-color:#C0272D;}
-</style>
-
-<!-- TELA PONTOS CBM -->
-<div id="pg-pontos-cbm" class="page" style="padding:14px 14px 100px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <div><strong style="font-size:1rem;">📍 Pontos de Interesse</strong><div style="font-size:.72rem;color:#6c6c70;">Compartilhado entre Perito e Vistoria</div></div>
-    <button onclick="voltarPrincipalCBM()" style="background:#f2f2f7;border:none;border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;">← Voltar</button>
+<!-- PÁGINA PONTOS DE INTERESSE -->
+<div id="pg-pontos" class="page" style="display:none;">
+  <div class="header">
+    <div><h1>Pontos de Interesse</h1><h2>CBMSC — Campo</h2></div>
+    <button class="btn btn-outline btn-sm" onclick="irLista()">← Voltar</button>
   </div>
-  <!-- CAMADAS -->
-  <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
-    <button class="tile-btn-cbm active" data-tile="rua" onclick="setTileCBM('rua')">🏙️ Ruas</button>
-    <button class="tile-btn-cbm" data-tile="satelite" onclick="setTileCBM('satelite')">🛰️ Satélite</button>
-    <button class="tile-btn-cbm" data-tile="relevo" onclick="setTileCBM('relevo')">🏔️ Relevo</button>
-    <button class="tile-btn-cbm" onclick="usarGpsCBM()" style="margin-left:auto;">📡 GPS</button>
+  <div style="padding:12px;">
+    <!-- MAPA -->
+    <div id="mapPOI-p"></div>
+    <!-- CAMADAS -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" id="tileRuaP" onclick="setTileP('rua')">🏙️ Ruas</button>
+      <button class="btn btn-outline btn-sm" id="tileSatP" onclick="setTileP('satelite')">🛰️ Satélite</button>
+      <button class="btn btn-outline btn-sm" id="tileRelevoP" onclick="setTileP('relevo')">🏔️ Relevo</button>
+    </div>
+    <button class="btn btn-primary" onclick="marcarPOIP()" style="margin-bottom:12px;width:100%;">📍 Marcar Ponto Aqui</button>
+    <div style="font-size:11px;font-weight:700;color:#6B5C8A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Pontos salvos</div>
+    <div id="listaPOI-p"></div>
   </div>
-  <!-- MAPA -->
-  <div id="mapCBM" style="width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;background:#e8e8e8;"></div>
-  <!-- BOTÃO MARCAR -->
-  <button onclick="abrirModalPOICBM(null)" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.92rem;font-weight:800;cursor:pointer;margin-bottom:12px;">📍 Marcar Ponto</button>
-  <!-- LISTA -->
-  <div style="font-size:.75rem;font-weight:800;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Pontos salvos</div>
-  <div id="lista-poi-cbm"></div>
 </div>
 
-<!-- MODAL PONTO CBM -->
-<div id="mo-poi-cbm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;">
-  <div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 16px 40px;width:100%;max-height:92vh;overflow-y:auto;box-sizing:border-box;">
+<!-- MODAL NOVO PONTO PERITO -->
+<div id="mo-poi-p" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;">
+  <div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 14px 38px;width:100%;max-height:92vh;overflow-y:auto;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <span id="mo-poi-cbm-titulo" style="font-size:1rem;font-weight:800;">📍 Novo Ponto</span>
-      <button onclick="fecharModalPOICBM()" style="background:#f2f2f7;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+      <span id="mo-poi-p-titulo" style="font-size:17px;font-weight:700;">📍 Novo Ponto</span>
+      <button onclick="fecharMoPOIP()" style="background:#f2f2f7;border:none;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <div style="margin-bottom:12px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Categoria</label>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="cat-grid-cbm"></div>
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;">Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;" id="catGridPOI-p"></div>
     </div>
-    <div style="margin-bottom:10px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Nome</label>
-      <input type="text" id="poi-nome-cbm" placeholder="Ex: Hidrante Rua das Flores…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.9rem;box-sizing:border-box;">
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Nome / Descrição</label>
+      <input type="text" id="poi-p-nome" placeholder="Ex: Hidrante Rua das Flores…" style="width:100%;padding:11px 13px;border:1.5px solid #e5e5ea;border-radius:10px;font-size:15px;box-sizing:border-box;">
     </div>
-    <div style="margin-bottom:10px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Observações</label>
-      <textarea id="poi-obs-cbm" placeholder="Informações adicionais…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.85rem;resize:vertical;min-height:55px;box-sizing:border-box;font-family:inherit;"></textarea>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:11px;font-weight:700;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;">Observações</label>
+      <textarea id="poi-p-obs" placeholder="Informações adicionais…" style="width:100%;padding:11px 13px;border:1.5px solid #e5e5ea;border-radius:10px;font-size:14px;font-family:inherit;resize:vertical;min-height:60px;box-sizing:border-box;"></textarea>
     </div>
-    <div style="background:#f8fafc;border-radius:9px;padding:10px;margin-bottom:14px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Coordenadas GPS</label>
+    <div style="background:#f2f2f7;border-radius:8px;padding:10px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:#6c6c70;margin-bottom:6px;">COORDENADAS</div>
+      <div id="poi-p-gps-label" style="font-size:12px;color:#6c6c70;margin-bottom:6px;">Sem GPS</div>
       <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <input type="number" id="poi-lat-cbm" placeholder="Latitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
-        <input type="number" id="poi-lng-cbm" placeholder="Longitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
+        <input type="number" id="poi-p-lat" placeholder="Latitude" step="0.00001" style="flex:1;padding:9px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:13px;">
+        <input type="number" id="poi-p-lng" placeholder="Longitude" step="0.00001" style="flex:1;padding:9px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:13px;">
       </div>
-      <button onclick="usarGpsCBM()" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:.82rem;cursor:pointer;">📡 Usar GPS agora</button>
+      <button onclick="usarGpsPOIP()" style="background:#fff;border:1px solid #e5e5ea;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;">📡 Usar GPS agora</button>
     </div>
-    <button onclick="salvarPOICBM()" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;">Salvar Ponto ✓</button>
+    <button onclick="salvarPOIP()" style="width:100%;background:#7c3aed;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;">Salvar Ponto ✓</button>
   </div>
 </div>
 

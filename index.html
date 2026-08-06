@@ -384,6 +384,7 @@ textarea.fc{resize:vertical;min-height:60px;}
     <button class="tab" onclick="showTab('meds',this)">🔬 Medicações</button>
     <button class="tab" onclick="showTab('exam',this)">🧪 Exames</button>
     <button class="tab" onclick="showTab('cons',this)">🩺 Consulta</button>
+    <button class="tab" onclick="showTab('vac',this)">💉 Vacinas</button>
     <button class="tab" onclick="showTab('bsca',this)">🔍 Buscar</button>
   </div>
 </header>
@@ -453,6 +454,14 @@ textarea.fc{resize:vertical;min-height:60px;}
   <input class="fc" id="bQ" placeholder="🔍 Sintoma, medicação, descrição…" oninput="buscar()" style="margin-bottom:9px;">
   <div class="dr" style="margin-bottom:11px;"><div class="fg"><label>De</label><input type="date" class="fc" id="bDe" onchange="buscar()"></div><div class="fg"><label>Até</label><input type="date" class="fc" id="bAte" onchange="buscar()"></div></div>
   <div class="tl" id="bOut"></div>
+</div>
+<!-- VACINAS -->
+<div class="scr" id="scr-vac">
+  <div class="sec-hd" style="display:flex;justify-content:space-between;align-items:center;padding:14px 14px 6px;">
+    <span style="font-size:.78rem;font-weight:800;color:var(--t2);">Calendário Vacinal</span>
+    <button class="btn bB bSm" onclick="abrirNovaVacinaCustom()">+ Nova Vacina</button>
+  </div>
+  <div id="vacOut"></div>
 </div>
 </main>
 <button class="fab" id="fabBtn" onclick="fabAct()">＋</button>
@@ -1098,6 +1107,7 @@ function showTab(nm,btn){
   if(nm==='meds')renderMeds();
   if(nm==='cons')renderConsLista();
   if(nm==='exam'){renderExamLista();}
+  if(nm==='vac'){renderVacinas();}
 }
 function fabAct(){abrirNovoEv();}
 
@@ -1689,14 +1699,14 @@ function salvarConsulta(){
 
     // Recriar exames
     cExs.forEach(function(ex){
-      EV[pid].push({
-        id:gId(),tipo:'exame',nome:ex.nome,
+      var exEv2={id:gId(),tipo:'exame',nome:ex.nome,
         data:dt+'T'+hr,hora:hr,
         sintomas:'Solicitado em consulta de '+fD(dt)+(mdc?' com '+mdc:''),
         medicacao:'',medico:mdc,obs:'',
         pendente:true,resultado:'',consId:cEditId,
-        fotos:[],atualizacoes:[],por:audit()
-      });
+        fotos:[],atualizacoes:[],por:audit()};
+      EV[pid].push(exEv2);
+      console.log('Exame (edit) criado:',exEv2.nome,'tipo:',exEv2.tipo,'pid:',pid);
     });
 
     // Recriar retorno
@@ -1893,7 +1903,10 @@ function editarResultadoExame(id){
 
 function renderExamLista(){
   var el=document.getElementById('examOut');if(!el)return;
-  var evs=getEv().filter(function(e){return e.tipo==='exame';})
+  console.log('renderExamLista: pid=',pid,'total eventos=',getEv().length);
+  var todosEvs=getEv();
+  console.log('tipos:',[...new Set(todosEvs.map(function(e){return e.tipo;}))]);
+  var evs=todosEvs.filter(function(e){return e.tipo==='exame';})
     .sort(function(a,b){return b.data.localeCompare(a.data);});
   if(!evs.length){
     el.innerHTML='<div class="empty"><div class="ei">🔬</div><h3>Nenhum exame</h3><p>Exames solicitados nas consultas aparecem aqui.</p></div>';
@@ -1940,60 +1953,65 @@ function relatorioConsulta(consId, completo){
   var consulta = evs.find(function(e){return e.id===consId;});
   if(!consulta) return;
   var mdc = consulta.medico || '';
-  // Find previous consultation with same doctor
+  var p = getP(); if(!p) return;
   var consultasMdc = evs.filter(function(e){
     return e.tipo==='consulta' && e.medico===mdc && e.id!==consId && e.data < consulta.data;
   }).sort(function(a,b){return b.data.localeCompare(a.data);});
-  var dataInicio = consultasMdc.length ? consultasMdc[0].data.slice(0,10) : null;
-  // Get events since last consultation
+  var dataInicio = (!completo && consultasMdc.length) ? consultasMdc[0].data.slice(0,10) : null;
   var evsFiltro = evs.filter(function(e){
-    if(completo) return true;
-    if(!dataInicio) return true;
-    return e.data >= dataInicio && e.id !== consId;
+    if(e.id===consId) return false;
+    if(dataInicio) return e.data >= dataInicio;
+    return true;
   });
-  var p = getP(); if(!p) return;
-  var linhas = [];
-  linhas.push('RELATÓRIO MÉDICO — '+p.nome);
-  linhas.push('Gerado em: '+new Date().toLocaleDateString('pt-BR'));
-  if(mdc) linhas.push('Médico: '+mdc);
-  if(dataInicio) linhas.push('Período: desde '+fD(dataInicio)+' (última consulta com este médico)');
-  linhas.push('');
-  // Group by type
-  var doencas = evsFiltro.filter(function(e){return e.tipo==='doenca';});
-  var meds = evsFiltro.filter(function(e){return e.tipo==='medicacao';});
+  var L = [];
+  L.push('RESUMO MÉDICO — '+p.nome.toUpperCase());
+  L.push('Gerado em: '+new Date().toLocaleDateString('pt-BR'));
+  if(mdc) L.push('Médico: '+mdc);
+  if(dataInicio) L.push('Período: desde '+fD(dataInicio));
+  L.push('');
+  L.push('--- CONSULTA DE REFERÊNCIA ---');
+  L.push('Data: '+fDT(consulta.data));
+  if(consulta.sintomas) L.push('Motivo: '+consulta.sintomas);
+  if(consulta.cDiag) L.push('Diagnóstico: '+consulta.cDiag);
+  L.push('');
   var exames = evsFiltro.filter(function(e){return e.tipo==='exame';});
-  var consults = evsFiltro.filter(function(e){return e.tipo==='consulta';});
-  if(doencas.length){
-    linhas.push('DOENÇAS/SINTOMAS ('+doencas.length+'):');
-    doencas.forEach(function(e){linhas.push('• '+fD(e.data.slice(0,10))+' — '+e.nome+(e.sintomas?' — '+e.sintomas:''));});
-    linhas.push('');
-  }
-  if(meds.length){
-    linhas.push('MEDICAÇÕES ('+meds.length+'):');
-    meds.forEach(function(e){linhas.push('• '+e.nome+(e.medicacao?' — '+e.medicacao:''));});
-    linhas.push('');
-  }
   if(exames.length){
-    linhas.push('EXAMES ('+exames.length+'):');
-    exames.forEach(function(e){linhas.push('• '+e.nome+(e.resultado?' — Resultado: '+e.resultado:' — Pendente')+(e.pendente?' ⏳':''));});
-    linhas.push('');
+    L.push('--- EXAMES ---');
+    exames.forEach(function(e){
+      L.push('• '+e.nome+': '+(e.resultado?'✅ '+e.resultado:'⏳ Pendente'));
+    });
+    L.push('');
   }
-  if(consults.length){
-    linhas.push('CONSULTAS ANTERIORES ('+consults.length+'):');
-    consults.forEach(function(e){linhas.push('• '+fD(e.data.slice(0,10))+(e.medico?' — '+e.medico:'')+(e.cDiag?' — '+e.cDiag:''));});
-    linhas.push('');
+  var meds = (MD[pid]||[]).filter(function(m){return m.ativo;});
+  if(meds.length){
+    L.push('--- MEDICAÇÕES ATUAIS ---');
+    meds.forEach(function(m){
+      L.push('• '+m.nome+(m.dose?' '+m.dose:'')+(m.cont?' — uso contínuo':m.durD?' — '+m.durD+' dias':''));
+    });
+    L.push('');
   }
-  // Alergias e medicações ativas
-  if(p.alerg&&p.alerg.length){linhas.push('ALERGIAS: '+p.alerg.join(', '));linhas.push('');}
-  var rel = linhas.join('\n');
-  // Share via WhatsApp or copy
+  var doencas = evsFiltro.filter(function(e){return e.tipo==='doenca';});
+  if(doencas.length){
+    L.push('--- CONDIÇÕES ---');
+    doencas.forEach(function(e){L.push('• '+e.nome+(e.sintomas?' — '+e.sintomas:''));});
+    L.push('');
+  }
+  if(p.alerg&&p.alerg.length){L.push('--- ALERGIAS ---');L.push(p.alerg.join(', '));L.push('');}
+  if(consulta.cRetD){
+    L.push('--- PRÓXIMO RETORNO ---');
+    L.push('📅 '+fD(consulta.cRetD)+(consulta.cRetH?' às '+consulta.cRetH:''));
+    if(consulta.cRetObs) L.push(consulta.cRetObs);
+    L.push('');
+  }
+  L.push('Gerado pelo app Saúde Família');
+  var rel = L.join('\n');
   if(navigator.share){
-    navigator.share({title:'Relatório Médico — '+p.nome, text:rel});
+    navigator.share({title:'Resumo Médico — '+p.nome, text:rel});
   } else if(navigator.clipboard){
-    navigator.clipboard.writeText(rel).then(function(){alert('✅ Relatório copiado!\n\nCole no WhatsApp ou onde precisar.');});
+    navigator.clipboard.writeText(rel).then(function(){alert('✅ Resumo copiado! Cole no WhatsApp.');});
   } else {
     var w=window.open('','_blank');
-    w.document.write('<pre style="font-family:monospace;padding:20px;">'+rel+'</pre>');
+    if(w) w.document.write('<pre style="font-family:monospace;padding:20px;white-space:pre-wrap;">'+rel+'</pre>');
   }
 }
 
@@ -2276,6 +2294,285 @@ function verificarLactante(){
 }
 
 init();
+// ══ VACINAS ══════════════════════════════════════════════════
+var CAL_VACINAL=[
+  {id:'bcg',nome:'BCG',doses:[{num:1,idade:'Ao nascer'}]},
+  {id:'hep_b',nome:'Hepatite B',doses:[{num:1,idade:'Ao nascer'},{num:2,idade:'2 meses'},{num:3,idade:'6 meses'}]},
+  {id:'penta',nome:'Pentavalente (DTP+Hib+HepB)',doses:[{num:1,idade:'2 meses'},{num:2,idade:'4 meses'},{num:3,idade:'6 meses'},{num:'R1',idade:'15 meses'},{num:'R2',idade:'4 anos'}]},
+  {id:'vip',nome:'Poliomielite Inativada (VIP)',doses:[{num:1,idade:'2 meses'},{num:2,idade:'4 meses'},{num:3,idade:'6 meses'}]},
+  {id:'vop',nome:'Poliomielite Oral (VOP)',doses:[{num:'R1',idade:'15 meses'},{num:'R2',idade:'4 anos'}]},
+  {id:'pneumo',nome:'Pneumocócica 10V',doses:[{num:1,idade:'2 meses'},{num:2,idade:'4 meses'},{num:'R',idade:'12 meses'}]},
+  {id:'rota',nome:'Rotavírus',doses:[{num:1,idade:'2 meses'},{num:2,idade:'4 meses'}]},
+  {id:'meningo',nome:'Meningocócica C',doses:[{num:1,idade:'3 meses'},{num:2,idade:'5 meses'},{num:'R',idade:'12 meses'}]},
+  {id:'febre_a',nome:'Febre Amarela',doses:[{num:1,idade:'9 meses'},{num:'R',idade:'4 anos'}]},
+  {id:'triplice_v',nome:'Tríplice Viral (SCR)',doses:[{num:1,idade:'12 meses'},{num:2,idade:'15 meses'}]},
+  {id:'varicela',nome:'Varicela',doses:[{num:1,idade:'15 meses'}]},
+  {id:'hepatite_a',nome:'Hepatite A',doses:[{num:1,idade:'15 meses'}]},
+  {id:'dtp',nome:'DTP (reforço)',doses:[{num:'R1',idade:'15 meses'},{num:'R2',idade:'4 anos'}]},
+  {id:'hpv',nome:'HPV',doses:[{num:1,idade:'9-14 anos'},{num:2,idade:'6 meses após 1ª'}]},
+  {id:'meningo_acwy',nome:'Meningocócica ACWY',doses:[{num:1,idade:'11-12 anos'},{num:'R',idade:'13 anos'}]},
+  {id:'dupla_adulto',nome:'dT (Dupla Adulto)',doses:[{num:'R',idade:'A cada 10 anos'}]},
+  {id:'influenza',nome:'Influenza',doses:[{num:'A',idade:'Anual'}]},
+  {id:'covid',nome:'COVID-19',doses:[{num:1,idade:'A partir de 6 meses'},{num:2,idade:'Conforme esquema'}]},
+];
+
+function getVacDoses(){return (getP()||{}).vacDoses||[];}
+function salvarVacDoses(d){var p=getP();if(!p)return;p.vacDoses=d;salvarP(p);}
+
+function renderVacinas(){
+  var el=document.getElementById('vacOut');if(!el)return;
+  el.innerHTML='';
+  var doses=getVacDoses();
+  CAL_VACINAL.forEach(function(vac){
+    var card=document.createElement('div');
+    card.style.cssText='background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);margin:0 14px 10px;overflow:hidden;';
+    // Header
+    var hdr=document.createElement('div');
+    hdr.style.cssText='padding:11px 13px 8px;display:flex;align-items:center;justify-content:space-between;';
+    hdr.innerHTML='<div style="font-size:.88rem;font-weight:800;">💉 '+esc(vac.nome)+'</div>';
+    card.appendChild(hdr);
+    // Doses
+    vac.doses.forEach(function(dose){
+      var dKey=vac.id+'_'+dose.num;
+      var reg=doses.find(function(d){return d.key===dKey;});
+      var tomada=!!(reg&&reg.data);
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 13px;border-top:1px solid var(--bdr);';
+      // Status icon
+      var ic=document.createElement('div');
+      ic.style.cssText='width:22px;height:22px;border-radius:50%;border:2px solid '+(tomada?'var(--grn)':'var(--bdr)')+';background:'+(tomada?'var(--grn)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;color:#fff;font-weight:800;';
+      ic.textContent=tomada?'✓':'';
+      // Info
+      var info=document.createElement('div');info.style.flex='1';
+      info.innerHTML='<div style="font-size:.82rem;font-weight:700;">Dose '+dose.num+'</div>'
+        +'<div style="font-size:.72rem;color:var(--t3);">'+dose.idade+'</div>'
+        +(tomada&&reg.data?'<div style="font-size:.72rem;color:var(--grn);">Tomada em: '+fD(reg.data)+(reg.prox?'  · Próxima: '+fD(reg.prox):'')+'</div>':'')
+        +(!tomada&&reg&&reg.prox?'<div style="font-size:.72rem;color:var(--ora);">⏰ Agendada: '+fD(reg.prox)+'</div>':'');
+      // Button
+      var btn=document.createElement('button');
+      btn.style.cssText='background:'+(tomada?'var(--grnp)':'var(--bdr)')+';border:none;border-radius:7px;padding:5px 9px;font-size:.75rem;font-weight:700;color:'+(tomada?'var(--grn)':'var(--t2)')+';cursor:pointer;white-space:nowrap;';
+      btn.textContent=tomada?'✏️ Editar':'+ Registrar';
+      btn.addEventListener('click',(function(vid,vnum,vnome,vidadeRec){return function(){abrirRegistroVacina(vid,vnum,vnome,vidadeRec);};})(vac.id,dose.num,vac.nome,dose.idade));
+      row.appendChild(ic);row.appendChild(info);row.appendChild(btn);
+      card.appendChild(row);
+    });
+    el.appendChild(card);
+  });
+  // Vacinas customizadas
+  var vacsC=getVacsCustom();
+  if(vacsC.length){
+    var secTitle=document.createElement('div');
+    secTitle.style.cssText='font-size:.75rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;padding:12px 14px 4px;';
+    secTitle.textContent='Outras Vacinas';
+    el.appendChild(secTitle);
+  }
+  vacsC.forEach(function(vac,vi){
+    var card=document.createElement('div');
+    card.style.cssText='background:var(--sur);border-radius:var(--r);box-shadow:var(--sh);margin:0 14px 10px;overflow:hidden;';
+    var hdr=document.createElement('div');
+    hdr.style.cssText='padding:11px 13px 8px;display:flex;align-items:center;justify-content:space-between;';
+    hdr.innerHTML='<div style="font-size:.88rem;font-weight:800;">💉 '+esc(vac.nome)+(vac.obs?'<div style="font-size:.72rem;color:var(--t3);font-weight:400;">'+esc(vac.obs)+'</div>':'')+'</div>';
+    var btns=document.createElement('div');btns.style.display='flex';btns.style.gap='4px';
+    var btnE=document.createElement('button');btnE.textContent='✏️';btnE.className='btn bSm bOut';btnE.style.padding='4px 7px';
+    btnE.addEventListener('click',(function(i){return function(){editarVacinaCustom(i);};})(vi));
+    var btnX=document.createElement('button');btnX.textContent='🗑️';btnX.className='btn bSm bOut';btnX.style.cssText='padding:4px 7px;color:var(--red);border-color:var(--red);';
+    btnX.addEventListener('click',(function(i){return function(){excluirVacinaCustom(i);};})(vi));
+    btns.appendChild(btnE);btns.appendChild(btnX);hdr.appendChild(btns);card.appendChild(hdr);
+    vac.doses.forEach(function(dose){
+      var dKey=vac.id+'_'+dose.num;
+      var reg=(getVacDoses()||[]).find(function(d){return d.key===dKey;});
+      var tomada=!!(reg&&reg.data);
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;padding:7px 13px;border-top:1px solid var(--bdr);';
+      var ic=document.createElement('div');
+      ic.style.cssText='width:22px;height:22px;border-radius:50%;border:2px solid '+(tomada?'var(--grn)':'var(--bdr)')+';background:'+(tomada?'var(--grn)':'transparent')+';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem;color:#fff;font-weight:800;';
+      ic.textContent=tomada?'✓':'';
+      var info=document.createElement('div');info.style.flex='1';
+      info.innerHTML='<div style="font-size:.82rem;font-weight:700;">Dose '+dose.num+'</div>'
+        +(tomada&&reg.data?'<div style="font-size:.72rem;color:var(--grn);">Tomada em: '+fD(reg.data)+(reg.prox?'  · Próxima: '+fD(reg.prox):'')+'</div>':'')
+        +(!tomada&&reg&&reg.prox?'<div style="font-size:.72rem;color:var(--ora);">⏰ Agendada: '+fD(reg.prox)+'</div>':'');
+      var btn=document.createElement('button');
+      btn.style.cssText='background:'+(tomada?'var(--grnp)':'var(--bdr)')+';border:none;border-radius:7px;padding:5px 9px;font-size:.75rem;font-weight:700;color:'+(tomada?'var(--grn)':'var(--t2)')+';cursor:pointer;white-space:nowrap;';
+      btn.textContent=tomada?'✏️ Editar':'+ Registrar';
+      btn.addEventListener('click',(function(vid,vnum,vnome){return function(){abrirRegistroVacina(vid,vnum,vnome,'Conforme indicação');};})(vac.id,dose.num,vac.nome));
+      row.appendChild(ic);row.appendChild(info);row.appendChild(btn);card.appendChild(row);
+    });
+    el.appendChild(card);
+  });
+}
+
+// Modal de registro de vacina
+var _vacEditKey=null;
+function abrirRegistroVacina(vacId,doseNum,nomeVac,idadeRec){
+  _vacEditKey=vacId+'_'+doseNum;
+  var doses=getVacDoses();
+  var reg=doses.find(function(d){return d.key===_vacEditKey;})||{};
+  document.getElementById('vacModalTit').textContent='💉 '+nomeVac+' — Dose '+doseNum;
+  document.getElementById('vacIdadeRec').textContent='Idade recomendada: '+idadeRec;
+  document.getElementById('vacData').value=reg.data||'';
+  document.getElementById('vacLote').value=reg.lote||'';
+  document.getElementById('vacLocal').value=reg.local||'';
+  document.getElementById('vacProxData').value=reg.prox||'';
+  document.getElementById('vacProxDias').value='';
+  abrirModal('ovVacina');
+}
+function abrirNovaVacina(){
+  // Abre primeira dose não tomada
+  var doses=getVacDoses();
+  for(var i=0;i<CAL_VACINAL.length;i++){
+    var vac=CAL_VACINAL[i];
+    for(var j=0;j<vac.doses.length;j++){
+      var key=vac.id+'_'+vac.doses[j].num;
+      var reg=doses.find(function(d){return d.key===key;});
+      if(!reg||!reg.data){abrirRegistroVacina(vac.id,vac.doses[j].num,vac.nome,vac.doses[j].idade);return;}
+    }
+  }
+  toast('Todas as vacinas registradas!');
+}
+function calcProxData(){
+  var dias=parseInt(document.getElementById('vacProxDias').value);
+  if(!dias||isNaN(dias))return;
+  var base=document.getElementById('vacData').value||new Date().toISOString().slice(0,10);
+  var d=new Date(base+'T12:00:00');
+  d.setDate(d.getDate()+dias);
+  document.getElementById('vacProxData').value=d.toISOString().slice(0,10);
+}
+function salvarVacina(){
+  var data=document.getElementById('vacData').value;
+  if(!data&&!confirm('Nenhuma data informada. Salvar assim mesmo?'))return;
+  var doses=getVacDoses();
+  var idx=doses.findIndex(function(d){return d.key===_vacEditKey;});
+  var reg={key:_vacEditKey,data:data,lote:document.getElementById('vacLote').value.trim(),local:document.getElementById('vacLocal').value.trim(),prox:document.getElementById('vacProxData').value};
+  if(idx>=0)doses[idx]=reg;else doses.push(reg);
+  salvarVacDoses(doses);
+  fModal('ovVacina');renderVacinas();
+  // Agendar alarme para próxima dose
+  if(reg.prox&&_swReg){try{agendarAlarme('Próxima dose de vacina',reg.prox,reg.prox+' — Dose agendada');}catch(e){}}
+  toast('Vacina registrada ✅');
+}
+function salvarP(p){var i=P.findIndex(function(x){return x.id===pid;});if(i>=0)P[i]=p;salvar();}
+
+// ── VACINAS CUSTOMIZADAS ──────────────────────────────────────
+function getVacsCustom(){return (getP()||{}).vacsCustom||[];}
+function salvarVacsCustom(v){var p=getP();if(!p)return;p.vacsCustom=v;salvarP(p);}
+
+var _vacCustomEditIdx=null;
+function abrirNovaVacinaCustom(){
+  _vacCustomEditIdx=null;
+  document.getElementById('vcNome').value='';
+  document.getElementById('vcDoses').value='1';
+  document.getElementById('vcObs').value='';
+  abrirModal('ovVacinaCustom');
+}
+function editarVacinaCustom(idx){
+  _vacCustomEditIdx=idx;
+  var v=getVacsCustom()[idx];if(!v)return;
+  document.getElementById('vcNome').value=v.nome||'';
+  document.getElementById('vcDoses').value=v.numDoses||'1';
+  document.getElementById('vcObs').value=v.obs||'';
+  abrirModal('ovVacinaCustom');
+}
+function salvarVacinaCustom(){
+  var nome=document.getElementById('vcNome').value.trim();
+  if(!nome){alert('Informe o nome da vacina.');return;}
+  var numDoses=parseInt(document.getElementById('vcDoses').value)||1;
+  var obs=document.getElementById('vcObs').value.trim();
+  var vacs=getVacsCustom();
+  // Build doses array
+  var doses=[];
+  for(var i=1;i<=numDoses;i++){doses.push({num:i,idade:'Conforme indicação'});}
+  var vac={id:'custom_'+Date.now(),nome:nome,numDoses:numDoses,obs:obs,doses:doses,custom:true};
+  if(_vacCustomEditIdx!=null){
+    vacs[_vacCustomEditIdx]=Object.assign(vacs[_vacCustomEditIdx],vac);
+  } else {
+    vacs.push(vac);
+  }
+  salvarVacsCustom(vacs);
+  fModal('ovVacinaCustom');
+  renderVacinas();
+  toast('Vacina adicionada ✅');
+}
+function excluirVacinaCustom(idx){
+  if(!confirm('Excluir esta vacina e seus registros?'))return;
+  var vacs=getVacsCustom();
+  var vac=vacs[idx];
+  // Remove doses registradas
+  var doses=getVacDoses().filter(function(d){return!d.key.startsWith(vac.id);});
+  salvarVacDoses(doses);
+  vacs.splice(idx,1);
+  salvarVacsCustom(vacs);
+  renderVacinas();
+  toast('Vacina excluída');
+}
+
 </script>
+<!-- MODAL VACINA -->
+<div class="ov" id="ovVacina">
+  <div class="modal">
+    <div class="mHdl"></div>
+    <div class="mTit" id="vacModalTit">💉 Vacina</div>
+    <div style="font-size:.75rem;color:var(--t3);margin-bottom:12px;" id="vacIdadeRec"></div>
+    <div class="fg">
+      <label class="lbl">Data da dose</label>
+      <input type="date" class="inp" id="vacData">
+    </div>
+    <div class="fg">
+      <label class="lbl">Lote da vacina</label>
+      <input type="text" class="inp" id="vacLote" placeholder="Ex: A1234B">
+    </div>
+    <div class="fg">
+      <label class="lbl">Local de vacinação</label>
+      <input type="text" class="inp" id="vacLocal" placeholder="UBS, clínica…">
+    </div>
+    <div class="fg">
+      <label class="lbl">Data da próxima dose</label>
+      <input type="date" class="inp" id="vacProxData">
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+        <span style="font-size:.75rem;color:var(--t3);padding-top:6px;">Calcular:</span>
+        <button onclick="document.getElementById('vacProxDias').value='15';calcProxData()" class="btn bSm bOut" style="padding:5px 9px;">15 dias</button>
+        <button onclick="document.getElementById('vacProxDias').value='30';calcProxData()" class="btn bSm bOut" style="padding:5px 9px;">30 dias</button>
+        <button onclick="document.getElementById('vacProxDias').value='60';calcProxData()" class="btn bSm bOut" style="padding:5px 9px;">60 dias</button>
+        <button onclick="document.getElementById('vacProxDias').value='180';calcProxData()" class="btn bSm bOut" style="padding:5px 9px;">6 meses</button>
+        <button onclick="document.getElementById('vacProxDias').value='365';calcProxData()" class="btn bSm bOut" style="padding:5px 9px;">1 ano</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+        <input type="number" class="inp" id="vacProxDias" placeholder="Ou digite os dias" style="flex:1;" oninput="calcProxData()">
+        <span style="font-size:.78rem;color:var(--t3);">dias</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn bP" onclick="salvarVacina()" style="flex:2;">Salvar ✓</button>
+      <button class="btn bOut" onclick="fModal('ovVacina')" style="flex:1;">Cancelar</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL NOVA VACINA CUSTOM -->
+<div class="ov" id="ovVacinaCustom">
+  <div class="modal">
+    <div class="mHdl"></div>
+    <div class="mTit">💉 Adicionar Vacina</div>
+    <div class="fg">
+      <label class="lbl">Nome da vacina *</label>
+      <input type="text" class="inp" id="vcNome" placeholder="Ex: Raiva, Febre Tifóide, Dengue…">
+    </div>
+    <div class="fg">
+      <label class="lbl">Número de doses</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="document.getElementById('vcDoses').value='1'" class="btn bSm bOut">1 dose</button>
+        <button onclick="document.getElementById('vcDoses').value='2'" class="btn bSm bOut">2 doses</button>
+        <button onclick="document.getElementById('vcDoses').value='3'" class="btn bSm bOut">3 doses</button>
+        <input type="number" class="inp" id="vcDoses" value="1" min="1" max="10" style="width:80px;">
+      </div>
+    </div>
+    <div class="fg">
+      <label class="lbl">Observações</label>
+      <input type="text" class="inp" id="vcObs" placeholder="Indicação, fabricante, etc.">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn bP" onclick="salvarVacinaCustom()" style="flex:2;">Salvar ✓</button>
+      <button class="btn bOut" onclick="fModal('ovVacinaCustom')" style="flex:1;">Cancelar</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

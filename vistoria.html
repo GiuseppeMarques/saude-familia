@@ -1,254 +1,18 @@
-<!DOCTYPE html>
+
+  if(s==='pontos') setTimeout(function(){initMapPOI();renderListaPOI();},150);
+}<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIFNvbWJyYSBkbyBlc2N1ZG8gLS0+CiAgPHBhdGggZD0iTTI2MCAzMiBMNDgwIDExMiBMNDgwIDI5MiBRNDgwIDQyMCAyNjAgNTAwIFE0MCA0MjAgNDAgMjkyIEw0MCAxMTIgWiIgZmlsbD0iIzhCMUExRSIgb3BhY2l0eT0iMC40Ii8+CiAgPCEtLSBFc2N1ZG8gcHJpbmNpcGFsIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMjggTDQ3NiAxMDggTDQ3NiAyODggUTQ3NiA0MTYgMjU2IDQ5NiBRMzYgNDE2IDM2IDI4OCBMMzYgMTA4IFoiIGZpbGw9IiNDMDI3MkQiLz4KICA8IS0tIEJvcmRhIGludGVybmEgLS0+CiAgPHBhdGggZD0iTTI1NiA1MiBMNDUyIDEyMiBMNDUyIDI4OCBRNDUyIDM5NiAyNTYgNDY4IFE2MCAzOTYgNjAgMjg4IEw2MCAxMjIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIENoYW1hIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMTMwCiAgICBRMjY4IDE1OCAyNjIgMTgwCiAgICBRMjc4IDE2MiAyNzYgMTM4CiAgICBRMjk4IDE2OCAyOTAgMjAwCiAgICBRMzA4IDE3NiAzMDQgMTQ4CiAgICBRMzMwIDE4MiAzMjAgMjE4CiAgICBRMzE0IDI0OCAyOTIgMjY0CiAgICBRMzAwIDI0MiAyODYgMjI2CiAgICBRMjgyIDI1NCAyNjQgMjY4CiAgICBRMjY2IDI0NCAyNTQgMjMyCiAgICBRMjQyIDI0NCAyNDQgMjY4CiAgICBRMjI2IDI1NCAyMjIgMjI2CiAgICBRMjA4IDI0MiAyMTYgMjY0CiAgICBRMTk0IDI0OCAxODggMjE4CiAgICBRMTc4IDE4MiAyMDQgMTQ4CiAgICBRMjAwIDE3NiAyMTggMjAwCiAgICBRMjEwIDE2OCAyMzIgMTM4CiAgICBRMjMwIDE2MiAyNDYgMTgwCiAgICBRMjQwIDE1OCAyNTYgMTMwWiIKICAgIGZpbGw9IndoaXRlIi8+CiAgPCEtLSBMaW5oYSBkaXZpc8OzcmlhIC0tPgogIDxyZWN0IHg9Ijc2IiB5PSIyODYiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBTQyAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM4MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iODgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNiI+U0M8L3RleHQ+Cjwvc3ZnPg==">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8IS0tIFNvbWJyYSBkbyBlc2N1ZG8gLS0+CiAgPHBhdGggZD0iTTI2MCAzMiBMNDgwIDExMiBMNDgwIDI5MiBRNDgwIDQyMCAyNjAgNTAwIFE0MCA0MjAgNDAgMjkyIEw0MCAxMTIgWiIgZmlsbD0iIzhCMUExRSIgb3BhY2l0eT0iMC40Ii8+CiAgPCEtLSBFc2N1ZG8gcHJpbmNpcGFsIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMjggTDQ3NiAxMDggTDQ3NiAyODggUTQ3NiA0MTYgMjU2IDQ5NiBRMzYgNDE2IDM2IDI4OCBMMzYgMTA4IFoiIGZpbGw9IiNDMDI3MkQiLz4KICA8IS0tIEJvcmRhIGludGVybmEgLS0+CiAgPHBhdGggZD0iTTI1NiA1MiBMNDUyIDEyMiBMNDUyIDI4OCBRNDUyIDM5NiAyNTYgNDY4IFE2MCAzOTYgNjAgMjg4IEw2MCAxMjIgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2IiBvcGFjaXR5PSIwLjUiLz4KICA8IS0tIENoYW1hIC0tPgogIDxwYXRoIGQ9Ik0yNTYgMTMwCiAgICBRMjY4IDE1OCAyNjIgMTgwCiAgICBRMjc4IDE2MiAyNzYgMTM4CiAgICBRMjk4IDE2OCAyOTAgMjAwCiAgICBRMzA4IDE3NiAzMDQgMTQ4CiAgICBRMzMwIDE4MiAzMjAgMjE4CiAgICBRMzE0IDI0OCAyOTIgMjY0CiAgICBRMzAwIDI0MiAyODYgMjI2CiAgICBRMjgyIDI1NCAyNjQgMjY4CiAgICBRMjY2IDI0NCAyNTQgMjMyCiAgICBRMjQyIDI0NCAyNDQgMjY4CiAgICBRMjI2IDI1NCAyMjIgMjI2CiAgICBRMjA4IDI0MiAyMTYgMjY0CiAgICBRMTk0IDI0OCAxODggMjE4CiAgICBRMTc4IDE4MiAyMDQgMTQ4CiAgICBRMjAwIDE3NiAyMTggMjAwCiAgICBRMjEwIDE2OCAyMzIgMTM4CiAgICBRMjMwIDE2MiAyNDYgMTgwCiAgICBRMjQwIDE1OCAyNTYgMTMwWiIKICAgIGZpbGw9IndoaXRlIi8+CiAgPCEtLSBMaW5oYSBkaXZpc8OzcmlhIC0tPgogIDxyZWN0IHg9Ijc2IiB5PSIyODYiIHdpZHRoPSIzNjAiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC43Ii8+CiAgPCEtLSBTQyAtLT4KICA8dGV4dCB4PSIyNTYiIHk9IjM4MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iODgiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iNiI+U0M8L3RleHQ+Cjwvc3ZnPg==">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vistoria CBMSC">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#C0272D">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vistoria CBMSC</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0MwMjcyRCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzhCMUExRSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE1IiBmaWxsPSJ1cmwoI2JnKSIvPjxyZWN0IHg9IjEyMCIgeT0iMTAwIiB3aWR0aD0iMjcyIiBoZWlnaHQ9IjM0MCIgcng9IjE4IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOTUiLz48cmVjdCB4PSIxMjAiIHk9IjEwMCIgd2lkdGg9IjI3MiIgaGVpZ2h0PSI1MCIgcng9IjE4IiBmaWxsPSIjRThFOEU4Ii8+PHJlY3QgeD0iMTIwIiB5PSIxMzAiIHdpZHRoPSIyNzIiIGhlaWdodD0iMjAiIGZpbGw9IiNFOEU4RTgiLz48cmVjdCB4PSIyMTYiIHk9IjgyIiB3aWR0aD0iODAiIGhlaWdodD0iMzYiIHJ4PSIxMCIgZmlsbD0iI0MwMjcyRCIvPjxyZWN0IHg9IjIzNiIgeT0iOTAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCIgcng9IjYiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zIi8+PHJlY3QgeD0iMTU1IiB5PSIxOTAiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjQiIGZpbGw9IiNDMDI3MkQiLz48bGluZSB4MT0iMTU4IiB5MT0iMTk5IiB4Mj0iMTYzIiB5Mj0iMjA0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMTYzIiB5MT0iMjA0IiB4Mj0iMTcxIiB5Mj0iMTk0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSIxODUiIHk9IjE5MiIgd2lkdGg9IjE0NSIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiNFMEUwRTAiLz48cmVjdCB4PSIxNTUiIHk9IjIzMCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iI0MwMjcyRCIvPjxsaW5lIHgxPSIxNTgiIHkxPSIyMzkiIHgyPSIxNjMiIHkyPSIyNDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSIxNjMiIHkxPSIyNDQiIHgyPSIxNzEiIHkyPSIyMzQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxyZWN0IHg9IjE4NSIgeT0iMjMyIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEwIiByeD0iNSIgZmlsbD0iI0UwRTBFMCIvPjxyZWN0IHg9IjE1NSIgeT0iMjcwIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSI0IiBmaWxsPSIjRTBFMEUwIi8+PHJlY3QgeD0iMTg1IiB5PSIyNzIiIHdpZHRoPSIxNDUiIGhlaWdodD0iMTAiIHJ4PSI1IiBmaWxsPSIjRTBFMEUwIi8+PHJlY3QgeD0iMTU1IiB5PSIzMTAiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjQiIGZpbGw9IiNFMEUwRTAiLz48cmVjdCB4PSIxODUiIHk9IjMxMiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiNFMEUwRTAiLz48cGF0aCBkPSJNMzMwIDI5MCBRMzU2IDI4MCAzODIgMjkwIEwzODIgMzMwIFEzNTYgMzUwIDMzMCAzMzAgWiIgZmlsbD0iI0MwMjcyRCIvPjx0ZXh0IHg9IjM1NiIgeT0iMzIyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNDPC90ZXh0Pjwvc3ZnPg==">
-<link rel="apple-touch-icon" id="aic_Vistoria" href="#">
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlZpc3RvcmlhIENCTVNDIiwgInNob3J0X25hbWUiOiAiVmlzdG9yaWEiLCAic3RhcnRfdXJsIjogIi4vdmlzdG9yaWEuaHRtbCIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjQzAyNzJEIiwgInRoZW1lX2NvbG9yIjogIiNDMDI3MkQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQTFNVElnTlRFeUlqNDhaR1ZtY3o0OGJHbHVaV0Z5UjNKaFpHbGxiblFnYVdROUltSm5JaUI0TVQwaU1DSWdlVEU5SWpBaUlIZ3lQU0l4SWlCNU1qMGlNU0krUEhOMGIzQWdiMlptYzJWMFBTSXdKU0lnYzNSdmNDMWpiMnh2Y2owaUkwTXdNamN5UkNJdlBqeHpkRzl3SUc5bVpuTmxkRDBpTVRBd0pTSWdjM1J2Y0MxamIyeHZjajBpSXpoQ01VRXhSU0l2UGp3dmJHbHVaV0Z5UjNKaFpHbGxiblErUEM5a1pXWnpQanh5WldOMElIZHBaSFJvUFNJMU1USWlJR2hsYVdkb2REMGlOVEV5SWlCeWVEMGlNVEUxSWlCbWFXeHNQU0oxY213b0kySm5LU0l2UGp4eVpXTjBJSGc5SWpFeU1DSWdlVDBpTVRBd0lpQjNhV1IwYUQwaU1qY3lJaUJvWldsbmFIUTlJak0wTUNJZ2NuZzlJakU0SWlCbWFXeHNQU0lqWm1abUlpQnZjR0ZqYVhSNVBTSXVPVFVpTHo0OGNtVmpkQ0I0UFNJeE1qQWlJSGs5SWpFd01DSWdkMmxrZEdnOUlqSTNNaUlnYUdWcFoyaDBQU0kxTUNJZ2NuZzlJakU0SWlCbWFXeHNQU0lqUlRoRk9FVTRJaTgrUEhKbFkzUWdlRDBpTVRJd0lpQjVQU0l4TXpBaUlIZHBaSFJvUFNJeU56SWlJR2hsYVdkb2REMGlNakFpSUdacGJHdzlJaU5GT0VVNFJUZ2lMejQ4Y21WamRDQjRQU0l5TVRZaUlIazlJamd5SWlCM2FXUjBhRDBpT0RBaUlHaGxhV2RvZEQwaU16WWlJSEo0UFNJeE1DSWdabWxzYkQwaUkwTXdNamN5UkNJdlBqeHlaV04wSUhnOUlqSXpOaUlnZVQwaU9UQWlJSGRwWkhSb1BTSTBNQ0lnYUdWcFoyaDBQU0l5TUNJZ2NuZzlJallpSUdacGJHdzlJaU5tWm1ZaUlHOXdZV05wZEhrOUlpNHpJaTgrUEhKbFkzUWdlRDBpTVRVMUlpQjVQU0l4T1RBaUlIZHBaSFJvUFNJeE9DSWdhR1ZwWjJoMFBTSXhPQ0lnY25nOUlqUWlJR1pwYkd3OUlpTkRNREkzTWtRaUx6NDhiR2x1WlNCNE1UMGlNVFU0SWlCNU1UMGlNVGs1SWlCNE1qMGlNVFl6SWlCNU1qMGlNakEwSWlCemRISnZhMlU5SWlObVptWWlJSE4wY205clpTMTNhV1IwYUQwaU1pNDFJaUJ6ZEhKdmEyVXRiR2x1WldOaGNEMGljbTkxYm1RaUx6NDhiR2x1WlNCNE1UMGlNVFl6SWlCNU1UMGlNakEwSWlCNE1qMGlNVGN4SWlCNU1qMGlNVGswSWlCemRISnZhMlU5SWlObVptWWlJSE4wY205clpTMTNhV1IwYUQwaU1pNDFJaUJ6ZEhKdmEyVXRiR2x1WldOaGNEMGljbTkxYm1RaUx6NDhjbVZqZENCNFBTSXhPRFVpSUhrOUlqRTVNaUlnZDJsa2RHZzlJakUwTlNJZ2FHVnBaMmgwUFNJeE1DSWdjbmc5SWpVaUlHWnBiR3c5SWlORk1FVXdSVEFpTHo0OGNtVmpkQ0I0UFNJeE5UVWlJSGs5SWpJek1DSWdkMmxrZEdnOUlqRTRJaUJvWldsbmFIUTlJakU0SWlCeWVEMGlOQ0lnWm1sc2JEMGlJME13TWpjeVJDSXZQanhzYVc1bElIZ3hQU0l4TlRnaUlIa3hQU0l5TXpraUlIZ3lQU0l4TmpNaUlIa3lQU0l5TkRRaUlITjBjbTlyWlQwaUkyWm1aaUlnYzNSeWIydGxMWGRwWkhSb1BTSXlMalVpSUhOMGNtOXJaUzFzYVc1bFkyRndQU0p5YjNWdVpDSXZQanhzYVc1bElIZ3hQU0l4TmpNaUlIa3hQU0l5TkRRaUlIZ3lQU0l4TnpFaUlIa3lQU0l5TXpRaUlITjBjbTlyWlQwaUkyWm1aaUlnYzNSeWIydGxMWGRwWkhSb1BTSXlMalVpSUhOMGNtOXJaUzFzYVc1bFkyRndQU0p5YjNWdVpDSXZQanh5WldOMElIZzlJakU0TlNJZ2VUMGlNak15SWlCM2FXUjBhRDBpTVRJd0lpQm9aV2xuYUhROUlqRXdJaUJ5ZUQwaU5TSWdabWxzYkQwaUkwVXdSVEJGTUNJdlBqeHlaV04wSUhnOUlqRTFOU0lnZVQwaU1qY3dJaUIzYVdSMGFEMGlNVGdpSUdobGFXZG9kRDBpTVRnaUlISjRQU0kwSWlCbWFXeHNQU0lqUlRCRk1FVXdJaTgrUEhKbFkzUWdlRDBpTVRnMUlpQjVQU0l5TnpJaUlIZHBaSFJvUFNJeE5EVWlJR2hsYVdkb2REMGlNVEFpSUhKNFBTSTFJaUJtYVd4c1BTSWpSVEJGTUVVd0lpOCtQSEpsWTNRZ2VEMGlNVFUxSWlCNVBTSXpNVEFpSUhkcFpIUm9QU0l4T0NJZ2FHVnBaMmgwUFNJeE9DSWdjbmc5SWpRaUlHWnBiR3c5SWlORk1FVXdSVEFpTHo0OGNtVmpkQ0I0UFNJeE9EVWlJSGs5SWpNeE1pSWdkMmxrZEdnOUlqRXdNQ0lnYUdWcFoyaDBQU0l4TUNJZ2NuZzlJalVpSUdacGJHdzlJaU5GTUVVd1JUQWlMejQ4Y0dGMGFDQmtQU0pOTXpNd0lESTVNQ0JSTXpVMklESTRNQ0F6T0RJZ01qa3dJRXd6T0RJZ016TXdJRkV6TlRZZ016VXdJRE16TUNBek16QWdXaUlnWm1sc2JEMGlJME13TWpjeVJDSXZQangwWlhoMElIZzlJak0xTmlJZ2VUMGlNekl5SWlCbWIyNTBMV1poYldsc2VUMGlRWEpwWVd3aUlHWnZiblF0YzJsNlpUMGlNaklpSUdadmJuUXRkMlZwWjJoMFBTSTVNREFpSUdacGJHdzlJaU5tWm1ZaUlIUmxlSFF0WVc1amFHOXlQU0p0YVdSa2JHVWlQbE5EUEM5MFpYaDBQand2YzNablBnPT0iLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Vistoria CBMSC">
-<meta name="theme-color" content="#C0272D">
-<script>
-(function(){
-  var ic="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0MwMjcyRCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzhCMUExRSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iMTE1IiBmaWxsPSJ1cmwoI2JnKSIvPjxyZWN0IHg9IjEyMCIgeT0iMTAwIiB3aWR0aD0iMjcyIiBoZWlnaHQ9IjM0MCIgcng9IjE4IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIuOTUiLz48cmVjdCB4PSIxMjAiIHk9IjEwMCIgd2lkdGg9IjI3MiIgaGVpZ2h0PSI1MCIgcng9IjE4IiBmaWxsPSIjRThFOEU4Ii8+PHJlY3QgeD0iMTIwIiB5PSIxMzAiIHdpZHRoPSIyNzIiIGhlaWdodD0iMjAiIGZpbGw9IiNFOEU4RTgiLz48cmVjdCB4PSIyMTYiIHk9IjgyIiB3aWR0aD0iODAiIGhlaWdodD0iMzYiIHJ4PSIxMCIgZmlsbD0iI0MwMjcyRCIvPjxyZWN0IHg9IjIzNiIgeT0iOTAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCIgcng9IjYiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii4zIi8+PHJlY3QgeD0iMTU1IiB5PSIxOTAiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjQiIGZpbGw9IiNDMDI3MkQiLz48bGluZSB4MT0iMTU4IiB5MT0iMTk5IiB4Mj0iMTYzIiB5Mj0iMjA0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48bGluZSB4MT0iMTYzIiB5MT0iMjA0IiB4Mj0iMTcxIiB5Mj0iMTk0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cmVjdCB4PSIxODUiIHk9IjE5MiIgd2lkdGg9IjE0NSIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiNFMEUwRTAiLz48cmVjdCB4PSIxNTUiIHk9IjIzMCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iNCIgZmlsbD0iI0MwMjcyRCIvPjxsaW5lIHgxPSIxNTgiIHkxPSIyMzkiIHgyPSIxNjMiIHkyPSIyNDQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxsaW5lIHgxPSIxNjMiIHkxPSIyNDQiIHgyPSIxNzEiIHkyPSIyMzQiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxyZWN0IHg9IjE4NSIgeT0iMjMyIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEwIiByeD0iNSIgZmlsbD0iI0UwRTBFMCIvPjxyZWN0IHg9IjE1NSIgeT0iMjcwIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSI0IiBmaWxsPSIjRTBFMEUwIi8+PHJlY3QgeD0iMTg1IiB5PSIyNzIiIHdpZHRoPSIxNDUiIGhlaWdodD0iMTAiIHJ4PSI1IiBmaWxsPSIjRTBFMEUwIi8+PHJlY3QgeD0iMTU1IiB5PSIzMTAiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgcng9IjQiIGZpbGw9IiNFMEUwRTAiLz48cmVjdCB4PSIxODUiIHk9IjMxMiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiNFMEUwRTAiLz48cGF0aCBkPSJNMzMwIDI5MCBRMzU2IDI4MCAzODIgMjkwIEwzODIgMzMwIFEzNTYgMzUwIDMzMCAzMzAgWiIgZmlsbD0iI0MwMjcyRCIvPjx0ZXh0IHg9IjM1NiIgeT0iMzIyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNDPC90ZXh0Pjwvc3ZnPg==";
-  // Apple touch icon via canvas
-  try{
-    var c=document.createElement('canvas');c.width=180;c.height=180;
-    var x=c.getContext('2d');var img=new Image();
-    img.onload=function(){x.drawImage(img,0,0,180,180);
-      var ai=document.getElementById('aic_Vistoria');if(ai)ai.href=c.toDataURL('image/png');
-    };img.src=ic;
-  }catch(e){var ai=document.getElementById('aic_Vistoria');if(ai)ai.href=ic;}
-})();
-
-// ══ MAPA LEAFLET (sistema idêntico ao Pontos de Interesse) ══════
-var _lmapCBM=null, _tileCBM=null, _markersCBM=[], _poiEditCBM=null, _poiCatCBM='hidrante', _poiLatCBM=null, _poiLngCBM=null;
-
-var TILES_CBM={
-  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
-  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
-  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
-};
-
-var CIDADES_CBM=[
-  {n:'Florianópolis',lat:-27.595,lng:-48.548,t:'cap'},
-  {n:'Curitiba',lat:-25.429,lng:-49.271,t:'cap'},
-  {n:'Porto Alegre',lat:-30.034,lng:-51.217,t:'cap'},
-  {n:'Joinville',lat:-26.304,lng:-48.846,t:'gde'},
-  {n:'Blumenau',lat:-26.919,lng:-49.066,t:'gde'},
-  {n:'Chapecó',lat:-27.101,lng:-52.615,t:'gde'},
-  {n:'Lages',lat:-27.816,lng:-50.326,t:'gde'},
-  {n:'Rancho Queimado',lat:-27.675,lng:-49.013,t:'viz'},
-  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337,t:'viz'},
-  {n:'Leoberto Leal',lat:-27.534,lng:-49.063,t:'viz'},
-  {n:'Angelina',lat:-27.567,lng:-49.001,t:'viz'},
-  {n:'Santo Amaro',lat:-27.693,lng:-48.797,t:'viz'},
-  {n:'São Bonifácio',lat:-27.904,lng:-48.933,t:'viz'},
-  {n:'Anitápolis',lat:-27.907,lng:-49.131,t:'viz'},
-  {n:'Águas Mornas',lat:-27.716,lng:-48.827,t:'viz'},
-  {n:'Antônio Carlos',lat:-27.475,lng:-48.745,t:'viz'},
-];
-
-var CATS_CBM=[
-  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
-  {id:'manancial',nome:'Manancial',ico:'🌊'},
-  {id:'ponte',nome:'Ponte',ico:'🌉'},
-  {id:'edificacao',nome:'Edificação',ico:'🏢'},
-  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
-  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
-  {id:'referencia',nome:'Referência',ico:'📍'},
-];
-
-function getPOIsCBM(){try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return[];}}
-function savePOIsCBM(l){localStorage.setItem('cbmsc_pois',JSON.stringify(l));}
-
-function initMapCBM(mapDivId){
-  if(_lmapCBM) return;
-  var el=document.getElementById(mapDivId||'mapCBM');
-  if(!el)return;
-  if(typeof LF==='undefined'){
-    el.innerHTML='<div style="padding:20px;text-align:center;color:#888;font-size:.85rem;">Mapa requer conexão com internet.<br>Conecte-se e recarregue.</div>';
-    return;
-  }
-  // Force dimensions
-  el.style.width='100%';
-  el.style.height='52vh';
-  el.style.minHeight='300px';
-  el.style.display='block';
-  try{
-    _lmapCBM=LF.map(el,{zoomControl:true}).setView([-27.5,-49.0],9);
-    _tileCBM=LF.tileLayer(TILES_CBM.rua.url,{attribution:TILES_CBM.rua.attr,maxZoom:19}).addTo(_lmapCBM);
-    // Cidades de referência
-    var cor={cap:'#0f172a',gde:'#334155',med:'#64748b',viz:'#C0272D'};
-    var raio={cap:7,gde:5,med:4,viz:5};
-    CIDADES_CBM.forEach(function(c){
-      var mk=LF.circleMarker([c.lat,c.lng],{
-        radius:raio[c.t]||4,fillColor:cor[c.t]||'#64748b',
-        color:'#fff',weight:1.5,fillOpacity:0.9
-      }).addTo(_lmapCBM).bindPopup(c.n);
-      if(c.t==='cap'||c.t==='viz'||c.t==='gde'){
-        mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[raio[c.t]+3,0],
-          className:'city-lbl-cbm'});
-      }
-    });
-    // Clique no mapa → abre modal com coords preenchidas
-    _lmapCBM.on('click',function(e){
-      _poiLatCBM=e.latlng.lat;_poiLngCBM=e.latlng.lng;
-      var fl=document.getElementById('poi-lat-cbm');
-      var fl2=document.getElementById('poi-lng-cbm');
-      if(fl)fl.value=_poiLatCBM.toFixed(6);
-      if(fl2)fl2.value=_poiLngCBM.toFixed(6);
-      abrirModalPOICBM(null);
-    });
-    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();renderMarkersCBM();},400);
-  }catch(e){console.log('MapCBM erro:',e);}
-}
-
-function setTileCBM(tipo){
-  // Update button states
-  document.querySelectorAll('.tile-btn-cbm').forEach(function(b){
-    b.classList.toggle('active',b.dataset.tile===tipo);
-  });
-  if(!_lmapCBM||!_tileCBM)return;
-  _lmapCBM.removeLayer(_tileCBM);
-  var t=TILES_CBM[tipo];if(!t)return;
-  _tileCBM=LF.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_lmapCBM);
-}
-
-function renderMarkersCBM(){
-  if(!_lmapCBM)return;
-  _markersCBM.forEach(function(m){_lmapCBM.removeLayer(m);});_markersCBM=[];
-  getPOIsCBM().forEach(function(p){
-    if(!p.lat||!p.lng)return;
-    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
-    var icon=LF.divIcon({
-      className:'',
-      html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',
-      iconSize:[28,28],iconAnchor:[14,14]
-    });
-    var mk=LF.marker([p.lat,p.lng],{icon:icon}).addTo(_lmapCBM)
-      .bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
-    _markersCBM.push(mk);
-  });
-}
-
-function usarGpsCBM(){
-  if(!navigator.geolocation){alert('GPS indisponível.');return;}
-  navigator.geolocation.getCurrentPosition(function(pos){
-    _poiLatCBM=pos.coords.latitude;_poiLngCBM=pos.coords.longitude;
-    var fl=document.getElementById('poi-lat-cbm');
-    var fl2=document.getElementById('poi-lng-cbm');
-    if(fl)fl.value=_poiLatCBM.toFixed(6);
-    if(fl2)fl2.value=_poiLngCBM.toFixed(6);
-    if(_lmapCBM)_lmapCBM.setView([_poiLatCBM,_poiLngCBM],14);
-    alert('GPS capturado ✅');
-  },function(){alert('Não foi possível obter GPS.');});
-}
-
-function abrirModalPOICBM(id){
-  _poiEditCBM=id;
-  var m=document.getElementById('mo-poi-cbm');if(!m)return;
-  document.getElementById('mo-poi-cbm-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
-  renderCatGridCBM();
-  if(id){
-    var p=getPOIsCBM().find(function(x){return x.id===id;});
-    if(p){_poiCatCBM=p.cat;
-      document.getElementById('poi-nome-cbm').value=p.nome||'';
-      document.getElementById('poi-obs-cbm').value=p.obs||'';
-      document.getElementById('poi-lat-cbm').value=p.lat||'';
-      document.getElementById('poi-lng-cbm').value=p.lng||'';
-      _poiLatCBM=p.lat;_poiLngCBM=p.lng;
-    }
-  }else{
-    document.getElementById('poi-nome-cbm').value='';
-    document.getElementById('poi-obs-cbm').value='';
-    document.getElementById('poi-lat-cbm').value=_poiLatCBM?_poiLatCBM.toFixed(6):'';
-    document.getElementById('poi-lng-cbm').value=_poiLngCBM?_poiLngCBM.toFixed(6):'';
-  }
-  renderCatGridCBM();
-  m.style.display='flex';
-}
-function fecharModalPOICBM(){
-  var m=document.getElementById('mo-poi-cbm');if(m)m.style.display='none';
-  _poiLatCBM=null;_poiLngCBM=null;_poiEditCBM=null;
-}
-function renderCatGridCBM(){
-  var el=document.getElementById('cat-grid-cbm');if(!el)return;el.innerHTML='';
-  CATS_CBM.forEach(function(c){
-    var btn=document.createElement('button');
-    var act=c.id===_poiCatCBM;
-    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid '+(act?'#C0272D':'#e2e8f0')+';background:'+(act?'#C0272D':'#f8fafc')+';color:'+(act?'#fff':'#1c1c1e')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
-    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
-    btn.onclick=(function(cid){return function(){_poiCatCBM=cid;renderCatGridCBM();};})(c.id);
-    el.appendChild(btn);
-  });
-}
-function salvarPOICBM(){
-  var nome=document.getElementById('poi-nome-cbm').value.trim();if(!nome){alert('Informe o nome.');return;}
-  var lat=parseFloat(document.getElementById('poi-lat-cbm').value)||_poiLatCBM;
-  var lng=parseFloat(document.getElementById('poi-lng-cbm').value)||_poiLngCBM;
-  var obs=document.getElementById('poi-obs-cbm').value.trim();
-  var lista=getPOIsCBM();
-  if(_poiEditCBM){
-    var i=lista.findIndex(function(x){return x.id===_poiEditCBM;});
-    if(i>=0){lista[i].nome=nome;lista[i].cat=_poiCatCBM;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}
-  }else{
-    lista.push({id:Date.now().toString(36),nome:nome,cat:_poiCatCBM,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});
-  }
-  savePOIsCBM(lista);fecharModalPOICBM();renderListaPOICBM();renderMarkersCBM();
-}
-function renderListaPOICBM(){
-  var el=document.getElementById('lista-poi-cbm');if(!el)return;
-  var lista=getPOIsCBM();
-  if(!lista.length){
-    el.innerHTML='<div style="text-align:center;padding:20px;color:#94a3b8;"><div style="font-size:2rem;">📍</div><p>Nenhum ponto. Toque no mapa ou em "Marcar Ponto".</p></div>';
-    return;
-  }
-  el.innerHTML='';
-  lista.forEach(function(p){
-    var cat=CATS_CBM.find(function(c){return c.id===p.cat;})||CATS_CBM[6];
-    var row=document.createElement('div');
-    row.style.cssText='background:#fff;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:10px;border:1px solid #e5e5ea;';
-    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
-      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
-      +(p.obs?'<div style="font-size:11px;color:#6c6c70;">'+p.obs+'</div>':'')
-      +(p.lat?'<div style="font-size:10px;color:#6c6c70;">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
-      +'</div>';
-    var btnE=document.createElement('button');btnE.textContent='✏️';
-    btnE.style.cssText='background:#f2f2f7;border:1px solid #e5e5ea;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;margin-right:4px;';
-    btnE.onclick=(function(id){return function(){abrirModalPOICBM(id);};})(p.id);
-    var btnD=document.createElement('button');btnD.textContent='🗑️';
-    btnD.style.cssText='background:#fff0f0;border:1px solid #ffcdd2;border-radius:7px;padding:5px 8px;cursor:pointer;font-size:.85rem;';
-    btnD.onclick=(function(id){return function(){if(confirm('Excluir?')){var l=getPOIsCBM().filter(function(x){return x.id!==id;});savePOIsCBM(l);renderListaPOICBM();renderMarkersCBM();}};})(p.id);
-    row.appendChild(btnE);row.appendChild(btnD);
-    el.appendChild(row);
-  });
-}
-
-function voltarPrincipalCBM(){
-  document.querySelectorAll(".s").forEach(function(s){s.style.display="none";});
-  var el=document.getElementById("s-home");if(el)el.style.display="block";
-  document.querySelectorAll(".ni").forEach(function(b){b.classList.remove("on");});
-  var nb=document.getElementById("ni-home");if(nb)nb.classList.add("on");
-}
-function irPontosCBM(){
-  navTo("pontos-cbm");
-  setTimeout(function(){
-    var mapEl=document.getElementById("mapCBM");
-    if(mapEl) mapEl.style.display="block";
-    initMapCBM("mapCBM");
-    renderListaPOICBM();
-    setTimeout(function(){if(_lmapCBM)_lmapCBM.invalidateSize();},200);
-  },100);
-}
-
-</script>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <style>
 :root{--verm:#C0272D;--fundo:#F2F2F7;--card:#FFFFFF;--borda:#E5E5EA;--texto:#1C1C1E;--sub:#6C6C70;--cinza:#8E8E93;--verde:#34C759;--azul:#007AFF;}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -477,8 +241,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prox-edif-dist{font-size:11px;font-weight:700;color:var(--verm);background:#FFF0F0;padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>var LF = window.L;</script>
+<style>
+#mapPOI{width:100%;height:55vh;border-radius:10px;margin-bottom:10px;}
+.city-lbl-cbmsc{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;}
+</style>
 </head>
 <body>
 
@@ -681,7 +447,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
     Relatório
   </button>
-  <button class="ni" id="ni-pontos" onclick="irPontosCBM()">
+  <button class="ni" id="ni-pontos" onclick="navTo('pontos')">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
     Pontos
   </button>
@@ -696,7 +462,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <input type="hidden" id="e-id">
     <div class="fr">
-      <div class="fg"><label class="fl">Número / RE *</label><input class="fi" id="e-num" placeholder="Ex: 2024/001"></div>
+      <div class="fg"><label class="fl">Número / RE *</label><input class="fi" id="e-num" placeholder="Ex: RE8013000123A"></div>
       <div class="fg"><label class="fl">Município *</label><select class="fs" id="e-mun"><option value="">Selecione...</option></select></div>
     </div>
     <div class="fg"><label class="fl">Nome / Razão Social *</label><input class="fi" id="e-nome" placeholder="Nome da edificação"></div>
@@ -706,6 +472,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="fg"><label class="fl">Área Vistoriada (m²)</label><input class="fi" type="number" id="e-area-vist" placeholder="Opcional"></div>
     </div>
     <div class="fr">
+      <div class="fg">
+        <label class="fl">Grau de Risco (1 a 5)</label>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+          <button type="button" class="grau-btn btn btn-s" data-grau="1" onclick="selGrauRisco(this)">1</button>
+          <button type="button" class="grau-btn btn btn-s" data-grau="2" onclick="selGrauRisco(this)">2</button>
+          <button type="button" class="grau-btn btn btn-s" data-grau="3" onclick="selGrauRisco(this)">3</button>
+          <button type="button" class="grau-btn btn btn-s" data-grau="4" onclick="selGrauRisco(this)" style="border-color:#EF4444;color:#EF4444;">4 ⚠️</button>
+          <button type="button" class="grau-btn btn btn-s" data-grau="5" onclick="selGrauRisco(this)" style="border-color:#DC2626;color:#DC2626;">5 🔴</button>
+        </div>
+        <input type="hidden" id="e-grau-risco" value="">
+        <div id="grauRiscoAviso" style="display:none;margin-top:6px;background:#FEF2F2;border-radius:7px;padding:7px 10px;font-size:.75rem;color:#DC2626;font-weight:700;">⚠️ Grau 4 e 5 — vistoria obrigatória anual!</div>
+      </div>
+      <div class="fg" id="fgVistAno" style="display:none;">
+        <label class="fl">Vistoria realizada em <span id="anoAtualLabel"></span>?</label>
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="btnVistSim" onclick="selVistoriaAno(true)" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--borda);background:var(--fundo);font-size:.85rem;font-weight:700;cursor:pointer;">✅ Sim</button>
+          <button type="button" id="btnVistNao" onclick="selVistoriaAno(false)" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--borda);background:var(--fundo);font-size:.85rem;font-weight:700;cursor:pointer;">❌ Não</button>
+        </div>
+        <input type="hidden" id="e-vist-ano" value="">
+      </div>
       <div class="fg"><label class="fl">Nº de Pavimentos</label>
         <input class="fi" type="number" id="e-npav" placeholder="Ex: 3" min="1" max="50" oninput="renderPavimentosForm()">
       </div>
@@ -746,6 +532,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="prev-lista" class="card" style="padding:10px;margin-bottom:12px"></div>
     <div class="sec">Laudos de Manutenção</div>
     <div class="fr">
+      <div class="fg"><label class="fl">Responsável pelo Bloco</label>
+        <input class="fi" id="e-resp-nome" placeholder="Nome do responsável"></div>
+      <div class="fg"><label class="fl">Contato do Responsável</label>
+        <input class="fi" id="e-resp-tel" placeholder="Telefone/WhatsApp"></div>
       <div class="fg"><label class="fl">Laudo Alarme</label><input type="date" class="fi" id="e-lal"></div>
       <div class="fg"><label class="fl">Laudo Hidrante</label><input type="date" class="fi" id="e-lhi"></div>
     </div>
@@ -764,7 +554,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span>Adicionar Vistoria</span>
       <button class="m-x" onclick="closeM('mo-vist')">✕</button>
     </div>
-    <div class="fg"><label class="fl">Tipo de Vistoria</label>
+    <div class="fg">
+        <label class="fl">Histórico de Vistorias (últimos 5 anos)</label>
+        <div id="histVistList" style="margin-bottom:6px;max-height:160px;overflow-y:auto;"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+          <input type="date" id="hv-data" class="fi" style="flex:1;min-width:110px;">
+          <select id="hv-resultado" class="fi" style="flex:1;min-width:100px;">
+            <option value="aprovado">✅ Aprovado</option>
+            <option value="reprovado">❌ Reprovado</option>
+            <option value="parcial">⚠️ Parcial</option>
+          </select>
+        </div>
+        <input type="text" id="hv-obs" class="fi" placeholder="Observações…" style="margin-bottom:5px;">
+        <button type="button" class="btn btn-s btn-sm" onclick="adicionarHistVist()">+ Registrar Vistoria</button>
+        <input type="hidden" id="e-hist-vist" value="[]">
+      </div>
+      <div class="fg"><label class="fl">Tipo de Vistoria</label>
       <select class="fs" id="v-tipo">
         <option value="habite-se">Habite-se</option>
         <option value="funcionamento">Funcionamento</option>
@@ -2292,7 +2097,7 @@ function abrirModalEdif(edif){document.getElementById('e-id').value=edif?edif.id
     document.getElementById('pavimentos-form').innerHTML = '';
   }
   openM('mo-edif');}
-function salvarEdif(){var nome=document.getElementById('e-nome').value.trim();var num=document.getElementById('e-num').value.trim();if(!nome||!num){alert('Preencha o numero/RE e o nome da edificacao.');return;}var id=document.getElementById('e-id').value||('e_'+Date.now());var e_mun_el=document.getElementById('e-mun');var e_mun_val=e_mun_el?(e_mun_el.tagName==='SELECT'?e_mun_el.options[e_mun_el.selectedIndex]&&e_mun_el.options[e_mun_el.selectedIndex].value!=='__outro__'?e_mun_el.value:'':e_mun_el.value):'';var edif={id:id,numero:num,municipio:e_mun_val.trim(),nome:nome,endereco:document.getElementById('e-end').value,area:document.getElementById('e-area').value,vencFunc:document.getElementById('e-venc-func').value,areaVist:document.getElementById('e-area-vist').value,lat:document.getElementById('e-lat').value,lng:document.getElementById('e-lng').value,prop:{nome:document.getElementById('e-pn').value,tel:document.getElementById('e-pt').value},inquilinos:getInqs(),projetos:getProjs(),preventivos:getPrevDom(),pavimentos:getPavDom(),nPavimentos:parseInt(document.getElementById('e-npav').value)||0,terreoCfg:document.getElementById('e-terreo').value,laudoAlarme:document.getElementById('e-lal').value,laudoHidrante:document.getElementById('e-lhi').value,obs:document.getElementById('e-obs').value.trim()};var idx=S.edificacoes.findIndex(function(e){return e.id===id;});if(idx>=0)S.edificacoes[idx]=edif;else S.edificacoes.push(edif);save();closeM('mo-edif');renderEdif();renderHome();}
+function salvarEdif(){var nome=document.getElementById('e-nome').value.trim();var num=document.getElementById('e-num').value.trim();if(!nome||!num){alert('Preencha o numero/RE e o nome da edificacao.');return;}var id=document.getElementById('e-id').value||('e_'+Date.now());var e_mun_el=document.getElementById('e-mun');var e_mun_val=e_mun_el?(e_mun_el.tagName==='SELECT'?e_mun_el.options[e_mun_el.selectedIndex]&&e_mun_el.options[e_mun_el.selectedIndex].value!=='__outro__'?e_mun_el.value:'':e_mun_el.value):'';var edif={id:id,numero:num,municipio:e_mun_val.trim(),nome:nome,endereco:document.getElementById('e-end').value,area:document.getElementById('e-area').value,vencFunc:document.getElementById('e-venc-func').value,areaVist:document.getElementById('e-area-vist').value,grauRisco:(document.getElementById('e-grau-risco')||{value:''}).value||'',vistAno:(document.getElementById('e-vist-ano')||{value:''}).value||'',histVist:JSON.parse((document.getElementById('e-hist-vist')||{value:'[]'}).value||'[]'),respNome:((document.getElementById('e-resp-nome')||{value:''}).value||'').trim(),respTel:((document.getElementById('e-resp-tel')||{value:''}).value||'').trim(),lat:document.getElementById('e-lat').value,lng:document.getElementById('e-lng').value,prop:{nome:document.getElementById('e-pn').value,tel:document.getElementById('e-pt').value},inquilinos:getInqs(),projetos:getProjs(),preventivos:getPrevDom(),pavimentos:getPavDom(),nPavimentos:parseInt(document.getElementById('e-npav').value)||0,terreoCfg:document.getElementById('e-terreo').value,laudoAlarme:document.getElementById('e-lal').value,laudoHidrante:document.getElementById('e-lhi').value,obs:document.getElementById('e-obs').value.trim()};var idx=S.edificacoes.findIndex(function(e){return e.id===id;});if(idx>=0)S.edificacoes[idx]=edif;else S.edificacoes.push(edif);save();closeM('mo-edif');renderEdif();renderHome();}
 function renderEdif(){
   var c=document.getElementById('lista-edif');
   if(!S.edificacoes.length){
@@ -3088,70 +2893,310 @@ document.getElementById('mun-novo').onkeydown=function(e){if(e.key==='Enter')adi
 document.getElementById('e-mun').onchange=function(){onMunChange(this);};
 document.getElementById('srch-vist-rota').oninput=function(){renderVistSelectRota(this.value);};
 
+// ══ PONTOS DE INTERESSE ══════════════════════════════════════
+var _mapPOI=null, _tilePOI=null, _markersPOI=[], _poiEditId=null, _poiCatSel='hidrante';
+var _poiLat=null, _poiLng=null;
+
+var CATS_POI=[
+  {id:'hidrante',nome:'Hidrante',ico:'🚒'},
+  {id:'manancial',nome:'Manancial',ico:'🌊'},
+  {id:'ponte',nome:'Ponte',ico:'🌉'},
+  {id:'edificacao',nome:'Edificação',ico:'🏢'},
+  {id:'risco',nome:'Ponto de Risco',ico:'⚠️'},
+  {id:'acesso',nome:'Acesso/Trevo',ico:'🛣️'},
+  {id:'referencia',nome:'Referência',ico:'📍'},
+];
+
+var TILES_POI={
+  rua:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',attr:'© OpenStreetMap'},
+  satelite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attr:'© Esri'},
+  relevo:{url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',attr:'© OpenTopoMap'}
+};
+
+var CIDADES_POI=[
+  {n:'Florianópolis',lat:-27.595,lng:-48.548,t:'cap'},
+  {n:'Rancho Queimado',lat:-27.675,lng:-49.013,t:'viz'},
+  {n:'Alfredo Wagner',lat:-27.697,lng:-49.337,t:'viz'},
+  {n:'Leoberto Leal',lat:-27.534,lng:-49.063,t:'viz'},
+  {n:'Angelina',lat:-27.567,lng:-49.001,t:'viz'},
+  {n:'Santo Amaro',lat:-27.693,lng:-48.797,t:'viz'},
+  {n:'São Bonifácio',lat:-27.904,lng:-48.933,t:'viz'},
+  {n:'Anitápolis',lat:-27.907,lng:-49.131,t:'viz'},
+  {n:'Águas Mornas',lat:-27.716,lng:-48.827,t:'viz'},
+  {n:'Antônio Carlos',lat:-27.475,lng:-48.745,t:'viz'},
+];
+
+function getPOIs(){
+  try{return JSON.parse(localStorage.getItem('cbmsc_pois')||'[]');}catch(e){return [];}
+}
+function savePOIs(lista){localStorage.setItem('cbmsc_pois',JSON.stringify(lista));}
+
+function initMapPOI(){
+  if(_mapPOI) return;
+  var el=document.getElementById('mapPOI');if(!el)return;
+  if(typeof L==='undefined'){
+    var s=document.createElement('script');
+    s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload=function(){_initMapPOIInner();};
+    document.head.appendChild(s);return;
+  }
+  _initMapPOIInner();
+}
+function _initMapPOIInner(){
+  if(_mapPOI) return;
+  var el=document.getElementById('mapPOI');if(!el)return;
+  try{
+    _mapPOI=L.map('mapPOI',{zoomControl:true}).setView([-27.5,-49.0],10);
+    _tilePOI=L.tileLayer(TILES_POI.rua.url,{attribution:TILES_POI.rua.attr,maxZoom:19}).addTo(_mapPOI);
+    CIDADES_POI.forEach(function(c){
+      var mk=L.circleMarker([c.lat,c.lng],{radius:c.t==='cap'?6:4,fillColor:c.t==='cap'?'#1C1C1E':'#C0272D',color:'#fff',weight:1.5,fillOpacity:0.9}).addTo(_mapPOI);
+      mk.bindTooltip(c.n,{permanent:true,direction:'right',offset:[6,0],className:'city-lbl-cbmsc'});
+    });
+    _mapPOI.on('click',function(e){
+      _poiLat=e.latlng.lat;_poiLng=e.latlng.lng;
+      document.getElementById('poi-lat').value=_poiLat.toFixed(6);
+      document.getElementById('poi-lng').value=_poiLng.toFixed(6);
+      document.getElementById('poi-gps-label').textContent='Selecionado no mapa: '+_poiLat.toFixed(5)+', '+_poiLng.toFixed(5);
+      abrirMoPOI(null);
+    });
+    setTimeout(function(){_mapPOI.invalidateSize();renderMarkersPOI();},300);
+  }catch(e){console.log('MapPOI erro:',e);}
+}
+function setTileV(tipo){
+  ['tileRuaV','tileSatV','tileRelevoV'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.style.background=el.id==='tile'+tipo.charAt(0).toUpperCase()+tipo.slice(1)+'V'?'#C0272D':'var(--fundo)';el.style.color=el.id==='tile'+tipo.charAt(0).toUpperCase()+tipo.slice(1)+'V'?'#fff':'var(--texto)';}
+  });
+  if(!_mapPOI||!_tilePOI)return;
+  _mapPOI.removeLayer(_tilePOI);
+  var t=TILES_POI[tipo];
+  _tilePOI=L.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_mapPOI);
+}
+function renderMarkersPOI(){
+  if(!_mapPOI)return;
+  _markersPOI.forEach(function(m){_mapPOI.removeLayer(m);});_markersPOI=[];
+  getPOIs().forEach(function(p){
+    if(!p.lat||!p.lng)return;
+    var cat=CATS_POI.find(function(c){return c.id===p.cat;})||CATS_POI[6];
+    var icon=L.divIcon({className:'',html:'<div style="font-size:1.4rem;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));">'+cat.ico+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    var mk=L.marker([p.lat,p.lng],{icon:icon}).addTo(_mapPOI).bindPopup('<b>'+cat.ico+' '+p.nome+'</b>'+(p.obs?'<br>'+p.obs:''));
+    _markersPOI.push(mk);
+  });
+}
+function renderListaPOI(){
+  var el=document.getElementById('listaPOI');if(!el)return;
+  var lista=getPOIs();
+  if(!lista.length){el.innerHTML='<div class="emp"><div class="emp-i">📍</div><div class="emp-t">Nenhum ponto cadastrado</div><div class="emp-s">Toque em "Marcar Ponto Aqui" ou no mapa para adicionar.</div></div>';return;}
+  el.innerHTML='';
+  lista.forEach(function(p,i){
+    var cat=CATS_POI.find(function(c){return c.id===p.cat;})||CATS_POI[6];
+    var row=document.createElement('div');
+    row.className='ci';row.style.display='flex';row.style.alignItems='center';row.style.gap='10px';
+    row.innerHTML='<span style="font-size:1.3rem;">'+cat.ico+'</span>'
+      +'<div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+p.nome+'</div>'
+      +(p.obs?'<div style="font-size:11px;color:var(--sub);">'+p.obs+'</div>':'')
+      +(p.lat?'<div style="font-size:10px;color:var(--sub);">'+p.lat.toFixed(5)+', '+p.lng.toFixed(5)+'</div>':'')
+      +'</div>';
+    var btnEdit=document.createElement('button');
+    btnEdit.className='btn btn-sm';btnEdit.textContent='✏️';btnEdit.style.cssText='background:var(--fundo);border:1px solid var(--borda);';
+    btnEdit.onclick=(function(id){return function(){abrirMoPOI(id);};})(p.id);
+    var btnDel=document.createElement('button');
+    btnDel.className='btn btn-sm';btnDel.textContent='🗑️';btnDel.style.cssText='background:#FFF0F0;border:1px solid #FFCDD2;';
+    btnDel.onclick=(function(id){return function(){if(confirm('Excluir este ponto?')){var l=getPOIs().filter(function(x){return x.id!==id;});savePOIs(l);renderListaPOI();renderMarkersPOI();}};})(p.id);
+    row.appendChild(btnEdit);row.appendChild(btnDel);
+    el.appendChild(row);
+  });
+}
+function abrirMoPOI(id){
+  _poiEditId=id;
+  var m=document.getElementById('mo-poi');if(!m)return;
+  document.getElementById('mo-poi-titulo').textContent=id?'✏️ Editar Ponto':'📍 Novo Ponto';
+  renderCatGridPOI();
+  if(id){
+    var p=getPOIs().find(function(x){return x.id===id;});
+    if(p){
+      _poiCatSel=p.cat;_poiLat=p.lat;_poiLng=p.lng;
+      document.getElementById('poi-nome').value=p.nome||'';
+      document.getElementById('poi-obs').value=p.obs||'';
+      document.getElementById('poi-lat').value=p.lat||'';
+      document.getElementById('poi-lng').value=p.lng||'';
+      document.getElementById('poi-gps-label').textContent=p.lat?'GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'Sem GPS';
+    }
+  } else {
+    document.getElementById('poi-nome').value='';
+    document.getElementById('poi-obs').value='';
+    if(!_poiLat){document.getElementById('poi-lat').value='';document.getElementById('poi-lng').value='';}
+    document.getElementById('poi-gps-label').textContent=_poiLat?'Selecionado: '+(_poiLat).toFixed(5)+', '+(_poiLng).toFixed(5):'Sem GPS — insira abaixo ou use botão';
+  }
+  renderCatGridPOI();
+  m.classList.add('on');
+}
+function fecharMoPOI(){
+  var m=document.getElementById('mo-poi');if(m)m.classList.remove('on');
+  _poiLat=null;_poiLng=null;_poiEditId=null;
+}
+function renderCatGridPOI(){
+  var el=document.getElementById('catGridPOI');if(!el)return;
+  el.innerHTML='';
+  CATS_POI.forEach(function(c){
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:8px 4px;border-radius:8px;border:1.5px solid var(--borda);background:'+(c.id===_poiCatSel?'#C0272D':'var(--fundo)')+';color:'+(c.id===_poiCatSel?'#fff':'var(--texto)')+';cursor:pointer;font-size:11px;font-weight:700;text-align:center;';
+    btn.innerHTML='<div style="font-size:1.2rem;margin-bottom:3px;">'+c.ico+'</div>'+c.nome;
+    btn.onclick=(function(cid){return function(){_poiCatSel=cid;renderCatGridPOI();};})(c.id);
+    el.appendChild(btn);
+  });
+}
+function usarGpsPOI(){
+  if(!navigator.geolocation){alert('GPS indisponível.');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    _poiLat=pos.coords.latitude;_poiLng=pos.coords.longitude;
+    document.getElementById('poi-lat').value=_poiLat.toFixed(6);
+    document.getElementById('poi-lng').value=_poiLng.toFixed(6);
+    document.getElementById('poi-gps-label').textContent='GPS: '+_poiLat.toFixed(5)+', '+_poiLng.toFixed(5);
+  },function(){alert('Não foi possível obter GPS.');});
+}
+function marcarPOI(){
+  _poiLat=null;_poiLng=null;_poiEditId=null;
+  abrirMoPOI(null);
+}
+function salvarPOI(){
+  var nome=document.getElementById('poi-nome').value.trim();if(!nome){alert('Informe o nome do ponto.');return;}
+  var lat=parseFloat(document.getElementById('poi-lat').value)||_poiLat;
+  var lng=parseFloat(document.getElementById('poi-lng').value)||_poiLng;
+  var obs=document.getElementById('poi-obs').value.trim();
+  var lista=getPOIs();
+  if(_poiEditId){
+    var i=lista.findIndex(function(x){return x.id===_poiEditId;});
+    if(i>=0){lista[i].nome=nome;lista[i].cat=_poiCatSel;lista[i].obs=obs;if(lat)lista[i].lat=lat;if(lng)lista[i].lng=lng;}
+  } else {
+    lista.push({id:Date.now().toString(36),nome:nome,cat:_poiCatSel,obs:obs,lat:lat||null,lng:lng||null,dt:new Date().toLocaleDateString('pt-BR')});
+  }
+  savePOIs(lista);fecharMoPOI();renderListaPOI();renderMarkersPOI();
+}
+
+function selGrauRisco(btn){
+  var g=parseInt(btn.dataset.grau);
+  document.querySelectorAll('.grau-btn').forEach(function(b){b.style.background='var(--fundo)';b.style.color='var(--texto)';});
+  btn.style.background=g>=4?'#DC2626':'#C0272D';btn.style.color='#fff';
+  document.getElementById('e-grau-risco').value=g;
+  var av=document.getElementById('grauRiscoAviso');if(av)av.style.display=g>=4?'block':'none';
+  var fv=document.getElementById('fgVistAno');if(fv)fv.style.display=g>=4?'block':'none';
+  var al=document.getElementById('anoAtualLabel');if(al)al.textContent=new Date().getFullYear();
+}
+function selVistoriaAno(sim){
+  var s=document.getElementById('btnVistSim'),n=document.getElementById('btnVistNao');
+  if(s){s.style.background=sim?'#16a34a':'var(--fundo)';s.style.color=sim?'#fff':'var(--texto)';}
+  if(n){n.style.background=!sim?'#DC2626':'var(--fundo)';n.style.color=!sim?'#fff':'var(--texto)';}
+  document.getElementById('e-vist-ano').value=sim?'sim':'nao';
+}
+var _histVistTemp=[];
+function adicionarHistVist(){
+  var data=document.getElementById('hv-data').value;
+  if(!data){alert('Informe a data.');return;}
+  var res=document.getElementById('hv-resultado').value;
+  var obs=document.getElementById('hv-obs').value.trim();
+  _histVistTemp.unshift({data:data,resultado:res,obs:obs});
+  _histVistTemp.sort(function(a,b){return b.data.localeCompare(a.data);});
+  var limite=new Date();limite.setFullYear(limite.getFullYear()-5);
+  _histVistTemp=_histVistTemp.filter(function(h){return new Date(h.data)>=limite;});
+  document.getElementById('hv-data').value='';
+  document.getElementById('hv-obs').value='';
+  renderHistVistList();
+}
+function renderHistVistList(){
+  var el=document.getElementById('histVistList');if(!el)return;
+  document.getElementById('e-hist-vist').value=JSON.stringify(_histVistTemp);
+  if(!_histVistTemp.length){el.innerHTML='<div style="font-size:.75rem;color:var(--sub);padding:4px;">Nenhuma vistoria registrada.</div>';return;}
+  var icons={aprovado:'✅',reprovado:'❌',parcial:'⚠️'};
+  el.innerHTML='';
+  _histVistTemp.forEach(function(h,i){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--fundo);border-radius:6px;margin-bottom:3px;font-size:.77rem;';
+    row.innerHTML='<span>'+(icons[h.resultado]||'•')+'</span><span style="font-weight:700;">'+h.data+'</span>'+(h.obs?'<span style="flex:1;color:var(--sub);">'+h.obs+'</span>':'<span style="flex:1;"></span>');
+    var rm=document.createElement('button');rm.textContent='✕';rm.style.cssText='background:none;border:none;color:var(--sub);cursor:pointer;';
+    rm.addEventListener('click',(function(i2){return function(){_histVistTemp.splice(i2,1);renderHistVistList();};})(i));
+    row.appendChild(rm);el.appendChild(row);
+  });
+}
+function getEdifPorRE(re){
+  try{
+    var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+    var reN=re.toUpperCase().replace(/\s/g,'');
+    return (db.edificacoes||[]).find(function(e){return (e.numero||'').toUpperCase().replace(/\s/g,'')===reN;});
+  }catch(e){return null;}
+}
+function verificarVigencias(){
+  try{
+    var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+    var hoje=new Date();var mes=hoje.getMonth();var ano=hoje.getFullYear();
+    var alertas=[];
+    (db.edificacoes||[]).forEach(function(e){
+      if(!e.vencFunc)return;
+      var venc=new Date(e.vencFunc);if(isNaN(venc))return;
+      var mesesRestantes=(venc.getFullYear()-ano)*12+(venc.getMonth()-mes);
+      if(mesesRestantes<=0)alertas.push('⚠️ '+e.nome+' ('+e.numero+') — Funcionamento VENCIDO em '+e.vencFunc);
+      else if(mesesRestantes===1)alertas.push('🔔 '+e.nome+' ('+e.numero+') — Vence em '+e.vencFunc);
+    });
+    var el=document.getElementById('alertasVigencia');
+    if(alertas.length){
+      if(!el){el=document.createElement('div');el.id='alertasVigencia';el.style.cssText='background:#FEF2F2;border:1.5px solid #EF4444;border-radius:10px;padding:12px;margin:12px 0;font-size:.8rem;color:#DC2626;';
+        var home=document.getElementById('s-home');if(home)home.insertBefore(el,home.firstChild);}
+      el.innerHTML='<div style="font-weight:800;margin-bottom:6px;">⚠️ Alertas de Vigência</div>'+alertas.map(function(a){return '<div>'+a+'</div>';}).join('');
+      el.style.display='block';
+    }else if(el)el.style.display='none';
+  }catch(e){}
+}
+window.addEventListener('load',function(){verificarVigencias();});
 
 </script>
 
-
-
-
-<!-- PAINEL DE PONTOS/MAPA CBM -->
-<style>
-#mapCBM{width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;display:block;}
-.city-lbl-cbm{background:none!important;border:none!important;box-shadow:none!important;color:#1C1C1E;font-size:9px;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff;}
-.tile-btn-cbm{padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:.78rem;font-weight:700;cursor:pointer;}
-.tile-btn-cbm.active{background:#C0272D;color:#fff;border-color:#C0272D;}
-</style>
-
-<!-- TELA PONTOS CBM -->
-<div id="s-pontos-cbm" class="s" style="padding:14px 14px 100px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <div><strong style="font-size:1rem;">📍 Pontos de Interesse</strong><div style="font-size:.72rem;color:#6c6c70;">Compartilhado entre Perito e Vistoria</div></div>
-    <button onclick="voltarPrincipalCBM()" style="background:#f2f2f7;border:none;border-radius:8px;padding:7px 12px;font-size:.82rem;font-weight:700;cursor:pointer;">← Voltar</button>
-  </div>
-  <!-- CAMADAS -->
-  <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
-    <button class="tile-btn-cbm active" data-tile="rua" onclick="setTileCBM('rua')">🏙️ Ruas</button>
-    <button class="tile-btn-cbm" data-tile="satelite" onclick="setTileCBM('satelite')">🛰️ Satélite</button>
-    <button class="tile-btn-cbm" data-tile="relevo" onclick="setTileCBM('relevo')">🏔️ Relevo</button>
-    <button class="tile-btn-cbm" onclick="usarGpsCBM()" style="margin-left:auto;">📡 GPS</button>
-  </div>
+<!-- TELA PONTOS DE INTERESSE -->
+<div class="scr" id="s-pontos" style="padding:14px 14px 100px;">
+  <div class="sec">Pontos de Interesse CBMSC</div>
   <!-- MAPA -->
-  <div id="mapCBM" style="width:100%;height:52vh;min-height:300px;border-radius:10px;margin-bottom:8px;background:#e8e8e8;"></div>
+  <div id="mapPOI"></div>
+  <!-- CAMADAS -->
+  <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+    <button class="btn btn-sm" id="tileRuaV" onclick="setTileV('rua')" style="background:#C0272D;color:#fff;border:none;">🏙️ Ruas</button>
+    <button class="btn btn-sm" id="tileSatV" onclick="setTileV('satelite')" style="background:var(--fundo);border:1px solid var(--borda);">🛰️ Satélite</button>
+    <button class="btn btn-sm" id="tileRelevoV" onclick="setTileV('relevo')" style="background:var(--fundo);border:1px solid var(--borda);">🏔️ Relevo</button>
+  </div>
   <!-- BOTÃO MARCAR -->
-  <button onclick="abrirModalPOICBM(null)" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:12px;font-size:.92rem;font-weight:800;cursor:pointer;margin-bottom:12px;">📍 Marcar Ponto</button>
-  <!-- LISTA -->
-  <div style="font-size:.75rem;font-weight:800;color:#6c6c70;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Pontos salvos</div>
-  <div id="lista-poi-cbm"></div>
+  <button class="btn btn-p" onclick="marcarPOI()" style="margin-bottom:10px;">📍 Marcar Ponto Aqui</button>
+  <!-- LISTA DE PONTOS -->
+  <div class="sec">Pontos salvos</div>
+  <div id="listaPOI"></div>
 </div>
 
-<!-- MODAL PONTO CBM -->
-<div id="mo-poi-cbm" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:flex-end;">
-  <div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 16px 40px;width:100%;max-height:92vh;overflow-y:auto;box-sizing:border-box;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <span id="mo-poi-cbm-titulo" style="font-size:1rem;font-weight:800;">📍 Novo Ponto</span>
-      <button onclick="fecharModalPOICBM()" style="background:#f2f2f7;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;">✕</button>
+<!-- MODAL NOVO PONTO -->
+<div class="mo" id="mo-poi">
+  <div class="m">
+    <div class="m-t">
+      <span id="mo-poi-titulo">📍 Novo Ponto</span>
+      <button class="m-x" onclick="fecharMoPOI()">✕</button>
     </div>
-    <div style="margin-bottom:12px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Categoria</label>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="cat-grid-cbm"></div>
+    <div class="fg">
+      <label class="fl">Categoria</label>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;" id="catGridPOI"></div>
     </div>
-    <div style="margin-bottom:10px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Nome</label>
-      <input type="text" id="poi-nome-cbm" placeholder="Ex: Hidrante Rua das Flores…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.9rem;box-sizing:border-box;">
+    <div class="fg">
+      <label class="fl">Nome / Descrição</label>
+      <input type="text" class="fi" id="poi-nome" placeholder="Ex: Hidrante Rua das Flores, Manancial km 5…">
     </div>
-    <div style="margin-bottom:10px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:5px;">Observações</label>
-      <textarea id="poi-obs-cbm" placeholder="Informações adicionais…" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.85rem;resize:vertical;min-height:55px;box-sizing:border-box;font-family:inherit;"></textarea>
+    <div class="fg">
+      <label class="fl">Observações</label>
+      <textarea class="ft" id="poi-obs" placeholder="Informações adicionais…" style="min-height:60px;"></textarea>
     </div>
-    <div style="background:#f8fafc;border-radius:9px;padding:10px;margin-bottom:14px;">
-      <label style="font-size:.72rem;font-weight:700;color:#6c6c70;text-transform:uppercase;display:block;margin-bottom:6px;">Coordenadas GPS</label>
+    <div style="background:var(--fundo);border-radius:8px;padding:10px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px;">COORDENADAS</div>
+      <div id="poi-gps-label" style="font-size:12px;color:var(--sub);margin-bottom:6px;">Sem GPS — insira abaixo ou use botão</div>
       <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <input type="number" id="poi-lat-cbm" placeholder="Latitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
-        <input type="number" id="poi-lng-cbm" placeholder="Longitude" step="0.000001" style="flex:1;padding:9px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;">
+        <input type="number" class="fi" id="poi-lat" placeholder="Latitude" step="0.00001" style="flex:1;">
+        <input type="number" class="fi" id="poi-lng" placeholder="Longitude" step="0.00001" style="flex:1;">
       </div>
-      <button onclick="usarGpsCBM()" style="width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px;font-size:.82rem;cursor:pointer;">📡 Usar GPS agora</button>
+      <button class="btn btn-s btn-sm" onclick="usarGpsPOI()">📡 Usar GPS agora</button>
     </div>
-    <button onclick="salvarPOICBM()" style="width:100%;background:#C0272D;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.92rem;font-weight:700;cursor:pointer;">Salvar Ponto ✓</button>
+    <button class="btn btn-p" onclick="salvarPOI()">Salvar Ponto ✓</button>
   </div>
 </div>
 
