@@ -27,6 +27,178 @@
     };img.src=ic;
   }catch(e){}
 })();
+// ── PERSISTÊNCIA DA VIAGEM ATIVA ────────────────────────────
+var VIAGEM_KEY='rastro_viagem_ativa';
+function salvarViagemAtiva(){
+  if(!viagemAtiva) return;
+  try{
+    var dados={id:viagemAtiva.id,nome:viagemAtiva.nome,obs:viagemAtiva.obs,
+      inicio:viagemAtiva.inicio,buffer:viagemAtiva.buffer||[]};
+    localStorage.setItem(VIAGEM_KEY,JSON.stringify(dados));
+  }catch(e){}
+}
+function limparViagemAtiva(){
+  localStorage.removeItem(VIAGEM_KEY);
+}
+function restaurarViagemAtiva(){
+  try{
+    var raw=localStorage.getItem(VIAGEM_KEY);
+    if(!raw)return;
+    var dados=JSON.parse(raw);
+    if(!dados||!dados.id)return;
+    // Restaurar viagem ativa — reconectar GPS e timer
+    viagemAtiva={id:dados.id,nome:dados.nome,obs:dados.obs,
+      inicio:dados.inicio,watchId:null,buffer:dados.buffer||[],timerInt:null};
+    // Reconectar GPS
+    if(navigator.geolocation){
+      viagemAtiva.watchId=navigator.geolocation.watchPosition(
+        function(pos){
+          if(viagemAtiva)viagemAtiva.buffer.push({lat:pos.coords.latitude,lng:pos.coords.longitude,ts:Date.now()});
+          salvarViagemAtiva();
+        },
+        function(){},{enableHighAccuracy:true,maximumAge:5000,timeout:15000}
+      );
+    }
+    // Reconectar timer
+    viagemAtiva.timerInt=setInterval(function(){
+      var el=document.getElementById('trilhaTimer2');if(!el||!viagemAtiva)return;
+      var ms=Date.now()-viagemAtiva.inicio;var s=Math.floor(ms/1000);
+      var m=Math.floor(s/60);var h=Math.floor(m/60);
+      el.textContent=(h?String(h).padStart(2,'0')+':':'')+String(m%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+    },1000);
+    // Mostrar banner
+    var banner=document.getElementById('tripBanner');
+    if(banner){banner.style.display='block';
+      var span=document.getElementById('tripBannerNome');
+      if(span)span.textContent=viagemAtiva.nome;}
+    console.log('Viagem restaurada:',viagemAtiva.nome);
+    toast('🐾 Viagem "'+viagemAtiva.nome+'" retomada!');
+  }catch(e){console.log('Erro ao restaurar viagem:',e);}
+}
+
+// ── COMPARTILHAR VIAGEM ──────────────────────────────────────
+function compartilharViagem(vid){
+  var v=db.viagens.find(function(x){return x.id===vid;});if(!v)return;
+  var pts=db.pontos.filter(function(p){return p.viagemId===vid&&p.lat&&p.lng;});
+  var linhas=[];
+  linhas.push('🐾 *'+v.nome+'*');
+  linhas.push('📅 '+fmtData(v.inicio)+(v.fim?' · ⏱ '+fmtDur(v.fim-v.inicio):''));
+  if(v.obs)linhas.push('📝 '+v.obs);
+  linhas.push('');
+  if(pts.length){
+    linhas.push('📍 Pontos marcados:');
+    pts.forEach(function(p,i){
+      var c=catById(p.cat);
+      linhas.push((i+1)+'. '+c.ic+' '+(p.nome||'Sem nome')+(p.desc?' — '+p.desc.slice(0,60):''));
+    });
+    linhas.push('');
+    // Link Google Maps com todos os pontos
+    if(pts.length===1){
+      linhas.push('🗺️ '+pts[0].nome+':');
+      linhas.push('https://www.google.com/maps/search/?api=1&query='+pts[0].lat+','+pts[0].lng);
+    } else {
+      var o=pts[0],d=pts[pts.length-1];
+      var mid=pts.slice(1,-1).map(function(p){return p.lat+','+p.lng;}).join('|');
+      var url='https://www.google.com/maps/dir/?api=1&origin='+o.lat+','+o.lng+'&destination='+d.lat+','+d.lng+(mid?'&waypoints='+encodeURIComponent(mid):'');
+      linhas.push('🗺️ Rota completa:');
+      linhas.push(url);
+    }
+  }
+  var msg=linhas.join('\n');
+  if(navigator.share){
+    navigator.share({title:v.nome,text:msg}).catch(function(){});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(function(){
+      toast('✅ Copiado! Cole no WhatsApp.');
+      setTimeout(function(){window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');},600);
+    });
+  } else {
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  }
+}
+
+// ── COMPARTILHAR TUDO ────────────────────────────────────────
+function compartilharTudo(){
+  var linhas=[];
+  linhas.push('🧭 *RASTRO — Meus Pontos e Viagens*');
+  linhas.push('📅 Exportado em: '+new Date().toLocaleDateString('pt-BR'));
+  linhas.push('');
+
+  // Viagens
+  if(db.viagens.length){
+    linhas.push('═══ VIAGENS ('+db.viagens.length+') ═══');
+    db.viagens.slice().reverse().forEach(function(v,i){
+      var pts=db.pontos.filter(function(p){return p.viagemId===v.id;});
+      linhas.push('');
+      linhas.push((i+1)+'. 🐾 *'+v.nome+'*');
+      linhas.push('   📅 '+fmtData(v.inicio)+(v.fim?' · ⏱ '+fmtDur(v.fim-v.inicio):''));
+      if(v.obs)linhas.push('   📝 '+v.obs);
+      if(pts.length){
+        pts.forEach(function(p){
+          var c=catById(p.cat);
+          linhas.push('   '+c.ic+' '+(p.nome||'Sem nome')+(p.lat?' ('+p.lat.toFixed(4)+', '+p.lng.toFixed(4)+')':''));
+          if(p.desc)linhas.push('      └ '+p.desc.slice(0,80));
+        });
+      }
+    });
+    linhas.push('');
+  }
+
+  // Pontos sem viagem
+  var ptsSoltos=db.pontos.filter(function(p){return !p.viagemId;});
+  if(ptsSoltos.length){
+    linhas.push('═══ PONTOS AVULSOS ('+ptsSoltos.length+') ═══');
+    ptsSoltos.forEach(function(p){
+      var c=catById(p.cat);
+      linhas.push(c.ic+' '+(p.nome||'Sem nome')+(p.lat?' ('+p.lat.toFixed(4)+', '+p.lng.toFixed(4)+')':''));
+      if(p.desc)linhas.push('   └ '+p.desc.slice(0,80));
+    });
+    linhas.push('');
+  }
+
+  // Link Maps com todos os pontos com GPS
+  var ptsGps=db.pontos.filter(function(p){return p.lat&&p.lng;});
+  if(ptsGps.length>=2&&ptsGps.length<=10){
+    var o=ptsGps[0],d=ptsGps[ptsGps.length-1];
+    var mid=ptsGps.slice(1,-1).map(function(p){return p.lat+','+p.lng;}).join('|');
+    var url='https://www.google.com/maps/dir/?api=1&origin='+o.lat+','+o.lng+'&destination='+d.lat+','+d.lng+(mid?'&waypoints='+encodeURIComponent(mid):'');
+    linhas.push('🗺️ Todos no mapa:');
+    linhas.push(url);
+  } else if(ptsGps.length===1){
+    linhas.push('🗺️ '+('https://www.google.com/maps/search/?api=1&query='+ptsGps[0].lat+','+ptsGps[0].lng));
+  }
+
+  linhas.push('');
+  linhas.push('Total: '+db.pontos.length+' pontos · '+db.viagens.length+' viagens');
+
+  var msg=linhas.join('\n');
+  if(navigator.share){
+    navigator.share({title:'Rastro — Meus dados',text:msg}).catch(function(){});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(msg).then(function(){
+      toast('✅ Copiado! Cole no WhatsApp.');
+      setTimeout(function(){window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');},600);
+    });
+  } else {
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  }
+}
+
+// ── EXPORTAR BACKUP COMPLETO ─────────────────────────────────
+function exportarJSON(){
+  var dados={viagens:db.viagens,pontos:db.pontos,exportadoEm:new Date().toISOString(),versao:1};
+  var json=JSON.stringify(dados,null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='rastro-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  toast('💾 Backup baixado!');
+}
+
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -167,7 +339,11 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
     <div style="padding:12px 14px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;">
       <div class="chip on" data-cat="" onclick="filtrarCat(this)">Todos</div>
     </div>
-    <div class="card" id="pontosCard">
+    <div style="padding:0 14px 10px;display:flex;gap:8px;">
+    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar tudo</button>
+    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar backup</button>
+  </div>
+  <div class="card" id="pontosCard">
       <div class="empty" id="pontosEmpty">
         <div class="ic">📍</div>
         <h3>Nenhum ponto ainda</h3>
@@ -253,6 +429,10 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
   <!-- ══ DIÁRIO ══ -->
   <div class="scr" id="scr-diario">
     <div class="sec-title">Histórico de Viagens</div>
+  <div style="padding:0 14px 10px;display:flex;gap:8px;">
+    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar tudo</button>
+    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar backup</button>
+  </div>
     <div id="diarioEmpty" class="empty" style="padding:30px 20px;">
       <div class="ic">📔</div>
       <h3>Nenhuma viagem salva</h3>
@@ -305,7 +485,7 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
         <div id="pFotoPreview" style="margin-bottom:8px;display:none;"><img id="pFotoImg" style="width:100%;border-radius:10px;max-height:180px;object-fit:cover;"></div>
         <label style="display:block;border:2px dashed var(--bdr);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-size:.82rem;color:var(--t3);">
           📷 Adicionar foto
-          <input type="file" accept="image/*" onchange="selecionarFoto(this)" style="display:none;">
+          <input type="file" accept="image/*" capture="environment" onchange="selecionarFoto(this)" style="display:none;">
         </label>
       </div>
       <div style="background:var(--bg);border-radius:10px;padding:10px;margin-bottom:14px;">
@@ -328,10 +508,11 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
       <div id="vResumo" style="background:var(--pri-l);border-radius:10px;padding:12px;margin-bottom:14px;font-size:.82rem;color:var(--pri);"></div>
       <div id="vPontosTit" style="font-size:.78rem;font-weight:800;color:var(--t2);margin-bottom:8px;"></div>
       <div id="vPontosList" class="card" style="margin:0 0 14px;"></div>
-      <div style="display:flex;gap:8px;">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
         <button class="btn btn-pri" style="flex:2;" onclick="salvarEdicaoViagem()">Salvar ✓</button>
         <button class="btn btn-ghost" style="flex:1;" onclick="verViagemMapa()">🗺️ Mapa</button>
       </div>
+      <button class="btn btn-ghost" style="margin-bottom:8px;" onclick="compartilharViagem(editandoViagemId)">📤 Compartilhar viagem</button>
       <button class="btn btn-ghost" style="margin-top:8px;color:var(--red);border-color:var(--red);" onclick="excluirViagem()">🗑️ Excluir viagem</button>
     </div>
   </div>
@@ -358,6 +539,8 @@ var CATS=[
   {id:'seguranca',ic:'🚔',nome:'Segurança'},
   {id:'saude',ic:'🏥',nome:'Saúde'},
   {id:'foto',ic:'📷',nome:'Fotografia'},
+  {id:'cachoeira',ic:'💦',nome:'Cachoeira'},
+  {id:'bifurcacao',ic:'🔀',nome:'Bifurcação'},
   {id:'outro',ic:'🗺️',nome:'Outro'},
 ];
 
@@ -511,6 +694,8 @@ function iniciarViagem(){
   var nome='Viagem de '+new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
   var obs='';
   viagemAtiva={id:uid(),nome:nome,obs:obs,inicio:Date.now(),watchId:null,buffer:[],timerInt:null};
+  // Persistir no localStorage para sobreviver saída do app (câmera, etc.)
+  salvarViagemAtiva();
   // GPS watch
   if(navigator.geolocation){
     viagemAtiva.watchId=navigator.geolocation.watchPosition(
@@ -524,7 +709,9 @@ function iniciarViagem(){
     var ms=Date.now()-viagemAtiva.inicio;var s=Math.floor(ms/1000);var m=Math.floor(s/60);var h=Math.floor(m/60);
     el.textContent=(h?String(h).padStart(2,'0')+':':'')+String(m%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
   },1000);
-  fecharModal('ovNovaViagem');renderTrilha();
+  fecharModal('ovNovaViagem');
+  // Ir direto para a aba Trilha e mostrar estado ativo
+  irTela('trilha', document.querySelector('.nav-btn[data-s="trilha"]'));
   toast('Viagem iniciada! Boa jornada 🐾');
 }
 function abrirViagemAtiva(){irTela('trilha',document.querySelector('.nav-btn[data-s="trilha"]'));}
@@ -589,6 +776,7 @@ function salvarViagem(){
   var v={id:viagemAtiva.id,nome:nome,obs:obs,inicio:viagemAtiva.inicio,fim:Date.now(),trilha:viagemAtiva.buffer.slice()};
   db.viagens.push(v);
   salvarDb();
+  limparViagemAtiva();
   viagemAtiva=null;
   fecharModal('ovEncerrar');
   renderTrilha();renderDiario();renderMapaTrilha();
@@ -674,12 +862,22 @@ function mapaZoom(lat,lng,z){
   initMapa();setTimeout(function(){if(_map)_map.setView([lat,lng],z);},150);
   irTela('mapa',document.querySelector('.nav-btn[data-s="mapa"]'));
 }
+var _myMarker=null;
 function centralizarGps(){
   if(!navigator.geolocation){toast('GPS indisponível');return;}
+  toast('📡 Obtendo posição…');
   navigator.geolocation.getCurrentPosition(function(pos){
-    if(_map)_map.setView([pos.coords.latitude,pos.coords.longitude],14);
-    toast('📡 Posição atualizada');
-  },function(){toast('Não foi possível obter GPS');},{enableHighAccuracy:true,timeout:8000});
+    var lat=pos.coords.latitude,lng=pos.coords.longitude;
+    // Garantir que o mapa está inicializado
+    initMapa();
+    if(!_map){toast('Abra o mapa primeiro');return;}
+    _map.setView([lat,lng],15);
+    // Marcador de posição atual
+    if(_myMarker)_map.removeLayer(_myMarker);
+    var icon=L.divIcon({className:'',html:'<div style="width:16px;height:16px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 0 0 3px rgba(37,99,235,.4);"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+    _myMarker=L.marker([lat,lng],{icon:icon}).addTo(_map).bindPopup('📡 Você está aqui<br>'+lat.toFixed(5)+', '+lng.toFixed(5)).openPopup();
+    toast('📡 Posição encontrada!');
+  },function(e){toast('GPS: '+( e.code===1?'permissão negada':e.code===2?'posição indisponível':'timeout'));},{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
 
 // ══ ROTA ═════════════════════════════════════════════════════
@@ -755,8 +953,14 @@ function renderDiario(){
     var foot=document.createElement('div');foot.className='vc-foot';
     foot.innerHTML='<span class="bdg bdg-g">📍 '+pts.length+' ponto'+(pts.length!==1?'s':'')+'</span>'+(v.trilha&&v.trilha.length?'<span class="bdg bdg-b">🐾 '+v.trilha.length+' pts GPS</span>':'');
     card.appendChild(head);card.appendChild(foot);
+    // Botão compartilhar
+    var btnShare=document.createElement('button');
+    btnShare.textContent='📤 Compartilhar';
+    btnShare.style.cssText='width:calc(100% - 28px);margin:0 14px 10px;padding:10px;background:var(--bg);border:1.5px solid var(--bdr);border-radius:10px;font-size:.82rem;font-weight:700;cursor:pointer;color:var(--t2);';
+    btnShare.addEventListener('click',(function(vid){return function(e){e.stopPropagation();compartilharViagem(vid);};})(v.id));
     card.addEventListener('click',(function(vid){return function(){abrirDetViagem(vid);};})(v.id));
     el.appendChild(card);
+    el.appendChild(btnShare);
   });
 }
 function abrirDetViagem(id){
@@ -821,6 +1025,7 @@ function excluirViagem(){
 
 // ══ INIT ═════════════════════════════════════════════════════
 carregarDb();
+restaurarViagemAtiva();
 // DADOS DE TESTE — remover após verificar
 (function(){
   if(db.viagens.length||db.pontos.length) return; // só injeta se vazio
