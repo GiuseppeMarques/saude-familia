@@ -199,6 +199,51 @@ function exportarJSON(){
   toast('💾 Backup baixado!');
 }
 
+// ── IMPORTAR BACKUP ──────────────────────────────────────────
+function importarJSON(input){
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var dados=JSON.parse(e.target.result);
+      // Validar estrutura
+      if(!dados.viagens&&!dados.pontos){
+        alert('Arquivo inválido. Selecione um backup do Rastro.');return;
+      }
+      var nViagens=(dados.viagens||[]).length;
+      var nPontos=(dados.pontos||[]).length;
+      var msg='Importar backup?\n\n'+nViagens+' viagem(ns)\n'+nPontos+' ponto(s)\n\nEscolha como importar:';
+      // Perguntar se mescla ou substitui
+      var opcao=confirm(msg+'\n\nOK = Mesclar com dados atuais\nCancelar = Substituir tudo');
+      if(opcao===null)return; // usuário fechou
+      if(opcao){
+        // Mesclar — adiciona apenas itens com IDs novos
+        var idsViagens=db.viagens.map(function(v){return v.id;});
+        var idsPontos=db.pontos.map(function(p){return p.id;});
+        var novasViagens=(dados.viagens||[]).filter(function(v){return!idsViagens.includes(v.id);});
+        var novosPontos=(dados.pontos||[]).filter(function(p){return!idsPontos.includes(p.id);});
+        db.viagens=db.viagens.concat(novasViagens);
+        db.pontos=db.pontos.concat(novosPontos);
+        salvarDb();
+        toast('✅ Mesclado: +'+novasViagens.length+' viagens, +'+novosPontos.length+' pontos');
+      } else {
+        // Substituir tudo
+        if(!confirm('Atenção: isso apagará TODOS os dados atuais. Confirmar?'))return;
+        db.viagens=dados.viagens||[];
+        db.pontos=dados.pontos||[];
+        salvarDb();
+        toast('✅ Dados restaurados: '+nViagens+' viagens, '+nPontos+' pontos');
+      }
+      // Atualizar telas
+      renderPontos();renderDiario();renderMapaPontos();
+      input.value='';
+    }catch(err){
+      alert('Erro ao importar: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -339,9 +384,13 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
     <div style="padding:12px 14px 8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;">
       <div class="chip on" data-cat="" onclick="filtrarCat(this)">Todos</div>
     </div>
-    <div style="padding:0 14px 10px;display:flex;gap:8px;">
-    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar tudo</button>
-    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar backup</button>
+    <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar</button>
+    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar</button>
+    <label class="btn btn-ghost" style="flex:1;text-align:center;cursor:pointer;">
+      📥 Importar
+      <input type="file" accept=".json" onchange="importarJSON(this)" style="display:none;">
+    </label>
   </div>
   <div class="card" id="pontosCard">
       <div class="empty" id="pontosEmpty">
@@ -429,9 +478,13 @@ body{background:var(--bg);color:var(--t1);font-family:-apple-system,BlinkMacSyst
   <!-- ══ DIÁRIO ══ -->
   <div class="scr" id="scr-diario">
     <div class="sec-title">Histórico de Viagens</div>
-  <div style="padding:0 14px 10px;display:flex;gap:8px;">
-    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar tudo</button>
-    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar backup</button>
+  <div style="padding:0 14px 10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-ghost" style="flex:1;" onclick="compartilharTudo()">📤 Compartilhar</button>
+    <button class="btn btn-ghost" style="flex:1;" onclick="exportarJSON()">💾 Exportar</button>
+    <label class="btn btn-ghost" style="flex:1;text-align:center;cursor:pointer;">
+      📥 Importar
+      <input type="file" accept=".json" onchange="importarJSON(this)" style="display:none;">
+    </label>
   </div>
     <div id="diarioEmpty" class="empty" style="padding:30px 20px;">
       <div class="ic">📔</div>
