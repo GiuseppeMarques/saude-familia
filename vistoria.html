@@ -26,7 +26,151 @@
     };img.src=ic;
   }catch(e){}
 })();
+// ══ NOVAS EDIFICAÇÕES PENDENTES ══════════════════════════════
+var _pendFiltro='todas', _pendEditId=null;
+
+function getPendencias(){
+  var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+  return db.pendencias||[];
+}
+function savePendencias(lista){
+  var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+  db.pendencias=lista;
+  localStorage.setItem('vistoria_db',JSON.stringify(db));
+}
+
+function abrirNovaEdifPendente(){
+  document.getElementById('pend-obs').value='';
+  document.getElementById('pend-prazo').value='';
+  openM('mo-pend-rapido');
+}
+
+function salvarEdifPendente(){
+  var obs=document.getElementById('pend-obs').value.trim();
+  var prazo=document.getElementById('pend-prazo').value;
+  var lista=getPendencias();
+  var id='pend_'+Date.now();
+  function salvarComGps(lat,lng){
+    lista.push({id:id,obs:obs,prazo:prazo,lat:lat,lng:lng,status:'pendente',criadoEm:new Date().toISOString(),nome:'',re:''});
+    savePendencias(lista);
+    closeM('mo-pend-rapido');
+    renderPendencias();
+    toast('📍 Edificação marcada'+(lat?' com GPS':' sem GPS')+'!');
+  }
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){salvarComGps(pos.coords.latitude,pos.coords.longitude);},
+      function(){salvarComGps(null,null);},
+      {enableHighAccuracy:true,timeout:8000,maximumAge:0}
+    );
+  } else {salvarComGps(null,null);}
+}
+
+function renderPendencias(){
+  var el=document.getElementById('lista-pendencias');if(!el)return;
+  var hoje=new Date().toISOString().slice(0,10);
+  var lista=getPendencias().filter(function(p){
+    if(_pendFiltro==='pendente')return p.status==='pendente'&&(!p.prazo||p.prazo>=hoje);
+    if(_pendFiltro==='vencida')return p.status==='pendente'&&p.prazo&&p.prazo<hoje;
+    if(_pendFiltro==='concluida')return p.status==='concluida'||p.status==='cadastrada';
+    return true;
+  }).sort(function(a,b){return (a.prazo||'9999').localeCompare(b.prazo||'9999');});
+  if(!lista.length){
+    el.innerHTML='<div class="emp"><div class="emp-i">🔍</div><div class="emp-t">Nenhuma edificação pendente</div><div class="emp-s">Toque em "+ Marcar" para registrar uma nova edificação encontrada em campo.</div></div>';
+    return;
+  }
+  el.innerHTML='';
+  lista.forEach(function(p){
+    var vencida=p.prazo&&p.prazo<hoje&&p.status==='pendente';
+    var card=document.createElement('div');
+    card.className='ci';card.style.cursor='pointer';
+    card.style.borderLeft='4px solid '+(p.status==='concluida'||p.status==='cadastrada'?'#16a34a':vencida?'#DC2626':'#F59E0B');
+    card.innerHTML='<div style="display:flex;align-items:flex-start;gap:8px;">'
+      +'<span style="font-size:1.3rem;">'+(p.status==='concluida'?'✅':p.status==='cadastrada'?'🏢':vencida?'⚠️':'🔍')+'</span>'
+      +'<div style="flex:1;">'
+      +'<div style="font-size:.88rem;font-weight:700;">'+(p.nome||p.obs||'Edificação s/ nome')+'</div>'
+      +(p.re?'<div style="font-size:.72rem;color:var(--sub);">RE: '+p.re+'</div>':'')
+      +'<div style="font-size:.72rem;color:var(--sub);">'+(p.lat?'📍 GPS capturado':'📍 Sem GPS')+(p.prazo?' · Prazo: '+p.prazo:'')+'</div>'
+      +(vencida?'<div style="font-size:.72rem;color:#DC2626;font-weight:700;">⚠️ Prazo vencido!</div>':'')
+      +'</div></div>';
+    card.addEventListener('click',(function(id){return function(){abrirEditPendente(id);};})(p.id));
+    el.appendChild(card);
+  });
+}
+
+function filtrarPend(f,btn){
+  _pendFiltro=f;
+  document.querySelectorAll('#s-pendencias .pill').forEach(function(b){b.classList.remove('on');});
+  if(btn)btn.classList.add('on');
+  renderPendencias();
+}
+
+function abrirEditPendente(id){
+  _pendEditId=id;
+  var p=getPendencias().find(function(x){return x.id===id;});if(!p)return;
+  document.getElementById('pend-edit-tit').textContent=p.nome||p.obs||'Edificação Pendente';
+  document.getElementById('pe-obs').value=p.obs||'';
+  document.getElementById('pe-prazo').value=p.prazo||'';
+  document.getElementById('pe-re').value=p.re||'';
+  document.getElementById('pe-nome').value=p.nome||'';
+  document.getElementById('pe-status').value=p.status||'pendente';
+  document.getElementById('pe-gps-info').textContent=p.lat?'📍 GPS: '+p.lat.toFixed(5)+', '+p.lng.toFixed(5):'📍 Sem GPS registrado';
+  openM('mo-pend-edit');
+}
+
+function salvarEditPendente(){
+  var lista=getPendencias();
+  var idx=lista.findIndex(function(x){return x.id===_pendEditId;});if(idx<0)return;
+  lista[idx].obs=document.getElementById('pe-obs').value.trim();
+  lista[idx].prazo=document.getElementById('pe-prazo').value;
+  lista[idx].re=document.getElementById('pe-re').value.trim();
+  lista[idx].nome=document.getElementById('pe-nome').value.trim();
+  lista[idx].status=document.getElementById('pe-status').value;
+  savePendencias(lista);closeM('mo-pend-edit');renderPendencias();
+  toast('Edificação atualizada ✅');
+}
+
+function excluirPendente(){
+  if(!confirm('Excluir esta pendência?'))return;
+  var lista=getPendencias().filter(function(x){return x.id!==_pendEditId;});
+  savePendencias(lista);closeM('mo-pend-edit');renderPendencias();
+}
+
+function converterParaEdificacao(){
+  var lista=getPendencias();
+  var p=lista.find(function(x){return x.id===_pendEditId;});if(!p)return;
+  var re=document.getElementById('pe-re').value.trim();
+  var nome=document.getElementById('pe-nome').value.trim();
+  if(!re||!nome){alert('Preencha o RE e o Nome para converter em edificação.');return;}
+  // Criar edificação no sistema
+  var db=JSON.parse(localStorage.getItem('vistoria_db')||'{}');
+  if(!db.edificacoes)db.edificacoes=[];
+  var nova={id:'e_'+Date.now(),numero:re,nome:nome,endereco:'',municipio:'',area:'',
+    lat:p.lat||'',lng:p.lng||'',grauRisco:'',histVist:[],respNome:'',respTel:'',
+    vencFunc:'',obs:p.obs||''};
+  db.edificacoes.push(nova);
+  // Marcar pendência como cadastrada
+  var idx=lista.findIndex(function(x){return x.id===_pendEditId;});
+  lista[idx].status='cadastrada';lista[idx].re=re;lista[idx].nome=nome;
+  db.pendencias=lista;
+  localStorage.setItem('vistoria_db',JSON.stringify(db));
+  // Também salvar no S para render imediato
+  if(typeof S!=='undefined'&&S.edificacoes)S.edificacoes.push(nova);
+  closeM('mo-pend-edit');renderPendencias();
+  toast('✅ Edificação criada no sistema! Complete os dados em Edificações.');
+}
+
+// Render pendências quando entra na tela
+var _origNavTo=navTo;
+navTo=function(id){
+  _origNavTo(id);
+  if(id==='pendencias')renderPendencias();
+};
+
 </script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>var LF=window.L;</script>
 <style>
 :root{--verm:#C0272D;--fundo:#F2F2F7;--card:#FFFFFF;--borda:#E5E5EA;--texto:#1C1C1E;--sub:#6C6C70;--cinza:#8E8E93;--verde:#34C759;--azul:#007AFF;}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -49,7 +193,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card-s{font-size:12px;color:var(--sub);margin-top:2px}
 .card-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .bdg{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
-.b-hs{background:#E8F5E9;color:#2E7D32}.b-fn{background:#E3F2FD;color:#1565C0}.b-of{background:#FFF3E0;color:#E65100}
+.b-hs{background:#E8F5E9;color:#2E7D32}.b-af{background:#FEF3C7;color:#92400E;}.b-rt{background:#ECFDF5;color:#065F46;}.b-dn{background:#FEF2F2;color:#991B1B;}.b-fn{background:#E3F2FD;color:#1565C0}.b-of{background:#FFF3E0;color:#E65100}
 .b-pend{background:#FFF8E1;color:#F57F17}.b-ok{background:#E8F5E9;color:#2E7D32}.b-and{background:#E3F2FD;color:#1565C0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
 .btn:active{opacity:.8}
@@ -464,6 +608,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="ni" id="ni-pontos" onclick="navTo('pontos')">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
     Pontos
+  </button>
+  <button class="ni" id="ni-pendencias" onclick="navTo('pendencias')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+    Pendências
   </button>
 </nav>
 
@@ -1552,8 +1700,7 @@ function renderExpListas() {
       '<div class="exp-chk '+(sel?'on':'')+'" id="expcv-'+v.id+'">'+(sel?'✓':'')+'</div>'+
       '<div class="exp-info">'+
         '<div class="exp-nome">Nº '+(e?e.numero:'—')+' — '+(e?e.nome:'—')+'</div>'+
-        '<div class="exp-sub">'+(TIPO_L[v.tipo]||v.tipo)+' · '+dt+(v.concluida?' ✅':'')+'</div>'+
-      '</div></div>';
+        '<div class="exp-sub">'+(TIPO_L[v.tipo]||v.tipo)+' · '+dt+(v.concluida?' ✅':'')+'</div>'+(v.motivo?'<div style="font-size:11px;color:#92400E;background:#FEF3C7;padding:4px 8px;border-radius:5px;margin-top:4px;">📋 '+v.motivo+'</div>':'')+'</div></div>';
   }).join('') : '<div style="font-size:12px;color:var(--sub);padding:4px">Nenhuma vistoria neste filtro.</div>';
 
   // Render rotas
@@ -2037,8 +2184,8 @@ function buscarEdificacoesProximas(edifId) {
 
 function getCL(tipo) { return tipo === 'funcionamento' ? CL_FN : CL_HS; }
 var TIPO_L = {'habite-se':'Habite-se','funcionamento':'Funcionamento','oficio':'Existente/Oficio'};
-var TIPO_B = {'habite-se':'b-hs','funcionamento':'b-fn','oficio':'b-of'};
-var TIPO_R = {'habite-se':'HABITE-SE','funcionamento':'FUNCIONAMENTO','oficio':'EXISTENTE/OFICIO'};
+var TIPO_B = {'habite-se':'b-hs','funcionamento':'b-fn','oficio':'b-of','af':'b-af','rotina':'b-rt','denuncia':'b-dn'};
+var TIPO_R = {'habite-se':'HABITE-SE','funcionamento':'FUNCIONAMENTO','oficio':'EXISTENTE/OFICIO','af':'AUTO DE FISCALIZAÇÃO','rotina':'ROTINA','denuncia':'DENÚNCIA'};
 function navTo(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});document.getElementById('s-'+id).classList.add('on');document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});var ni=document.getElementById('ni-'+id);if(ni)ni.classList.add('on');document.getElementById('btnBack').classList.remove('on');backFn=null;var ts={home:['Vistoria CBMSC','CBMSC - SC'],edificacoes:['Edificacoes','Cadastro'],vistorias:['Vistorias','Lista de pendencias'],rotas:['Rotas','Roteiros do dia'],exec:['Execucao',''],relatorio:['Relatorios','Gerar relatorio'],dados:['Dados','Exportar · Planejar · Excluir']};var t=ts[id]||['CBMSC',''];document.getElementById('hdrT').textContent=t[0];document.getElementById('hdrS').textContent=t[1];if(id==='home')renderHome();if(id==='edificacoes')renderEdif();if(id==='vistorias')renderVist();if(id==='rotas')renderRotas();if(id==='relatorio')renderRel();
   if(id==='dados')initDados();}
 function goBack(){if(backFn)backFn();else navTo('home');}
@@ -2948,11 +3095,8 @@ function savePOIs(lista){localStorage.setItem('cbmsc_pois',JSON.stringify(lista)
 function initMapPOI(){
   if(_mapPOI) return;
   var el=document.getElementById('mapPOI');if(!el)return;
-  if(typeof L==='undefined'){
-    var s=document.createElement('script');
-    s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.onload=function(){_initMapPOIInner();};
-    document.head.appendChild(s);return;
+  if(typeof LF==='undefined'||!LF){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:#888;">Mapa requer internet.</div>';return;
   }
   _initMapPOIInner();
 }
@@ -2983,7 +3127,7 @@ function setTileV(tipo){
   });
   if(!_mapPOI||!_tilePOI)return;
   _mapPOI.removeLayer(_tilePOI);
-  var t=TILES_POI[tipo];
+  var LF2=window.L;var t=TILES_POI[tipo];
   _tilePOI=L.tileLayer(t.url,{attribution:t.attr,maxZoom:tipo==='relevo'?17:19}).addTo(_mapPOI);
 }
 function renderMarkersPOI(){
@@ -3211,6 +3355,66 @@ window.addEventListener('load',function(){verificarVigencias();});
       <button class="btn btn-s btn-sm" onclick="usarGpsPOI()">📡 Usar GPS agora</button>
     </div>
     <button class="btn btn-p" onclick="salvarPOI()">Salvar Ponto ✓</button>
+  </div>
+</div>
+
+
+<!-- TELA PENDÊNCIAS (Novas Edificações) -->
+<div class="scr" id="s-pendencias">
+  <div class="hd-row" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;">
+    <div><h2 style="font-size:1rem;font-weight:800;">🔍 Novas Edificações</h2>
+    <div style="font-size:.72rem;color:var(--sub);">Encontradas em campo — verificar documentação</div></div>
+    <button class="btn btn-p btn-sm" onclick="abrirNovaEdifPendente()">+ Marcar</button>
+  </div>
+  <!-- Filtros -->
+  <div style="display:flex;gap:6px;padding:0 14px 8px;overflow-x:auto;">
+    <button class="pill on" id="pf-todas" onclick="filtrarPend('todas',this)">Todas</button>
+    <button class="pill" id="pf-pendente" onclick="filtrarPend('pendente',this)">⏳ Pendente</button>
+    <button class="pill" id="pf-vencida" onclick="filtrarPend('vencida',this)">⚠️ Vencida</button>
+    <button class="pill" id="pf-concluida" onclick="filtrarPend('concluida',this)">✅ Concluída</button>
+  </div>
+  <div id="lista-pendencias"></div>
+</div>
+
+<!-- MODAL NOVA EDIF PENDENTE (rápido, só GPS) -->
+<div class="mo" id="mo-pend-rapido">
+  <div class="m">
+    <div class="m-t"><span>📍 Nova Edificação</span><button class="m-x" onclick="closeM('mo-pend-rapido')">✕</button></div>
+    <div style="background:#FEF3C7;border-radius:8px;padding:10px;margin-bottom:12px;font-size:.8rem;color:#92400E;">
+      📡 GPS será capturado automaticamente. Complete os dados depois.
+    </div>
+    <div class="fg"><label class="fl">Observação rápida</label>
+      <input type="text" class="fi" id="pend-obs" placeholder="Ex: Loja comercial, sem placa, 2 pavimentos…"></div>
+    <div class="fg"><label class="fl">Prazo para retorno</label>
+      <input type="date" class="fi" id="pend-prazo"></div>
+    <button class="btn btn-p" onclick="salvarEdifPendente()">📍 Salvar posição</button>
+  </div>
+</div>
+
+<!-- MODAL EDITAR EDIF PENDENTE -->
+<div class="mo" id="mo-pend-edit">
+  <div class="m">
+    <div class="m-t"><span id="pend-edit-tit">Edificação Pendente</span><button class="m-x" onclick="closeM('mo-pend-edit')">✕</button></div>
+    <div class="fg"><label class="fl">Observação</label>
+      <textarea class="ft" id="pe-obs" style="min-height:60px;"></textarea></div>
+    <div class="fg"><label class="fl">Prazo para retorno</label>
+      <input type="date" class="fi" id="pe-prazo"></div>
+    <div class="fg"><label class="fl">Número RE (se encontrado)</label>
+      <input type="text" class="fi" id="pe-re" placeholder="Ex: RE8013000456A"></div>
+    <div class="fg"><label class="fl">Nome / Razão Social</label>
+      <input type="text" class="fi" id="pe-nome" placeholder="Nome da edificação"></div>
+    <div class="fg"><label class="fl">Status</label>
+      <select class="fi" id="pe-status">
+        <option value="pendente">⏳ Pendente — ainda retornar</option>
+        <option value="concluida">✅ Concluída — documentação verificada</option>
+        <option value="cadastrada">🏢 Cadastrada — virou edificação no sistema</option>
+      </select></div>
+    <div id="pe-gps-info" style="font-size:.75rem;color:var(--sub);margin-bottom:12px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-p" style="flex:2;" onclick="salvarEditPendente()">Salvar ✓</button>
+      <button class="btn btn-s" style="flex:1;color:var(--red);border-color:var(--red);" onclick="excluirPendente()">Excluir</button>
+    </div>
+    <button class="btn btn-p" style="margin-top:8px;background:#16a34a;" onclick="converterParaEdificacao()">🏢 Converter para Edificação</button>
   </div>
 </div>
 
